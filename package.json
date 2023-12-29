@@ -3,17 +3,6 @@
   "version": "0.0.1",
   "description": "The Momentic SDK for Node.js",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "module": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
   "files": [
     "dist/**/*"
   ],
