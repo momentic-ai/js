@@ -24,10 +24,10 @@
   "homepage": "https://momentic.ai",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/momentic-ai/momentic.git"
+    "url": "git+https://github.com/momentic-ai/sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/momentic-ai/momentic/issues"
+    "url": "https://github.com/momentic-ai/sdk/issues"
   },
   "keywords": [
     "ai",
