@@ -19,18 +19,9 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
-// ../../packages/web-agent/src/browsers/chrome.ts
-import {
-  chromium,
-  devices
-} from "playwright";
-
-// ../../packages/web-agent/src/utils/url.ts
-var urlChanged = (url1, url2) => {
-  const { hostname, pathname } = new URL(url1);
-  const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
-  return hostname !== hostname2 || pathname !== pathname2;
-};
+// ../../packages/types/src/preset.ts
+import dedent from "dedent";
+import * as z2 from "zod";
 
 // ../../packages/types/src/a11y-targets.ts
 import * as z from "zod";
@@ -46,16 +37,153 @@ var A11yTargetWithCacheSchema = z.object({
   serializedForm: z.string().optional()
 });
 
-// ../../packages/types/src/assertions.ts
-import { z as z2 } from "zod";
-var LLMAssertionEvalSchema = z2.object({
-  thoughts: z2.string(),
-  result: z2.boolean(),
-  relevantElements: z2.array(z2.number()).optional()
+// ../../packages/types/src/preset.ts
+var PresetCommandType = /* @__PURE__ */ ((PresetCommandType2) => {
+  PresetCommandType2["AI_ASSERTION"] = "AI_ASSERTION";
+  PresetCommandType2["CLICK"] = "CLICK";
+  PresetCommandType2["SELECT_OPTION"] = "SELECT_OPTION";
+  PresetCommandType2["TYPE"] = "TYPE";
+  PresetCommandType2["PRESS"] = "PRESS";
+  PresetCommandType2["NAVIGATE"] = "NAVIGATE";
+  PresetCommandType2["SCROLL_UP"] = "SCROLL_UP";
+  PresetCommandType2["SCROLL_DOWN"] = "SCROLL_DOWN";
+  PresetCommandType2["GO_BACK"] = "GO_BACK";
+  PresetCommandType2["GO_FORWARD"] = "GO_FORWARD";
+  PresetCommandType2["WAIT"] = "WAIT";
+  PresetCommandType2["REFRESH"] = "REFRESH";
+  return PresetCommandType2;
+})(PresetCommandType || {});
+var ElementDescriptorSchema = z2.object({
+  // natural language passed to LLM
+  elementDescriptor: z2.string(),
+  // Cached A11y target - when a user creates a preset action, this will not exist
+  a11yData: A11yTargetWithCacheSchema.optional()
 });
+var CommonCommandSchema = z2.object({
+  // If the command is suggested by AI, why it did so
+  thoughts: z2.string().optional()
+});
+var NavigateCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("NAVIGATE" /* NAVIGATE */),
+    url: z2.string()
+  })
+).describe("NAVIGATE <url> - Go to the specified url");
+var ScrollUpCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("SCROLL_UP" /* SCROLL_UP */)
+  })
+).describe("SCROLL_UP - Scroll up one page");
+var ScrollDownCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("SCROLL_DOWN" /* SCROLL_DOWN */)
+  })
+).describe("SCROLL_DOWN - Scroll down one page");
+var WaitCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("WAIT" /* WAIT */),
+    delay: z2.number()
+    // seconds
+  })
+);
+var RefreshCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("REFRESH" /* REFRESH */)
+  })
+);
+var GoBackCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("GO_BACK" /* GO_BACK */)
+  })
+);
+var GoForwardCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("GO_FORWARD" /* GO_FORWARD */)
+  })
+);
+var ClickCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("CLICK" /* CLICK */),
+    target: ElementDescriptorSchema,
+    doubleClick: z2.boolean().default(false),
+    rightClick: z2.boolean().default(false)
+  })
+).describe(
+  dedent`CLICK <id> - click on the element that has the specified id.
+  You are NOT allowed to click on disabled, hidden or StaticText elements.
+  Only click on elements on the Current Page.
+  Only click on elements with the following tag names: button, input, link, image, generic.
+  `.replace("\n", " ")
+);
+var SelectOptionCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("SELECT_OPTION" /* SELECT_OPTION */),
+    target: ElementDescriptorSchema,
+    option: z2.string()
+  })
+).describe(
+  // TODO: if we move to a non-mutative way of selecting elements (e.g. by selector), we should update this description
+  `SELECT_OPTION <id> "<option>" - select the specified item from the select with the specified id. The item should exist on the page. Use the name of the item instead of the id. Make sure to include quotes around the option.`
+);
+var AIAssertionCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("AI_ASSERTION" /* AI_ASSERTION */),
+    assertion: z2.string(),
+    useVision: z2.boolean().default(false),
+    disableCache: z2.boolean().default(false)
+  })
+);
+var TypeOptionsSchema = z2.object({
+  clearContent: z2.boolean().default(true),
+  pressKeysSequentially: z2.boolean().default(false)
+});
+var TypeCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("TYPE" /* TYPE */),
+    target: ElementDescriptorSchema,
+    value: z2.string(),
+    pressEnter: z2.boolean().default(false)
+  })
+).merge(TypeOptionsSchema).describe(
+  `TYPE <id> "<text>" - type the specified text into the input with the specified id. The text should be specified by the user - do not use text from the EXAMPLES or generate text yourself. Make sure to include quotes around the text.`
+);
+var PressCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("PRESS" /* PRESS */),
+    value: z2.string()
+  })
+).describe(
+  `PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.`
+);
+var PresetCommandSchema = z2.discriminatedUnion("type", [
+  ClickCommandSchema,
+  GoBackCommandSchema,
+  GoForwardCommandSchema,
+  NavigateCommandSchema,
+  PressCommandSchema,
+  RefreshCommandSchema,
+  ScrollDownCommandSchema,
+  ScrollUpCommandSchema,
+  SelectOptionCommandSchema,
+  TypeCommandSchema,
+  AIAssertionCommandSchema,
+  WaitCommandSchema
+]);
+var AISuggestiblePresetCommandSchema = z2.discriminatedUnion("type", [
+  ClickCommandSchema,
+  TypeCommandSchema,
+  PressCommandSchema,
+  SelectOptionCommandSchema,
+  NavigateCommandSchema,
+  ScrollDownCommandSchema,
+  ScrollUpCommandSchema
+]);
+
+// ../../packages/types/src/steps.ts
+import * as z4 from "zod";
 
 // ../../packages/types/src/ai-commands.ts
-import * as z4 from "zod";
+import * as z3 from "zod";
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -71,212 +199,101 @@ var EmptyA11yTreeError = class extends Error {
   }
 };
 
-// ../../packages/types/src/preset.ts
-import dedent from "dedent";
-import * as z3 from "zod";
-var ElementDescriptorSchema = z3.object({
-  // natural language passed to LLM
-  elementDescriptor: z3.string(),
-  // Cached A11y target - when a user creates a preset action, this will not exist
-  a11yData: A11yTargetWithCacheSchema.optional()
-});
-var CommonCommandSchema = z3.object({
-  // If the command is suggested by AI, why it did so
-  thoughts: z3.string().optional()
-});
-var NavigateCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("NAVIGATE" /* NAVIGATE */),
-    url: z3.string()
-  })
-).describe("NAVIGATE <url> - Go to the specified url");
-var ScrollUpCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SCROLL_UP" /* SCROLL_UP */)
-  })
-).describe("SCROLL_UP - Scroll up one page");
-var ScrollDownCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SCROLL_DOWN" /* SCROLL_DOWN */)
-  })
-).describe("SCROLL_DOWN - Scroll down one page");
-var WaitCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("WAIT" /* WAIT */),
-    delay: z3.number()
-    // seconds
-  })
-);
-var RefreshCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("REFRESH" /* REFRESH */)
-  })
-);
-var GoBackCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("GO_BACK" /* GO_BACK */)
-  })
-);
-var GoForwardCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("GO_FORWARD" /* GO_FORWARD */)
-  })
-);
-var ClickCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("CLICK" /* CLICK */),
-    target: ElementDescriptorSchema,
-    doubleClick: z3.boolean().default(false),
-    rightClick: z3.boolean().default(false)
-  })
-).describe(
-  dedent`CLICK <id> - click on the element that has the specified id.
-  You are NOT allowed to click on disabled, hidden or StaticText elements.
-  Only click on elements on the Current Page.
-  Only click on elements with the following tag names: button, input, link, image, generic.
-  `.replace("\n", " ")
-);
-var SelectOptionCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SELECT_OPTION" /* SELECT_OPTION */),
-    target: ElementDescriptorSchema,
-    option: z3.string()
-  })
-).describe(
-  // TODO: if we move to a non-mutative way of selecting elements (e.g. by selector), we should update this description
-  `SELECT_OPTION <id> "<option>" - select the specified item from the select with the specified id. The item should exist on the page. Use the name of the item instead of the id. Make sure to include quotes around the option.`
-);
-var AIAssertionCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("AI_ASSERTION" /* AI_ASSERTION */),
-    assertion: z3.string(),
-    useVision: z3.boolean().default(false),
-    disableCache: z3.boolean().default(false)
-  })
-);
-var TypeOptionsSchema = z3.object({
-  clearContent: z3.boolean().default(true),
-  pressKeysSequentially: z3.boolean().default(false)
-});
-var TypeCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("TYPE" /* TYPE */),
-    target: ElementDescriptorSchema,
-    value: z3.string(),
-    pressEnter: z3.boolean().default(false)
-  })
-).merge(TypeOptionsSchema).describe(
-  `TYPE <id> "<text>" - type the specified text into the input with the specified id. The text should be specified by the user - do not use text from the EXAMPLES or generate text yourself. Make sure to include quotes around the text.`
-);
-var PressCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("PRESS" /* PRESS */),
-    value: z3.string()
-  })
-).describe(
-  `PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.`
-);
-var PresetCommandSchema = z3.discriminatedUnion("type", [
-  ClickCommandSchema,
-  GoBackCommandSchema,
-  GoForwardCommandSchema,
-  NavigateCommandSchema,
-  PressCommandSchema,
-  RefreshCommandSchema,
-  ScrollDownCommandSchema,
-  ScrollUpCommandSchema,
-  SelectOptionCommandSchema,
-  TypeCommandSchema,
-  AIAssertionCommandSchema,
-  WaitCommandSchema
-]);
-var AISuggestiblePresetCommandSchema = z3.discriminatedUnion("type", [
-  ClickCommandSchema,
-  TypeCommandSchema,
-  PressCommandSchema,
-  SelectOptionCommandSchema,
-  NavigateCommandSchema,
-  ScrollDownCommandSchema,
-  ScrollUpCommandSchema
-]);
-
 // ../../packages/types/src/ai-commands.ts
 var SuccessCommandSchema = CommonCommandSchema.merge(
-  z4.object({
-    type: z4.literal("SUCCESS" /* SUCCESS */)
+  z3.object({
+    type: z3.literal("SUCCESS" /* SUCCESS */)
   })
 ).describe("SUCCESS - the user goal has been successfully achieved");
 var FailureCommandSchema = CommonCommandSchema.merge(
-  z4.object({
-    type: z4.literal("FAILURE" /* FAILURE */)
+  z3.object({
+    type: z3.literal("FAILURE" /* FAILURE */)
   })
 ).describe(
   "FAILURE - there are no commands to suggest that could make progress that have not already been tried before"
 );
-var ControlFlowCommandSchema = z4.discriminatedUnion("type", [
+var ControlFlowCommandSchema = z3.discriminatedUnion("type", [
   SuccessCommandSchema,
   FailureCommandSchema
 ]);
-var AICommandSchema = z4.discriminatedUnion("type", [
+var AICommandSchema = z3.discriminatedUnion("type", [
   ...ControlFlowCommandSchema.options,
   // We allow all preset actions here because users
   // can edit AI commands to be any preset.
   // However, the AI can only suggest items in AISuggestiblePresetCommandSchema
   ...AISuggestiblePresetCommandSchema.options
 ]);
-var LLMOutputSchema = z4.object({
-  command: z4.string(),
-  thoughts: z4.string()
+var LLMOutputSchema = z3.object({
+  command: z3.string(),
+  thoughts: z3.string()
 });
-var NumericStringSchema = z4.string().pipe(z4.coerce.number());
-
-// ../../packages/types/src/command-results.ts
-import * as z6 from "zod";
+var NumericStringSchema = z3.string().pipe(z3.coerce.number());
 
 // ../../packages/types/src/steps.ts
-import * as z5 from "zod";
 var StepType = /* @__PURE__ */ ((StepType2) => {
   StepType2["AI_ACTION"] = "AI_ACTION";
   StepType2["PRESET_ACTION"] = "PRESET_ACTION";
   StepType2["MODULE"] = "MODULE";
   return StepType2;
 })(StepType || {});
-var AIActionSchema = z5.object({
-  type: z5.literal("AI_ACTION" /* AI_ACTION */),
-  text: z5.string(),
+var AIActionSchema = z4.object({
+  type: z4.literal("AI_ACTION" /* AI_ACTION */),
+  text: z4.string(),
   // Cached commands for this step
-  commands: z5.array(AICommandSchema).optional()
+  commands: z4.array(AICommandSchema).optional()
 });
-var PresetActionSchema = z5.object({
-  type: z5.literal("PRESET_ACTION" /* PRESET_ACTION */),
+var PresetActionSchema = z4.object({
+  type: z4.literal("PRESET_ACTION" /* PRESET_ACTION */),
   command: PresetCommandSchema
 });
-var ModuleStepSchema = z5.object({
-  type: z5.literal("MODULE" /* MODULE */),
-  moduleId: z5.string().uuid()
+var ModuleStepSchema = z4.object({
+  type: z4.literal("MODULE" /* MODULE */),
+  moduleId: z4.string().uuid()
 });
-var AllowedModuleStepSchema = z5.union([
+var AllowedModuleStepSchema = z4.union([
   AIActionSchema,
   PresetActionSchema
 ]);
-var ResolvedModuleStepSchema = z5.object({
-  type: z5.literal("RESOLVED_MODULE"),
-  moduleId: z5.string().uuid(),
-  name: z5.string(),
+var ResolvedModuleStepSchema = z4.object({
+  type: z4.literal("RESOLVED_MODULE"),
+  moduleId: z4.string().uuid(),
+  name: z4.string(),
   steps: AllowedModuleStepSchema.array()
 });
-var StepSchema = z5.union([
+var StepSchema = z4.union([
   AIActionSchema,
   PresetActionSchema,
   ModuleStepSchema
 ]);
-var ResolvedStepSchema = z5.union([
+var ResolvedStepSchema = z4.union([
   AIActionSchema,
   PresetActionSchema,
   ResolvedModuleStepSchema
 ]);
 
+// ../../packages/web-agent/src/browsers/chrome.ts
+import {
+  chromium,
+  devices
+} from "playwright";
+
+// ../../packages/web-agent/src/utils/url.ts
+var urlChanged = (url1, url2) => {
+  const { hostname, pathname } = new URL(url1);
+  const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
+  return hostname !== hostname2 || pathname !== pathname2;
+};
+
+// ../../packages/types/src/assertions.ts
+import { z as z5 } from "zod";
+var LLMAssertionEvalSchema = z5.object({
+  thoughts: z5.string(),
+  result: z5.boolean(),
+  relevantElements: z5.array(z5.number()).optional()
+});
+
 // ../../packages/types/src/command-results.ts
+import * as z6 from "zod";
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
   ResultStatus2["SUCCESS"] = "SUCCESS";
   ResultStatus2["FAILED"] = "FAILED";
@@ -2285,5 +2302,7 @@ var APIGenerator = class {
 export {
   APIGenerator,
   AgentController,
-  ChromeBrowser
+  ChromeBrowser,
+  PresetCommandType,
+  StepType
 };
