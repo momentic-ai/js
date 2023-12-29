@@ -33,7 +33,8 @@
   "dependencies": {
     "dedent": "^1.5.1",
     "diff-lines": "^1.1.1",
-    "playwright": "^1.40.1",
+    "playwright": "1.39.0",
+    "@playwright/browser-chromium": "1.39.0",
     "zod": "^3.22.4"
   }
 }
