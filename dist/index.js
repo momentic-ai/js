@@ -1,8 +1,6 @@
-import * as __WEBPACK_EXTERNAL_MODULE_playwright__ from "playwright";
-import * as __WEBPACK_EXTERNAL_MODULE_zod__ from "zod";
-import * as __WEBPACK_EXTERNAL_MODULE_dedent__ from "dedent";
-import * as __WEBPACK_EXTERNAL_MODULE_diff_lines_24b6f423__ from "diff-lines";
-/******/ var __webpack_modules__ = ({
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
 /***/ 909:
 /***/ (function(__unused_webpack_module, exports) {
@@ -335,88 +333,99 @@ function ArgumentError(message) {
 
 /***/ })
 
-/******/ });
+/******/ 	});
 /************************************************************************/
-/******/ // The module cache
-/******/ var __webpack_module_cache__ = {};
-/******/ 
-/******/ // The require function
-/******/ function __nccwpck_require__(moduleId) {
-/******/ 	// Check if module is in cache
-/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 	if (cachedModule !== undefined) {
-/******/ 		return cachedModule.exports;
-/******/ 	}
-/******/ 	// Create a new module (and put it into the cache)
-/******/ 	var module = __webpack_module_cache__[moduleId] = {
-/******/ 		// no module.id needed
-/******/ 		// no module.loaded needed
-/******/ 		exports: {}
-/******/ 	};
-/******/ 
-/******/ 	// Execute the module function
-/******/ 	var threw = true;
-/******/ 	try {
-/******/ 		__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
-/******/ 		threw = false;
-/******/ 	} finally {
-/******/ 		if(threw) delete __webpack_module_cache__[moduleId];
-/******/ 	}
-/******/ 
-/******/ 	// Return the exports of the module
-/******/ 	return module.exports;
-/******/ }
-/******/ 
-/************************************************************************/
-/******/ /* webpack/runtime/compat get default export */
-/******/ (() => {
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__nccwpck_require__.n = (module) => {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			() => (module['default']) :
-/******/ 			() => (module);
-/******/ 		__nccwpck_require__.d(getter, { a: getter });
-/******/ 		return getter;
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/define property getters */
-/******/ (() => {
-/******/ 	// define getter functions for harmony exports
-/******/ 	__nccwpck_require__.d = (exports, definition) => {
-/******/ 		for(var key in definition) {
-/******/ 			if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
-/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 			}
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __nccwpck_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
 /******/ 		}
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/hasOwnProperty shorthand */
-/******/ (() => {
-/******/ 	__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/compat */
-/******/ 
-/******/ if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = new URL('.', import.meta.url).pathname.slice(import.meta.url.match(/^file:\/\/\/\w:/) ? 1 : 0, -1) + "/";
-/******/ 
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		var threw = true;
+/******/ 		try {
+/******/ 			__webpack_modules__[moduleId].call(module.exports, module, module.exports, __nccwpck_require__);
+/******/ 			threw = false;
+/******/ 		} finally {
+/******/ 			if(threw) delete __webpack_module_cache__[moduleId];
+/******/ 		}
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__nccwpck_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/compat */
+/******/ 	
+/******/ 	if (typeof __nccwpck_require__ !== 'undefined') __nccwpck_require__.ab = __dirname + "/";
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
+// ESM COMPAT FLAG
+__nccwpck_require__.r(__webpack_exports__);
 
 // EXPORTS
 __nccwpck_require__.d(__webpack_exports__, {
-  "_w": () => (/* reexport */ APIGenerator),
-  "Yt": () => (/* reexport */ AgentController),
-  "DE": () => (/* reexport */ ChromeBrowser)
+  "APIGenerator": () => (/* reexport */ APIGenerator),
+  "AgentController": () => (/* reexport */ AgentController),
+  "ChromeBrowser": () => (/* reexport */ ChromeBrowser)
 });
 
 ;// CONCATENATED MODULE: external "playwright"
-var x = y => { var x = {}; __nccwpck_require__.d(x, y); return x; }
-var y = x => () => x
-const external_playwright_namespaceObject = x({ ["chromium"]: () => __WEBPACK_EXTERNAL_MODULE_playwright__.chromium, ["devices"]: () => __WEBPACK_EXTERNAL_MODULE_playwright__.devices });
+const external_playwright_namespaceObject = require("playwright");
 ;// CONCATENATED MODULE: ../../packages/web-agent/src/utils/url.ts
 // Returns true if 2 urls are different, ignoring differences in query params.
 const urlChanged = (url1, url2) => {
@@ -433,9 +442,7 @@ var AgentType;
 })(AgentType || (AgentType = {}));
 
 ;// CONCATENATED MODULE: external "zod"
-var external_zod_x = y => { var x = {}; __nccwpck_require__.d(x, y); return x; }
-var external_zod_y = x => () => x
-const external_zod_namespaceObject = external_zod_x({ ["array"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.array, ["boolean"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.boolean, ["coerce"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.coerce, ["discriminatedUnion"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.discriminatedUnion, ["literal"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.literal, ["nativeEnum"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.nativeEnum, ["null"]: () => __WEBPACK_EXTERNAL_MODULE_zod__["null"], ["number"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.number, ["object"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.object, ["string"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.string, ["union"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.union, ["z"]: () => __WEBPACK_EXTERNAL_MODULE_zod__.z });
+const external_zod_namespaceObject = require("zod");
 ;// CONCATENATED MODULE: ../../packages/types/src/a11y-targets.ts
 
 const A11yTargetWithCacheSchema = external_zod_namespaceObject.object({
@@ -481,9 +488,8 @@ class EmptyA11yTreeError extends Error {
 }
 
 ;// CONCATENATED MODULE: external "dedent"
-var external_dedent_x = y => { var x = {}; __nccwpck_require__.d(x, y); return x; }
-var external_dedent_y = x => () => x
-const external_dedent_namespaceObject = external_dedent_x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_dedent__["default"] });
+const external_dedent_namespaceObject = require("dedent");
+var external_dedent_default = /*#__PURE__*/__nccwpck_require__.n(external_dedent_namespaceObject);
 ;// CONCATENATED MODULE: ../../packages/types/src/preset.ts
 
 
@@ -541,7 +547,7 @@ const ClickCommandSchema = CommonCommandSchema.merge(external_zod_namespaceObjec
     target: ElementDescriptorSchema,
     doubleClick: external_zod_namespaceObject.boolean().default(false),
     rightClick: external_zod_namespaceObject.boolean().default(false),
-})).describe(external_dedent_namespaceObject["default"] `CLICK <id> - click on the element that has the specified id.
+})).describe((external_dedent_default()) `CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
@@ -1073,6 +1079,7 @@ function serializeAICommand(cmd) {
     return humanSummary;
 }
 function serializePresetCommand(command) {
+    var _a;
     switch (command.type) {
         case preset_PresetCommandType.NAVIGATE:
             return `Go to URL: ${clampText(command.url, 30)}`;
@@ -1092,7 +1099,7 @@ function serializePresetCommand(command) {
             return `Click on '${command.target.elementDescriptor}'`;
         case preset_PresetCommandType.TYPE:
             let serializedTarget = "";
-            if (command.target.a11yData?.serializedForm) {
+            if ((_a = command.target.a11yData) === null || _a === void 0 ? void 0 : _a.serializedForm) {
                 serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
             }
             else if (command.target.elementDescriptor.length > 0) {
@@ -1277,10 +1284,11 @@ class ProcessedA11yNode {
         this.backendNodeID = params.backendNodeID;
     }
     getLogForm() {
+        var _a, _b;
         return JSON.stringify({
             id: this.id,
-            name: this.name ?? "",
-            role: this.role ?? "",
+            name: (_a = this.name) !== null && _a !== void 0 ? _a : "",
+            role: (_b = this.role) !== null && _b !== void 0 ? _b : "",
             backendNodeId: this.backendNodeID,
         });
     }
@@ -1372,10 +1380,11 @@ class ProcessedA11yTree {
  * May not be unique in a graph.
  */
 function getNodePathIdentifier(node) {
-    if (node.name?.value) {
+    var _a, _b;
+    if ((_a = node.name) === null || _a === void 0 ? void 0 : _a.value) {
         return `"${node.name.value}"`;
     }
-    if (node.role?.value &&
+    if (((_b = node.role) === null || _b === void 0 ? void 0 : _b.value) &&
         node.role.value !== "none" &&
         node.role.value !== "generic") {
         return `"${node.role.value}"`;
@@ -1383,22 +1392,23 @@ function getNodePathIdentifier(node) {
     return `"${node.nodeId}"`;
 }
 function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
+    var _a, _b, _c, _d, _e, _f, _g;
     if (!parent && node.parentId) {
         throw new Error(`Got no parent for accessibility node ${node.nodeId}: ${JSON.stringify(node)}`);
     }
     const processedNode = new ProcessedA11yNode({
         id: node.nodeId,
-        role: node.role?.value || "",
-        name: node.name?.value || "",
-        content: node.value?.value || "",
+        role: ((_a = node.role) === null || _a === void 0 ? void 0 : _a.value) || "",
+        name: ((_b = node.name) === null || _b === void 0 ? void 0 : _b.value) || "",
+        content: ((_c = node.value) === null || _c === void 0 ? void 0 : _c.value) || "",
         properties: {},
         children: [],
         pathFromRoot: (parent ? `${parent.pathFromRoot} ` : "") + getNodePathIdentifier(node),
         backendNodeID: node.backendDOMNodeId,
         // md5Sum: "",
     });
-    if (node.value?.value) {
-        processedNode.content = `${node.value?.value}`;
+    if ((_d = node.value) === null || _d === void 0 ? void 0 : _d.value) {
+        processedNode.content = `${(_e = node.value) === null || _e === void 0 ? void 0 : _e.value}`;
     }
     if (node.properties) {
         node.properties.forEach((prop) => {
@@ -1406,7 +1416,7 @@ function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
         });
     }
     outputNodeMap.set(processedNode.id, processedNode);
-    const children = node.childIds ?? [];
+    const children = (_f = node.childIds) !== null && _f !== void 0 ? _f : [];
     for (const childId of children) {
         if (!childId) {
             continue;
@@ -1430,7 +1440,7 @@ function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
     if (processedNode.children.length === 1 &&
         processedNode.children[0].role === "StaticText") {
         const currentName = processedNode.name;
-        const childName = processedNode.children[0]?.name;
+        const childName = (_g = processedNode.children[0]) === null || _g === void 0 ? void 0 : _g.name;
         if (currentName === childName || !childName) {
             processedNode.children = [];
         }
@@ -1496,12 +1506,16 @@ function processA11yTree(graph) {
     }
     // filter out nodes that are no longer rendered on the page
     graph.allNodes = graph.allNodes.filter((node) => {
+        var _a;
         if (!node.ignored) {
             return true;
         }
         // CDP types are wrong; notRendered is a possible ignored reason
-        return !node.ignoredReasons?.find((reason) => reason.name === "notRendered" &&
-            reason.value?.value);
+        return !((_a = node.ignoredReasons) === null || _a === void 0 ? void 0 : _a.find((reason) => {
+            var _a;
+            return reason.name === "notRendered" &&
+                ((_a = reason.value) === null || _a === void 0 ? void 0 : _a.value);
+        }));
     });
     const nodeMap = new Map();
     for (const node of graph.allNodes) {
@@ -1609,7 +1623,7 @@ function addIDsScript() {
     // Loop through all elements and add the property
     for (let i = 0; i < allElements.length; i++) {
         const element = allElements[i];
-        element?.setAttribute("data-momentic-id", currentID);
+        element === null || element === void 0 ? void 0 : element.setAttribute("data-momentic-id", currentID);
         currentID++;
     }
 }
@@ -1678,6 +1692,15 @@ function isRequestRelevantForPageLoad(request, currentURL) {
 
 
 ;// CONCATENATED MODULE: ../../packages/web-agent/src/browsers/chrome.ts
+var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
 
 
@@ -1705,108 +1728,120 @@ class ChromeBrowser {
     /**
      * Creates a new browser and waits for navigation to the given test URL.
      */
-    static async init(baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-        const browser = await external_playwright_namespaceObject.chromium.launch({ headless: true });
-        const context = await browser.newContext({
-            viewport: {
-                width: 1920,
-                height: 1080,
-            },
-            // comment out the below if you are on Mac OS but you're using a monitor
-            deviceScaleFactor: process.platform === "darwin"
-                ? RETINA_WINDOW_SCALE_FACTOR
-                : 1,
-            userAgent: external_playwright_namespaceObject.devices["Desktop Chrome"].userAgent,
-            geolocation: { latitude: 37.7749, longitude: -122.4194 },
-            locale: "en-US",
-            timezoneId: "America/Los_Angeles",
-        });
-        const page = await context.newPage();
-        const cdpClient = await context.newCDPSession(page);
-        const chrome = new ChromeBrowser({
-            browser,
-            context,
-            page,
-            baseURL,
-            cdpClient,
-            logger,
-        });
-        let completed = false;
-        const navigateAndInitCDP = async () => {
-            try {
-                await chrome.navigate(baseURL, false);
-                await cdpClient.send("Accessibility.enable");
-                await cdpClient.send("DOM.enable");
-                await cdpClient.send("Overlay.enable");
-            }
-            catch (err) {
-                logger.error({ err }, "Failed to initialize chrome browser");
-            }
-            finally {
-                completed = true;
-            }
-        };
-        void navigateAndInitCDP();
-        const sendScreenshot = async () => {
-            if (!onScreenshot) {
-                return;
-            }
-            try {
-                onScreenshot({
-                    viewport: chrome.viewport,
-                    buffer: await chrome.screenshot(),
-                });
-            }
-            catch (err) {
-                logger.error({ err }, "Failed to take screenshot");
-            }
-        };
-        void sendScreenshot();
-        // NOTE: this is a very quick interval because while chome is navigating
-        // we want to show updates to the user ASAP
-        const screenshotInterval = setInterval(() => {
+    static init(baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const browser = yield external_playwright_namespaceObject.chromium.launch({ headless: true });
+            const context = yield browser.newContext({
+                viewport: {
+                    width: 1920,
+                    height: 1080,
+                },
+                // comment out the below if you are on Mac OS but you're using a monitor
+                deviceScaleFactor: process.platform === "darwin"
+                    ? RETINA_WINDOW_SCALE_FACTOR
+                    : 1,
+                userAgent: external_playwright_namespaceObject.devices["Desktop Chrome"].userAgent,
+                geolocation: { latitude: 37.7749, longitude: -122.4194 },
+                locale: "en-US",
+                timezoneId: "America/Los_Angeles",
+            });
+            const page = yield context.newPage();
+            const cdpClient = yield context.newCDPSession(page);
+            const chrome = new ChromeBrowser({
+                browser,
+                context,
+                page,
+                baseURL,
+                cdpClient,
+                logger,
+            });
+            let completed = false;
+            const navigateAndInitCDP = () => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    yield chrome.navigate(baseURL, false);
+                    yield cdpClient.send("Accessibility.enable");
+                    yield cdpClient.send("DOM.enable");
+                    yield cdpClient.send("Overlay.enable");
+                }
+                catch (err) {
+                    logger.error({ err }, "Failed to initialize chrome browser");
+                }
+                finally {
+                    completed = true;
+                }
+            });
+            void navigateAndInitCDP();
+            const sendScreenshot = () => __awaiter(this, void 0, void 0, function* () {
+                if (!onScreenshot) {
+                    return;
+                }
+                try {
+                    onScreenshot({
+                        viewport: chrome.viewport,
+                        buffer: yield chrome.screenshot(),
+                    });
+                }
+                catch (err) {
+                    logger.error({ err }, "Failed to take screenshot");
+                }
+            });
             void sendScreenshot();
-        }, 250);
-        const startTime = Date.now();
-        while (!completed && Date.now() - startTime < timeout) {
-            await sleep(CHECK_INTERVAL_MS);
-        }
-        clearInterval(screenshotInterval);
-        if (!completed) {
-            logger.warn("Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?");
-        }
-        return chrome;
+            // NOTE: this is a very quick interval because while chome is navigating
+            // we want to show updates to the user ASAP
+            const screenshotInterval = setInterval(() => {
+                void sendScreenshot();
+            }, 250);
+            const startTime = Date.now();
+            while (!completed && Date.now() - startTime < timeout) {
+                yield sleep(CHECK_INTERVAL_MS);
+            }
+            clearInterval(screenshotInterval);
+            if (!completed) {
+                logger.warn("Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?");
+            }
+            return chrome;
+        });
     }
     // Things to do on every page load
-    async pageSetup() {
-        await this.page.evaluate(addCursorScript);
-        await this.page.evaluate(addIDsScript);
+    pageSetup() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.evaluate(addCursorScript);
+            yield this.page.evaluate(addIDsScript);
+        });
     }
-    async wait(timeoutMs) {
-        await this.page.waitForTimeout(timeoutMs);
+    wait(timeoutMs) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.waitForTimeout(timeoutMs);
+        });
     }
-    async cleanup() {
-        await this.page.close();
-        await this.context.close();
-        await this.browser.close();
+    cleanup() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.close();
+            yield this.context.close();
+            yield this.browser.close();
+        });
     }
     get closed() {
         return this.page.isClosed() || !this.browser.isConnected();
     }
-    async html() {
-        return await this.page.content();
+    html() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.page.content();
+        });
     }
     get url() {
         return this.page.url();
     }
-    async screenshot(quality = 100, scale = "device") {
-        return await this.page.screenshot({
-            fullPage: false,
-            quality,
-            scale,
-            type: "jpeg",
-            // allow the blinking text cursor thing to remain there
-            caret: "initial",
+    screenshot(quality = 100, scale = "device") {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.page.screenshot({
+                fullPage: false,
+                quality,
+                scale,
+                type: "jpeg",
+                // allow the blinking text cursor thing to remain there
+                caret: "initial",
+            });
         });
     }
     get viewport() {
@@ -1816,502 +1851,560 @@ class ChromeBrowser {
         }
         return viewport;
     }
-    async navigate(url, 
+    navigate(url, 
     // FIXME: this is an escape hatch to make sure some pages load (assembledhq.com)
     wrapPossibleNavigation = true) {
-        this.logger.debug(`Navigating to ${url}`);
-        const startTime = Date.now();
-        const doNav = async () => {
-            try {
-                await this.page.goto(url, {
-                    timeout: MAX_LOAD_TIMEOUT_MS,
-                });
-                this.logger.debug({ url }, `Got load event in ${Math.floor(Date.now() - startTime)}ms`);
-            }
-            catch (e) {
-                this.logger.warn({ url, type: "navigate", err: e }, "Timeout elapsed waiting for page to load, continuing anyways...");
-            }
-        };
-        if (wrapPossibleNavigation) {
-            await this.wrapPossibleNavigation(doNav);
-        }
-        else {
-            await doNav();
-        }
-        if (CHROME_INTERNAL_URLS.has(this.url) &&
-            process.env.NODE_ENV === "production") {
-            // in dev, this is a little annoying
-            throw new Error(`${url} took too long to load 😞. Please ensure the site and your internet are working.`);
-        }
-        await this.pageSetup();
-        this.logger.debug({ url }, "Navigation complete");
-    }
-    async fill(target, text, options = {}) {
-        const element = await this.click(target, {
-            doubleClick: false,
-            rightClick: false,
-        });
-        await this.type(text, options);
-        return element;
-    }
-    async type(text, options = {}) {
-        const { clearContent = true, pressKeysSequentially = false } = options;
-        if (clearContent) {
-            await this.page.keyboard.press("Meta+A");
-            await this.page.keyboard.press("Backspace");
-        }
-        if (pressKeysSequentially) {
-            await this.page.keyboard.type(text);
-        }
-        else {
-            await this.page.keyboard.insertText(text);
-        }
-    }
-    async clickByA11yID(index, options = {}) {
-        const node = this.nodeMap.get(`${index}`);
-        if (!node) {
-            throw new Error(`Could not find node in DOM with index: ${index}`);
-        }
-        const nodeClicked = await this.clickUsingCDP(node, options);
-        await this.highlightNode(nodeClicked);
-        return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    }
-    async selectOptionByA11yID(index, option) {
-        const node = this.nodeMap.get(`${index}`);
-        if (!node) {
-            throw new Error(`Could not find node in DOM with index: ${index}`);
-        }
-        if (!node.backendNodeID) {
-            throw new Error(`Select target missing backend node id: ${node.getLogForm()}`);
-        }
-        const locator = await this.getLocatorFromBackendID(node.backendNodeID);
-        await locator.selectOption(option, {
-            timeout: COMPLICATED_BROWSER_ACTION_TIMEOUT_MS,
-        });
-        await this.highlightNode(node);
-        return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    }
-    async highlight(target) {
-        try {
-            await this.highlightByA11yID(target.id);
-        }
-        catch (err) {
-            // should never be fatal
-            this.logger.warn({ err, target }, "Failed to highlight target");
-        }
-    }
-    async highlightByA11yID(index) {
-        const node = this.nodeMap.get(`${index}`);
-        if (!node) {
-            throw new Error(`Could not find node in DOM with index: ${index}`);
-        }
-        if (!node.backendNodeID) {
-            throw new Error(`Select target missing backend node id: ${node.getLogForm()}`);
-        }
-        await this.highlightNode(node);
-    }
-    async highlightNode(node) {
-        try {
-            await this.cdpClient.send("Overlay.highlightNode", {
-                highlightConfig: NODE_HIGHLIGHT_CONFIG,
-                backendNodeId: node.backendNodeID,
+        return __awaiter(this, void 0, void 0, function* () {
+            this.logger.debug(`Navigating to ${url}`);
+            const startTime = Date.now();
+            const doNav = () => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    yield this.page.goto(url, {
+                        timeout: MAX_LOAD_TIMEOUT_MS,
+                    });
+                    this.logger.debug({ url }, `Got load event in ${Math.floor(Date.now() - startTime)}ms`);
+                }
+                catch (e) {
+                    this.logger.warn({ url, type: "navigate", err: e }, "Timeout elapsed waiting for page to load, continuing anyways...");
+                }
             });
-        }
-        catch (err) {
-            this.logger.warn({ err }, "Failed to add node highlight");
-        }
-        const hideHighlight = async () => {
+            if (wrapPossibleNavigation) {
+                yield this.wrapPossibleNavigation(doNav);
+            }
+            else {
+                yield doNav();
+            }
+            if (CHROME_INTERNAL_URLS.has(this.url) &&
+                process.env.NODE_ENV === "production") {
+                // in dev, this is a little annoying
+                throw new Error(`${url} took too long to load 😞. Please ensure the site and your internet are working.`);
+            }
+            yield this.pageSetup();
+            this.logger.debug({ url }, "Navigation complete");
+        });
+    }
+    fill(target, text, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const element = yield this.click(target, {
+                doubleClick: false,
+                rightClick: false,
+            });
+            yield this.type(text, options);
+            return element;
+        });
+    }
+    type(text, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { clearContent = true, pressKeysSequentially = false } = options;
+            if (clearContent) {
+                yield this.page.keyboard.press("Meta+A");
+                yield this.page.keyboard.press("Backspace");
+            }
+            if (pressKeysSequentially) {
+                yield this.page.keyboard.type(text);
+            }
+            else {
+                yield this.page.keyboard.insertText(text);
+            }
+        });
+    }
+    clickByA11yID(index, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const node = this.nodeMap.get(`${index}`);
+            if (!node) {
+                throw new Error(`Could not find node in DOM with index: ${index}`);
+            }
+            const nodeClicked = yield this.clickUsingCDP(node, options);
+            yield this.highlightNode(nodeClicked);
+            return node.serialize({ noChildren: true, noProperties: true, noID: true });
+        });
+    }
+    selectOptionByA11yID(index, option) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const node = this.nodeMap.get(`${index}`);
+            if (!node) {
+                throw new Error(`Could not find node in DOM with index: ${index}`);
+            }
+            if (!node.backendNodeID) {
+                throw new Error(`Select target missing backend node id: ${node.getLogForm()}`);
+            }
+            const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
+            yield locator.selectOption(option, {
+                timeout: COMPLICATED_BROWSER_ACTION_TIMEOUT_MS,
+            });
+            yield this.highlightNode(node);
+            return node.serialize({ noChildren: true, noProperties: true, noID: true });
+        });
+    }
+    highlight(target) {
+        return __awaiter(this, void 0, void 0, function* () {
             try {
-                await this.cdpClient.send("Overlay.hideHighlight", {
+                yield this.highlightByA11yID(target.id);
+            }
+            catch (err) {
+                // should never be fatal
+                this.logger.warn({ err, target }, "Failed to highlight target");
+            }
+        });
+    }
+    highlightByA11yID(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const node = this.nodeMap.get(`${index}`);
+            if (!node) {
+                throw new Error(`Could not find node in DOM with index: ${index}`);
+            }
+            if (!node.backendNodeID) {
+                throw new Error(`Select target missing backend node id: ${node.getLogForm()}`);
+            }
+            yield this.highlightNode(node);
+        });
+    }
+    highlightNode(node) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.cdpClient.send("Overlay.highlightNode", {
+                    highlightConfig: NODE_HIGHLIGHT_CONFIG,
                     backendNodeId: node.backendNodeID,
                 });
             }
             catch (err) {
-                // this is okay, purely visual and often occurs due to navigation
-                this.logger.debug({ err }, "Failed to remove node highlight");
+                this.logger.warn({ err }, "Failed to add node highlight");
             }
-        };
-        setTimeout(() => {
-            void hideHighlight();
-        }, HIGHLIGHT_DURATION_MS);
-    }
-    async wrapPossibleNavigation(fn, timeoutMS = MAX_LOAD_TIMEOUT_MS) {
-        const startTime = Date.now();
-        const startURL = this.url;
-        let lastRequestReceived = Date.now();
-        const firedRequests = new Map();
-        const finishedRequests = new Map();
-        const requestFinishedListener = (request) => {
-            const key = serializeRequest(request);
-            finishedRequests.set(key, (finishedRequests.get(key) ?? 0) + 1);
-        };
-        const requestFiredListener = (request) => {
-            if (!isRequestRelevantForPageLoad(request, this.url)) {
-                this.logger.debug({
-                    uri: serializeRequest(request),
-                }, "Ignoring request for page load network stability");
-                return;
-            }
-            const key = serializeRequest(request);
-            this.logger.debug({
-                uri: key,
-            }, "Request fired on page load, delaying network stability");
-            firedRequests.set(key, (firedRequests.get(key) ?? 0) + 1);
-            lastRequestReceived = Date.now();
-        };
-        this.page.on("requestfinished", requestFinishedListener);
-        this.page.on("request", requestFiredListener);
-        // fire actual function asynchronously
-        // instead of throwing the error, we return it so we can handle it later
-        let rejected = false;
-        const retPromise = fn().catch((e) => {
-            rejected = true;
-            if (e instanceof Error)
-                return e;
-            // we are returning NOT throwing on purpose
-            return new Error(`${e}`);
-        });
-        await sleep(CHECK_INTERVAL_MS);
-        const unwrapAndThrowError = async (p) => {
-            const v = await p;
-            if (v instanceof Error) {
-                throw v;
-            }
-            return v;
-        };
-        // wait for network idle
-        let unfinishedRequests = new Set();
-        const waitForNetworkIdle = async () => {
-            while (!rejected && Date.now() - startTime < timeoutMS) {
-                unfinishedRequests = new Set();
-                await sleep(CHECK_INTERVAL_MS);
-                if (Date.now() - lastRequestReceived <=
-                    NETWORK_STABLE_DURATION_MS) {
-                    continue;
+            const hideHighlight = () => __awaiter(this, void 0, void 0, function* () {
+                try {
+                    yield this.cdpClient.send("Overlay.hideHighlight", {
+                        backendNodeId: node.backendNodeID,
+                    });
                 }
-                let anyDifference = false;
-                for (const key of firedRequests.keys()) {
-                    if (firedRequests.get(key) !== finishedRequests.get(key)) {
-                        this.logger.debug({ uri: key }, "Waiting on request to finish");
-                        anyDifference = true;
-                        unfinishedRequests.add(key);
+                catch (err) {
+                    // this is okay, purely visual and often occurs due to navigation
+                    this.logger.debug({ err }, "Failed to remove node highlight");
+                }
+            });
+            setTimeout(() => {
+                void hideHighlight();
+            }, HIGHLIGHT_DURATION_MS);
+        });
+    }
+    wrapPossibleNavigation(fn, timeoutMS = MAX_LOAD_TIMEOUT_MS) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const startTime = Date.now();
+            const startURL = this.url;
+            let lastRequestReceived = Date.now();
+            const firedRequests = new Map();
+            const finishedRequests = new Map();
+            const requestFinishedListener = (request) => {
+                var _a;
+                const key = serializeRequest(request);
+                finishedRequests.set(key, ((_a = finishedRequests.get(key)) !== null && _a !== void 0 ? _a : 0) + 1);
+            };
+            const requestFiredListener = (request) => {
+                var _a;
+                if (!isRequestRelevantForPageLoad(request, this.url)) {
+                    this.logger.debug({
+                        uri: serializeRequest(request),
+                    }, "Ignoring request for page load network stability");
+                    return;
+                }
+                const key = serializeRequest(request);
+                this.logger.debug({
+                    uri: key,
+                }, "Request fired on page load, delaying network stability");
+                firedRequests.set(key, ((_a = firedRequests.get(key)) !== null && _a !== void 0 ? _a : 0) + 1);
+                lastRequestReceived = Date.now();
+            };
+            this.page.on("requestfinished", requestFinishedListener);
+            this.page.on("request", requestFiredListener);
+            // fire actual function asynchronously
+            // instead of throwing the error, we return it so we can handle it later
+            let rejected = false;
+            const retPromise = fn().catch((e) => {
+                rejected = true;
+                if (e instanceof Error)
+                    return e;
+                // we are returning NOT throwing on purpose
+                return new Error(`${e}`);
+            });
+            yield sleep(CHECK_INTERVAL_MS);
+            const unwrapAndThrowError = (p) => __awaiter(this, void 0, void 0, function* () {
+                const v = yield p;
+                if (v instanceof Error) {
+                    throw v;
+                }
+                return v;
+            });
+            // wait for network idle
+            let unfinishedRequests = new Set();
+            const waitForNetworkIdle = () => __awaiter(this, void 0, void 0, function* () {
+                while (!rejected && Date.now() - startTime < timeoutMS) {
+                    unfinishedRequests = new Set();
+                    yield sleep(CHECK_INTERVAL_MS);
+                    if (Date.now() - lastRequestReceived <=
+                        NETWORK_STABLE_DURATION_MS) {
+                        continue;
+                    }
+                    let anyDifference = false;
+                    for (const key of firedRequests.keys()) {
+                        if (firedRequests.get(key) !== finishedRequests.get(key)) {
+                            this.logger.debug({ uri: key }, "Waiting on request to finish");
+                            anyDifference = true;
+                            unfinishedRequests.add(key);
+                        }
+                    }
+                    if (!anyDifference) {
+                        this.logger.debug({
+                            url: this.url,
+                            requests: JSON.stringify(Array.from(firedRequests.entries())),
+                        }, `Network idle in ${Math.floor(Date.now() - startTime)}ms`);
+                        return true;
                     }
                 }
-                if (!anyDifference) {
-                    this.logger.debug({
+                if (!rejected) {
+                    this.logger.warn({
                         url: this.url,
-                        requests: JSON.stringify(Array.from(firedRequests.entries())),
-                    }, `Network idle in ${Math.floor(Date.now() - startTime)}ms`);
-                    return true;
+                        requests: JSON.stringify(Array.from(unfinishedRequests.entries())),
+                    }, "Timeout elapsed waiting for network idle, continuing anyways...");
+                }
+                return false;
+            });
+            const waitResult = yield waitForNetworkIdle();
+            this.page.off("requestfinished", requestFinishedListener);
+            this.page.off("request", requestFiredListener);
+            if (!waitResult) {
+                return unwrapAndThrowError(retPromise);
+            }
+            if (!rejected && urlChanged(this.url, startURL)) {
+                this.logger.debug(`Detected url change in wrapPossibleNavigation, waiting for load state`);
+                try {
+                    yield this.page.waitForLoadState("load", {
+                        timeout: timeoutMS - (Date.now() - startTime),
+                    });
+                }
+                catch (e) {
+                    this.logger.warn({ url: this.url }, "Timeout elapsed waiting for load state to fire, continuing anyways...");
                 }
             }
-            if (!rejected) {
-                this.logger.warn({
-                    url: this.url,
-                    requests: JSON.stringify(Array.from(unfinishedRequests.entries())),
-                }, "Timeout elapsed waiting for network idle, continuing anyways...");
-            }
-            return false;
-        };
-        const waitResult = await waitForNetworkIdle();
-        this.page.off("requestfinished", requestFinishedListener);
-        this.page.off("request", requestFiredListener);
-        if (!waitResult) {
             return unwrapAndThrowError(retPromise);
-        }
-        if (!rejected && urlChanged(this.url, startURL)) {
-            this.logger.debug(`Detected url change in wrapPossibleNavigation, waiting for load state`);
-            try {
-                await this.page.waitForLoadState("load", {
-                    timeout: timeoutMS - (Date.now() - startTime),
-                });
-            }
-            catch (e) {
-                this.logger.warn({ url: this.url }, "Timeout elapsed waiting for load state to fire, continuing anyways...");
-            }
-        }
-        return unwrapAndThrowError(retPromise);
-    }
-    async click(target, options = {}) {
-        const elementInteracted = await this.wrapPossibleNavigation(() => this.clickByA11yID(target.id, options));
-        return elementInteracted;
-    }
-    async selectOption(target, option) {
-        return this.selectOptionByA11yID(target.id, option);
-    }
-    async press(key) {
-        await this.wrapPossibleNavigation(() => this.page.keyboard.press(key));
-    }
-    async refresh() {
-        await this.page.reload();
-        await this.pageSetup();
-    }
-    async getA11yTree() {
-        let processedTree = null;
-        let attempt = 0;
-        const url = this.url;
-        while (!processedTree) {
-            try {
-                this.logger.debug(`Getting a11y tree at ${url}`);
-                const graph = await this.getRawA11yTree();
-                if (!graph.root || graph.allNodes.length === 0) {
-                    // throw specific error class
-                    throw new Error("No a11y tree found on page");
-                }
-                processedTree = processA11yTree(graph);
-            }
-            catch (e) {
-                this.logger.error({ err: e, url }, "Error fetching a11y tree");
-                if (attempt === 0) {
-                    await sleep(1000);
-                    attempt++;
-                }
-                else {
-                    throw new Error(`Max retries exceeded fetching a11y tree: ${e}`);
-                }
-            }
-        }
-        if (!processedTree.root) {
-            // could be valid!
-            this.logger.warn("A11y tree was pruned entirely");
-        }
-        this.nodeMap = processedTree.nodeMap;
-        return processedTree;
-    }
-    async getRawA11yTree() {
-        const url = this.page.url();
-        let lastTreeUpdateTimestamp = Date.now();
-        const treeUpdateListener = () => {
-            lastTreeUpdateTimestamp = Date.now();
-        };
-        this.cdpClient.addListener("Accessibility.nodesUpdated", treeUpdateListener);
-        let accessibilityTreeLoadFired = false;
-        const accessibilityLoadListener = () => {
-            this.logger.info({ url }, `A11y tree load event fired`);
-            accessibilityTreeLoadFired = true;
-        };
-        this.cdpClient.addListener("Accessibility.loadComplete", accessibilityLoadListener);
-        // make sure the a11y tree hasn't updated in the last 1 second
-        // and the a11y event has fired
-        const a11yLoadStart = Date.now();
-        let timeoutTriggered = true;
-        while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
-            await sleep(CHECK_INTERVAL_MS);
-            if (!accessibilityTreeLoadFired &&
-                Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
-                // some websites never fire the a11y load event
-                // thus, we only allocate 1 second for catching this event
-                this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
-                continue;
-            }
-            if (Date.now() - lastTreeUpdateTimestamp >=
-                A11Y_STABLE_DURATION_MS) {
-                this.logger.debug({ url }, `A11y tree not stable yet, waiting...`);
-                continue;
-            }
-            timeoutTriggered = false;
-            break;
-        }
-        this.logger.debug({
-            duration: Date.now() - a11yLoadStart,
-            eventReceived: accessibilityTreeLoadFired,
-            timeoutTriggered,
-        }, "A11y wait phase completed");
-        const { node: root } = await this.cdpClient.send("Accessibility.getRootAXNode");
-        const { nodes } = await this.cdpClient.send("Accessibility.queryAXTree", {
-            backendNodeId: root.backendDOMNodeId,
         });
-        this.cdpClient.removeListener("Accessibility.loadComplete", accessibilityLoadListener);
-        this.cdpClient.removeListener("Accessibility.nodesUpdated", treeUpdateListener);
-        return {
-            root,
-            allNodes: nodes,
-        };
     }
-    async clickUsingVisualCoordinates(backendNodeId) {
-        const location = await this.getElementLocation(backendNodeId);
-        if (!location) {
-            throw new Error(`Could not find element location with backend node id: ${backendNodeId}`);
-        }
-        this.logger.debug({ location }, "Executing mouse click");
-        await this.page.mouse.click(location.centerX, location.centerY);
+    click(target, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const elementInteracted = yield this.wrapPossibleNavigation(() => this.clickByA11yID(target.id, options));
+            return elementInteracted;
+        });
+    }
+    selectOption(target, option) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return this.selectOptionByA11yID(target.id, option);
+        });
+    }
+    press(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.wrapPossibleNavigation(() => this.page.keyboard.press(key));
+        });
+    }
+    refresh() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.reload();
+            yield this.pageSetup();
+        });
+    }
+    getA11yTree() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let processedTree = null;
+            let attempt = 0;
+            const url = this.url;
+            while (!processedTree) {
+                try {
+                    this.logger.debug(`Getting a11y tree at ${url}`);
+                    const graph = yield this.getRawA11yTree();
+                    if (!graph.root || graph.allNodes.length === 0) {
+                        // throw specific error class
+                        throw new Error("No a11y tree found on page");
+                    }
+                    processedTree = processA11yTree(graph);
+                }
+                catch (e) {
+                    this.logger.error({ err: e, url }, "Error fetching a11y tree");
+                    if (attempt === 0) {
+                        yield sleep(1000);
+                        attempt++;
+                    }
+                    else {
+                        throw new Error(`Max retries exceeded fetching a11y tree: ${e}`);
+                    }
+                }
+            }
+            if (!processedTree.root) {
+                // could be valid!
+                this.logger.warn("A11y tree was pruned entirely");
+            }
+            this.nodeMap = processedTree.nodeMap;
+            return processedTree;
+        });
+    }
+    getRawA11yTree() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const url = this.page.url();
+            let lastTreeUpdateTimestamp = Date.now();
+            const treeUpdateListener = () => {
+                lastTreeUpdateTimestamp = Date.now();
+            };
+            this.cdpClient.addListener("Accessibility.nodesUpdated", treeUpdateListener);
+            let accessibilityTreeLoadFired = false;
+            const accessibilityLoadListener = () => {
+                this.logger.info({ url }, `A11y tree load event fired`);
+                accessibilityTreeLoadFired = true;
+            };
+            this.cdpClient.addListener("Accessibility.loadComplete", accessibilityLoadListener);
+            // make sure the a11y tree hasn't updated in the last 1 second
+            // and the a11y event has fired
+            const a11yLoadStart = Date.now();
+            let timeoutTriggered = true;
+            while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
+                yield sleep(CHECK_INTERVAL_MS);
+                if (!accessibilityTreeLoadFired &&
+                    Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
+                    // some websites never fire the a11y load event
+                    // thus, we only allocate 1 second for catching this event
+                    this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
+                    continue;
+                }
+                if (Date.now() - lastTreeUpdateTimestamp >=
+                    A11Y_STABLE_DURATION_MS) {
+                    this.logger.debug({ url }, `A11y tree not stable yet, waiting...`);
+                    continue;
+                }
+                timeoutTriggered = false;
+                break;
+            }
+            this.logger.debug({
+                duration: Date.now() - a11yLoadStart,
+                eventReceived: accessibilityTreeLoadFired,
+                timeoutTriggered,
+            }, "A11y wait phase completed");
+            const { node: root } = yield this.cdpClient.send("Accessibility.getRootAXNode");
+            const { nodes } = yield this.cdpClient.send("Accessibility.queryAXTree", {
+                backendNodeId: root.backendDOMNodeId,
+            });
+            this.cdpClient.removeListener("Accessibility.loadComplete", accessibilityLoadListener);
+            this.cdpClient.removeListener("Accessibility.nodesUpdated", treeUpdateListener);
+            return {
+                root,
+                allNodes: nodes,
+            };
+        });
+    }
+    clickUsingVisualCoordinates(backendNodeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const location = yield this.getElementLocation(backendNodeId);
+            if (!location) {
+                throw new Error(`Could not find element location with backend node id: ${backendNodeId}`);
+            }
+            this.logger.debug({ location }, "Executing mouse click");
+            yield this.page.mouse.click(location.centerX, location.centerY);
+        });
     }
     // Get the "id" attribute value from an HTML element.
-    async getIDAttributeUsingCDP(objectId) {
-        // https://bugs.chromium.org/p/chromium/issues/detail?id=1374241
-        await this.cdpClient.send("DOM.getDocument", { depth: 0 });
-        const cdpNodeResult = await this.cdpClient.send("DOM.requestNode", {
-            objectId,
+    getIDAttributeUsingCDP(objectId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // https://bugs.chromium.org/p/chromium/issues/detail?id=1374241
+            yield this.cdpClient.send("DOM.getDocument", { depth: 0 });
+            const cdpNodeResult = yield this.cdpClient.send("DOM.requestNode", {
+                objectId,
+            });
+            const attrResult = yield this.cdpClient.send("DOM.getAttributes", {
+                nodeId: cdpNodeResult.nodeId,
+            });
+            const attributes = attrResult.attributes;
+            const indexAttr = attributes.findIndex((s) => s === "data-momentic-id");
+            if (indexAttr === -1) {
+                return "";
+            }
+            return attributes[indexAttr + 1] || "";
         });
-        const attrResult = await this.cdpClient.send("DOM.getAttributes", {
-            nodeId: cdpNodeResult.nodeId,
-        });
-        const attributes = attrResult.attributes;
-        const indexAttr = attributes.findIndex((s) => s === "data-momentic-id");
-        if (indexAttr === -1) {
-            return "";
-        }
-        return attributes[indexAttr + 1] || "";
     }
-    async getLocatorFromBackendID(backendNodeId) {
-        await this.page.evaluate(addIDsScript);
-        // get a remote javascript object from the a11y backend node ID
-        const cdpResolveResult = await this.cdpClient.send("DOM.resolveNode", {
-            backendNodeId,
-        });
-        if (!cdpResolveResult || !cdpResolveResult.object.objectId) {
-            throw new Error(`Could not resolve backend node ${backendNodeId}`);
-        }
-        try {
-            const id = await this.getIDAttributeUsingCDP(cdpResolveResult.object.objectId);
-            if (!id) {
-                throw new Error("Failed getting data-momentic-id attribute using CDP");
+    getLocatorFromBackendID(backendNodeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.evaluate(addIDsScript);
+            // get a remote javascript object from the a11y backend node ID
+            const cdpResolveResult = yield this.cdpClient.send("DOM.resolveNode", {
+                backendNodeId,
+            });
+            if (!cdpResolveResult || !cdpResolveResult.object.objectId) {
+                throw new Error(`Could not resolve backend node ${backendNodeId}`);
             }
-            return this.page.locator(`[data-momentic-id="${id}"]`);
-        }
-        catch (err) {
-            this.logger.error({
-                err,
-            }, "Failed to get ID attribute");
-            throw err;
-        }
-    }
-    async clickUsingCDP(originalNode, options = {}) {
-        let clickAttempts = 0;
-        let candidateNode = originalNode;
-        while (clickAttempts < MAX_BROWSER_ACTION_ATTEMPTS) {
-            // Did we reach the root?
-            if (!candidateNode || candidateNode.role === "RootWebArea") {
-                throw new Error(`Attempted to click node with no clickable surrounding elements: ${originalNode.getLogForm()}`);
-            }
-            // Check disqualifying conditions for clicks - these don't count as "attempts"
-            if (candidateNode.role === "StaticText") {
-                // static text corresponds to html text nodes that are not clickable
-                candidateNode = candidateNode.parent;
-                continue;
-            }
-            const candidateNodeID = candidateNode.backendNodeID;
-            if (!candidateNodeID) {
-                this.logger.warn({ node: candidateNode.getLogForm() }, "Click candidate had no backend node ID");
-                candidateNode = candidateNode.parent;
-                continue;
-            }
-            // Attempt to click
             try {
-                const locator = await this.getLocatorFromBackendID(candidateNodeID);
-                // this timeout is important because playwright checks for clickability/visibility
-                // before clicking, and a timeout indicates obstruction, or disabled state
-                // see: https://playwright.dev/docs/actionability#introduction
-                if (options.doubleClick) {
-                    await locator.dblclick({
-                        timeout: BROWSER_ACTION_TIMEOUT_MS,
-                    });
+                const id = yield this.getIDAttributeUsingCDP(cdpResolveResult.object.objectId);
+                if (!id) {
+                    throw new Error("Failed getting data-momentic-id attribute using CDP");
                 }
-                else {
-                    await locator.click({
-                        timeout: BROWSER_ACTION_TIMEOUT_MS,
-                        button: options.rightClick ? "right" : "left",
-                    });
-                }
-                if (candidateNode.id !== originalNode.id) {
-                    this.logger.info({
-                        oldNode: originalNode.getLogForm(),
-                        newNode: candidateNode.getLogForm(),
-                    }, `Redirected click successfully to new element`);
-                }
-                return candidateNode;
+                return this.page.locator(`[data-momentic-id="${id}"]`);
             }
             catch (err) {
-                this.logger.error({ err, node: candidateNode.getLogForm() }, "Failed click or click timed out");
-                clickAttempts++;
-                // try to click the parent instead
-                // we could re-prompt the LLM in the future
-                candidateNode = candidateNode.parent;
+                this.logger.error({
+                    err,
+                }, "Failed to get ID attribute");
+                throw err;
             }
-        }
-        throw new Error(`Max click redirection attempts exhausted on original element: ${originalNode.getLogForm()}`);
+        });
+    }
+    clickUsingCDP(originalNode, options = {}) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let clickAttempts = 0;
+            let candidateNode = originalNode;
+            while (clickAttempts < MAX_BROWSER_ACTION_ATTEMPTS) {
+                // Did we reach the root?
+                if (!candidateNode || candidateNode.role === "RootWebArea") {
+                    throw new Error(`Attempted to click node with no clickable surrounding elements: ${originalNode.getLogForm()}`);
+                }
+                // Check disqualifying conditions for clicks - these don't count as "attempts"
+                if (candidateNode.role === "StaticText") {
+                    // static text corresponds to html text nodes that are not clickable
+                    candidateNode = candidateNode.parent;
+                    continue;
+                }
+                const candidateNodeID = candidateNode.backendNodeID;
+                if (!candidateNodeID) {
+                    this.logger.warn({ node: candidateNode.getLogForm() }, "Click candidate had no backend node ID");
+                    candidateNode = candidateNode.parent;
+                    continue;
+                }
+                // Attempt to click
+                try {
+                    const locator = yield this.getLocatorFromBackendID(candidateNodeID);
+                    // this timeout is important because playwright checks for clickability/visibility
+                    // before clicking, and a timeout indicates obstruction, or disabled state
+                    // see: https://playwright.dev/docs/actionability#introduction
+                    if (options.doubleClick) {
+                        yield locator.dblclick({
+                            timeout: BROWSER_ACTION_TIMEOUT_MS,
+                        });
+                    }
+                    else {
+                        yield locator.click({
+                            timeout: BROWSER_ACTION_TIMEOUT_MS,
+                            button: options.rightClick ? "right" : "left",
+                        });
+                    }
+                    if (candidateNode.id !== originalNode.id) {
+                        this.logger.info({
+                            oldNode: originalNode.getLogForm(),
+                            newNode: candidateNode.getLogForm(),
+                        }, `Redirected click successfully to new element`);
+                    }
+                    return candidateNode;
+                }
+                catch (err) {
+                    this.logger.error({ err, node: candidateNode.getLogForm() }, "Failed click or click timed out");
+                    clickAttempts++;
+                    // try to click the parent instead
+                    // we could re-prompt the LLM in the future
+                    candidateNode = candidateNode.parent;
+                }
+            }
+            throw new Error(`Max click redirection attempts exhausted on original element: ${originalNode.getLogForm()}`);
+        });
     }
     /**
      * Currently unused, but could be useful for vision model integration.
      * Gets x/y position of an a11y node.
      */
-    async getElementLocation(backendNodeId) {
-        const tree = await this.cdpClient.send("DOMSnapshot.captureSnapshot", {
-            computedStyles: [],
-            includeDOMRects: true,
-            includePaintOrder: true,
-        });
-        let devicePixelRatio = await this.page.evaluate(() => window.devicePixelRatio);
-        // it lies on macos lolol
-        // this apparently isn't working when the browser is dragged onto a monitor either
-        if (process.platform === "darwin" && devicePixelRatio === 1) {
-            // UNCOMMENT THE BELOW IF YOU ARE ON MAC OS AND NOT USING A MONITOR
-            // COMMENT THE BELOW OUT IF YOU ARE USING A MONITOR OR NOT ON MAC OS
-            devicePixelRatio = RETINA_WINDOW_SCALE_FACTOR;
-        }
-        const document = tree["documents"][0];
-        const layout = document["layout"];
-        const nodes = document["nodes"];
-        const nodeNames = nodes["nodeName"] || [];
-        const backendNodeIds = nodes["backendNodeId"] || [];
-        const layoutNodeIndex = layout["nodeIndex"];
-        const bounds = layout["bounds"];
-        let cursor = -1;
-        for (let i = 0; i < nodeNames.length; i++) {
-            if (backendNodeIds[i] === backendNodeId) {
-                cursor = layoutNodeIndex.indexOf(i);
-                break;
+    getElementLocation(backendNodeId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tree = yield this.cdpClient.send("DOMSnapshot.captureSnapshot", {
+                computedStyles: [],
+                includeDOMRects: true,
+                includePaintOrder: true,
+            });
+            let devicePixelRatio = yield this.page.evaluate(() => window.devicePixelRatio);
+            // it lies on macos lolol
+            // this apparently isn't working when the browser is dragged onto a monitor either
+            if (process.platform === "darwin" && devicePixelRatio === 1) {
+                // UNCOMMENT THE BELOW IF YOU ARE ON MAC OS AND NOT USING A MONITOR
+                // COMMENT THE BELOW OUT IF YOU ARE USING A MONITOR OR NOT ON MAC OS
+                devicePixelRatio = RETINA_WINDOW_SCALE_FACTOR;
             }
-        }
-        if (cursor === -1) {
-            throw new Error(`Could not find any backend node with ID ${backendNodeId}`);
-        }
-        let [x = 0, y = 0, width = 0, height = 0] = bounds[cursor];
-        x /= devicePixelRatio;
-        y /= devicePixelRatio;
-        width /= devicePixelRatio;
-        height /= devicePixelRatio;
-        const centerX = x + width / 2;
-        const centerY = y + height / 2;
-        return { centerX, centerY };
-    }
-    async scrollUp() {
-        // TODO: this works pretty well for full page scroll, in the future we'd need to figure out how to scroll nested containers
-        await this.page.evaluate(() => {
-            (document.scrollingElement || document.body).scrollTop =
-                (document.scrollingElement || document.body).scrollTop -
-                    window.innerHeight;
-        });
-        await this.page.evaluate(() => {
-            (document.scrollingElement || document.body).scrollTop =
-                (document.scrollingElement || document.body).scrollTop +
-                    window.innerHeight;
-        });
-    }
-    async scrollDown() {
-        await this.page.evaluate(() => {
-            (document.scrollingElement || document.body).scrollTop =
-                (document.scrollingElement || document.body).scrollTop +
-                    window.innerHeight;
+            const document = tree["documents"][0];
+            const layout = document["layout"];
+            const nodes = document["nodes"];
+            const nodeNames = nodes["nodeName"] || [];
+            const backendNodeIds = nodes["backendNodeId"] || [];
+            const layoutNodeIndex = layout["nodeIndex"];
+            const bounds = layout["bounds"];
+            let cursor = -1;
+            for (let i = 0; i < nodeNames.length; i++) {
+                if (backendNodeIds[i] === backendNodeId) {
+                    cursor = layoutNodeIndex.indexOf(i);
+                    break;
+                }
+            }
+            if (cursor === -1) {
+                throw new Error(`Could not find any backend node with ID ${backendNodeId}`);
+            }
+            let [x = 0, y = 0, width = 0, height = 0] = bounds[cursor];
+            x /= devicePixelRatio;
+            y /= devicePixelRatio;
+            width /= devicePixelRatio;
+            height /= devicePixelRatio;
+            const centerX = x + width / 2;
+            const centerY = y + height / 2;
+            return { centerX, centerY };
         });
     }
-    async goForward() {
-        await this.wrapPossibleNavigation(() => this.page.goForward({ timeout: MAX_LOAD_TIMEOUT_MS }));
-        await this.pageSetup();
+    scrollUp() {
+        return __awaiter(this, void 0, void 0, function* () {
+            // TODO: this works pretty well for full page scroll, in the future we'd need to figure out how to scroll nested containers
+            yield this.page.evaluate(() => {
+                (document.scrollingElement || document.body).scrollTop =
+                    (document.scrollingElement || document.body).scrollTop -
+                        window.innerHeight;
+            });
+            yield this.page.evaluate(() => {
+                (document.scrollingElement || document.body).scrollTop =
+                    (document.scrollingElement || document.body).scrollTop +
+                        window.innerHeight;
+            });
+        });
     }
-    async goBack() {
-        await this.wrapPossibleNavigation(() => this.page.goBack({ timeout: MAX_LOAD_TIMEOUT_MS }));
-        await this.pageSetup();
+    scrollDown() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.page.evaluate(() => {
+                (document.scrollingElement || document.body).scrollTop =
+                    (document.scrollingElement || document.body).scrollTop +
+                        window.innerHeight;
+            });
+        });
+    }
+    goForward() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.wrapPossibleNavigation(() => this.page.goForward({ timeout: MAX_LOAD_TIMEOUT_MS }));
+            yield this.pageSetup();
+        });
+    }
+    goBack() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.wrapPossibleNavigation(() => this.page.goBack({ timeout: MAX_LOAD_TIMEOUT_MS }));
+            yield this.pageSetup();
+        });
     }
 }
 ChromeBrowser.USER_AGENT = external_playwright_namespaceObject.devices["Desktop Chrome"].userAgent;
 
 
 ;// CONCATENATED MODULE: external "diff-lines"
-var external_diff_lines_x = y => { var x = {}; __nccwpck_require__.d(x, y); return x; }
-var external_diff_lines_y = x => () => x
-const external_diff_lines_namespaceObject = external_diff_lines_x({ ["default"]: () => __WEBPACK_EXTERNAL_MODULE_diff_lines_24b6f423__["default"] });
+const external_diff_lines_namespaceObject = require("diff-lines");
+var external_diff_lines_default = /*#__PURE__*/__nccwpck_require__.n(external_diff_lines_namespaceObject);
 ;// CONCATENATED MODULE: ../../packages/web-agent/src/controller.ts
+var controller_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
 // @ts-expect-error: no types from this library
 
@@ -2353,16 +2446,20 @@ class AgentController {
     /**
      * Reset controller and browser state.
      */
-    async resetState() {
-        this.resetHistory();
-        await this.browser.navigate(this.browser.baseURL);
+    resetState() {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            this.resetHistory();
+            yield this.browser.navigate(this.browser.baseURL);
+        });
     }
     /**
      * Get the browser state as a string
      */
-    async getBrowserState() {
-        const a11yTree = await this.browser.getA11yTree();
-        return a11yTree.serialize();
+    getBrowserState() {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            const a11yTree = yield this.browser.getA11yTree();
+            return a11yTree.serialize();
+        });
     }
     getSerializedHistory(url, currentBrowserState) {
         let history;
@@ -2374,84 +2471,90 @@ class AgentController {
         }
         return history;
     }
-    async splitUserGoal(type, goal, disableCache) {
-        if (type === StepType.AI_ACTION &&
-            goal.match(/[,!;.]|(?:and)|(?:then)/) &&
-            this.config.useGoalSplitter) {
-            const granularInstructions = await this.generator.getGranularGoals({ goal, url: this.browser.url }, disableCache);
-            // convert into a stack (last element is first to be executed)
-            this.pendingInstructions = granularInstructions.reverse();
-        }
-        else {
-            this.pendingInstructions = [goal];
-        }
+    splitUserGoal(type, goal, disableCache) {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            if (type === StepType.AI_ACTION &&
+                goal.match(/[,!;.]|(?:and)|(?:then)/) &&
+                this.config.useGoalSplitter) {
+                const granularInstructions = yield this.generator.getGranularGoals({ goal, url: this.browser.url }, disableCache);
+                // convert into a stack (last element is first to be executed)
+                this.pendingInstructions = granularInstructions.reverse();
+            }
+            else {
+                this.pendingInstructions = [goal];
+            }
+        });
     }
     /**
      * Given previously executed commands, generate command for the current prompt.
      * Should only be used for AI action.
      */
-    async promptToCommand(type, goal, disableCache) {
-        // are we out of granular instructions to execute?
-        if (this.pendingInstructions.length === 0) {
-            // stores granular instructions in this.pendingInstructions, which functions like a stack
-            await this.splitUserGoal(type, goal, disableCache);
-        }
-        const currInstruction = this.pendingInstructions[this.pendingInstructions.length - 1];
-        this.logger.info({ goal: currInstruction }, "Starting prompt translation");
-        const getBrowserStateStart = Date.now();
-        const url = this.browser.url;
-        const browserState = await this.getBrowserState();
-        this.logger.info({
-            duration: Date.now() - getBrowserStateStart,
-            url,
-        }, "Got browser state");
-        const numPrevious = this.commandHistory.length;
-        this.commandHistory.push({
-            state: "PENDING",
-            browserStateBeforeCommand: browserState,
-            urlBeforeCommand: url,
-            type,
-        });
-        const history = this.getSerializedHistory(url, browserState);
-        const getCommandProposalStart = Date.now();
-        const proposedCommand = await this.generator.getProposedCommand({
-            url,
-            numPrevious,
-            browserState,
-            history,
-            goal: currInstruction,
-            lastCommand: this.lastExecutedCommand,
-        }, disableCache);
-        this.logger.info({ duration: Date.now() - getCommandProposalStart }, "Got proposed command");
-        if (proposedCommand.type === ControlFlowCommandType.SUCCESS) {
-            const finishedInstruction = this.pendingInstructions.pop();
-            this.logger.info({
-                finishedInstruction,
-                remainingInstructions: this.pendingInstructions,
-            }, "Removing pending instruction due to SUCCESS");
-            // promptToCommand will pick the next instruction to execute off the stack
-            if (this.pendingInstructions.length !== 0) {
-                // remove the last command from the history since it was an intermediate command from goalSplitter
-                this.commandHistory.pop();
-                return this.promptToCommand(type, "", disableCache);
+    promptToCommand(type, goal, disableCache) {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            // are we out of granular instructions to execute?
+            if (this.pendingInstructions.length === 0) {
+                // stores granular instructions in this.pendingInstructions, which functions like a stack
+                yield this.splitUserGoal(type, goal, disableCache);
             }
-        }
-        else if (
-        // on failure, we don't continue to execute
-        proposedCommand.type === ControlFlowCommandType.FAILURE) {
+            const currInstruction = this.pendingInstructions[this.pendingInstructions.length - 1];
+            this.logger.info({ goal: currInstruction }, "Starting prompt translation");
+            const getBrowserStateStart = Date.now();
+            const url = this.browser.url;
+            const browserState = yield this.getBrowserState();
             this.logger.info({
-                remainingInstructions: this.pendingInstructions,
-            }, "Removing pending instructions due to FAILURE");
-            this.pendingInstructions = [];
-        }
-        return proposedCommand;
+                duration: Date.now() - getBrowserStateStart,
+                url,
+            }, "Got browser state");
+            const numPrevious = this.commandHistory.length;
+            this.commandHistory.push({
+                state: "PENDING",
+                browserStateBeforeCommand: browserState,
+                urlBeforeCommand: url,
+                type,
+            });
+            const history = this.getSerializedHistory(url, browserState);
+            const getCommandProposalStart = Date.now();
+            const proposedCommand = yield this.generator.getProposedCommand({
+                url,
+                numPrevious,
+                browserState,
+                history,
+                goal: currInstruction,
+                lastCommand: this.lastExecutedCommand,
+            }, disableCache);
+            this.logger.info({ duration: Date.now() - getCommandProposalStart }, "Got proposed command");
+            if (proposedCommand.type === ControlFlowCommandType.SUCCESS) {
+                const finishedInstruction = this.pendingInstructions.pop();
+                this.logger.info({
+                    finishedInstruction,
+                    remainingInstructions: this.pendingInstructions,
+                }, "Removing pending instruction due to SUCCESS");
+                // promptToCommand will pick the next instruction to execute off the stack
+                if (this.pendingInstructions.length !== 0) {
+                    // remove the last command from the history since it was an intermediate command from goalSplitter
+                    this.commandHistory.pop();
+                    return this.promptToCommand(type, "", disableCache);
+                }
+            }
+            else if (
+            // on failure, we don't continue to execute
+            proposedCommand.type === ControlFlowCommandType.FAILURE) {
+                this.logger.info({
+                    remainingInstructions: this.pendingInstructions,
+                }, "Removing pending instructions due to FAILURE");
+                this.pendingInstructions = [];
+            }
+            return proposedCommand;
+        });
     }
-    async locateElement(description, disableCache) {
-        const locator = await this.generator.getElementLocation({ browserState: await this.getBrowserState(), goal: description }, disableCache);
-        if (locator.id < 0) {
-            throw new Error(`Unable to locate element with description: ${description}`);
-        }
-        return locator;
+    locateElement(description, disableCache) {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            const locator = yield this.generator.getElementLocation({ browserState: yield this.getBrowserState(), goal: description }, disableCache);
+            if (locator.id < 0) {
+                throw new Error(`Unable to locate element with description: ${description}`);
+            }
+            return locator;
+        });
     }
     /**
      * Construct a detailed history that can be passed to the LLM.
@@ -2475,7 +2578,7 @@ class AgentController {
                     historyLines.push(`  URL CHANGE: '${log.urlBeforeCommand}' -> '${currentURL}'`);
                 }
                 else {
-                    const browserStateDiff = (0,external_diff_lines_namespaceObject["default"])(log.browserStateBeforeCommand, currentPageState, {
+                    const browserStateDiff = external_diff_lines_default()(log.browserStateBeforeCommand, currentPageState, {
                         n_surrounding: 1,
                     });
                     if (!browserStateDiff) {
@@ -2498,7 +2601,7 @@ class AgentController {
         return historyLines.join("\n");
     }
     getListHistory() {
-        return external_dedent_namespaceObject["default"] `Here are the commands that you have successfully executed:
+        return (external_dedent_default()) `Here are the commands that you have successfully executed:
     ${this.commandHistory
             .filter((cmd) => cmd.type === StepType.AI_ACTION)
             .map((cmd) => `- ${cmd.serializedCommand}`)
@@ -2509,254 +2612,261 @@ class AgentController {
      * @param [stateless=false] Execute this command in a stateless fashion, without modifying any controller state such as
      * pending instructions. Useful when executing cached instructions.
      */
-    async executeCommand(command, disableCache, stateless = false) {
-        const pendingHistory = this.commandHistory[this.commandHistory.length - 1];
-        if (!stateless) {
-            // if we're not using cached commands, we must be executing a pending command
-            // generated by promptToCommand
-            if (!pendingHistory || pendingHistory.state !== "PENDING") {
-                throw new Error("Executing command but there is no pending entry in the history");
+    executeCommand(command, disableCache, stateless = false) {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            const pendingHistory = this.commandHistory[this.commandHistory.length - 1];
+            if (!stateless) {
+                // if we're not using cached commands, we must be executing a pending command
+                // generated by promptToCommand
+                if (!pendingHistory || pendingHistory.state !== "PENDING") {
+                    throw new Error("Executing command but there is no pending entry in the history");
+                }
             }
-        }
-        else {
-            // cached commands can rely on things like a11y IDs - we need to populate this state in the chrome browser.
-            // currently, all necessary side effects are accomplished by getting the a11y tree
-            await this.browser.getA11yTree();
-        }
-        let result;
-        try {
-            const executionStart = Date.now();
-            result = await this.sendCommandToBrowser(command, disableCache);
-            this.logger.info({ result, duration: Date.now() - executionStart }, "Got execution result");
-        }
-        catch (e) {
-            if (e instanceof Error) {
-                throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
-                    cause: e,
+            else {
+                // cached commands can rely on things like a11y IDs - we need to populate this state in the chrome browser.
+                // currently, all necessary side effects are accomplished by getting the a11y tree
+                yield this.browser.getA11yTree();
+            }
+            let result;
+            try {
+                const executionStart = Date.now();
+                result = yield this.sendCommandToBrowser(command, disableCache);
+                this.logger.info({ result, duration: Date.now() - executionStart }, "Got execution result");
+            }
+            catch (e) {
+                if (e instanceof Error) {
+                    throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
+                        cause: e,
+                    });
+                }
+                throw new BrowserExecutionError(`Unexpected throw from executing command`, {
+                    cause: new Error(`${e}`),
                 });
             }
-            throw new BrowserExecutionError(`Unexpected throw from executing command`, {
-                cause: new Error(`${e}`),
-            });
-        }
-        if (result.succeedImmediately && !stateless) {
-            // pop the last command off the stack since we won't get a real SUCCESS command within promptToCommand
-            this.pendingInstructions.pop();
-            if (this.pendingInstructions.length > 0) {
-                // we still have pending instructions queued up
-                // override the immediate success
-                result.succeedImmediately = false;
+            if (result.succeedImmediately && !stateless) {
+                // pop the last command off the stack since we won't get a real SUCCESS command within promptToCommand
+                this.pendingInstructions.pop();
+                if (this.pendingInstructions.length > 0) {
+                    // we still have pending instructions queued up
+                    // override the immediate success
+                    result.succeedImmediately = false;
+                }
             }
-        }
-        // TODO(ENG-139): Save other a11y stuff as well.
-        // Update the command with the targeted element
-        // if this is the first time the command was generated
-        if (result.elementInteracted &&
-            "target" in command &&
-            !command.target.elementDescriptor) {
-            // Save the serialized element interacted as the "descriptor" for now
-            // In the future, we can ask the LLM for a more human-readable descriptor
-            command.target.elementDescriptor = result.elementInteracted;
-        }
-        if (!stateless) {
-            // the conditional at the beginning of this function validates that pendingHistory isn't undefined
-            // if stateless is false
-            pendingHistory.generatedStep = command;
-            pendingHistory.serializedCommand = serializeAICommand(command);
-            pendingHistory.state = "DONE";
-        }
-        return result;
+            // TODO(ENG-139): Save other a11y stuff as well.
+            // Update the command with the targeted element
+            // if this is the first time the command was generated
+            if (result.elementInteracted &&
+                "target" in command &&
+                !command.target.elementDescriptor) {
+                // Save the serialized element interacted as the "descriptor" for now
+                // In the future, we can ask the LLM for a more human-readable descriptor
+                command.target.elementDescriptor = result.elementInteracted;
+            }
+            if (!stateless) {
+                // the conditional at the beginning of this function validates that pendingHistory isn't undefined
+                // if stateless is false
+                pendingHistory.generatedStep = command;
+                pendingHistory.serializedCommand = serializeAICommand(command);
+                pendingHistory.state = "DONE";
+            }
+            return result;
+        });
     }
     /**
      * Executes a preset command.
      * For most cases, the execution result contains metadata about the command executed.
      * For assertions, an AssertionResult with thoughts is returned.
      */
-    async executePresetStep(command, disableCache) {
-        const urlBeforeCommand = this.browser.url;
-        switch (command.type) {
-            case preset_PresetCommandType.AI_ASSERTION: {
-                let params;
-                if (command.useVision) {
-                    params = {
-                        goal: command.assertion,
-                        url: urlBeforeCommand,
-                        // used for vision only
-                        screenshot: await this.browser.screenshot(),
-                        // unused for visual assertion
-                        browserState: "",
-                        history: "",
-                        numPrevious: -1,
-                        lastCommand: null,
+    executePresetStep(command, disableCache) {
+        var _a, _b;
+        return controller_awaiter(this, void 0, void 0, function* () {
+            const urlBeforeCommand = this.browser.url;
+            switch (command.type) {
+                case preset_PresetCommandType.AI_ASSERTION: {
+                    let params;
+                    if (command.useVision) {
+                        params = {
+                            goal: command.assertion,
+                            url: urlBeforeCommand,
+                            // used for vision only
+                            screenshot: yield this.browser.screenshot(),
+                            // unused for visual assertion
+                            browserState: "",
+                            history: "",
+                            numPrevious: -1,
+                            lastCommand: null,
+                        };
+                    }
+                    else {
+                        const browserState = yield this.getBrowserState();
+                        const history = this.getSerializedHistory(urlBeforeCommand, browserState);
+                        params = {
+                            goal: command.assertion,
+                            url: urlBeforeCommand,
+                            // used for text only
+                            browserState,
+                            history,
+                            lastCommand: this.lastExecutedCommand,
+                            numPrevious: this.commandHistory.length,
+                        };
+                    }
+                    const result = yield this.generator.getAssertionResult(params, command.useVision, command.disableCache);
+                    if (result.relevantElements) {
+                        // highlight relevant elements
+                        void Promise.all(result.relevantElements.map((id) => this.browser.highlight({ id })));
+                    }
+                    return result;
+                }
+                case preset_PresetCommandType.NAVIGATE:
+                    yield this.browser.navigate(command.url);
+                    break;
+                case preset_PresetCommandType.GO_BACK:
+                    yield this.browser.goBack();
+                    break;
+                case preset_PresetCommandType.GO_FORWARD:
+                    yield this.browser.goForward();
+                    break;
+                case preset_PresetCommandType.SCROLL_DOWN:
+                    yield this.browser.scrollDown();
+                    break;
+                case preset_PresetCommandType.SCROLL_UP:
+                    yield this.browser.scrollUp();
+                    break;
+                case preset_PresetCommandType.WAIT:
+                    yield this.browser.wait(command.delay * 1000);
+                    break;
+                case preset_PresetCommandType.REFRESH:
+                    yield this.browser.refresh();
+                    break;
+                case preset_PresetCommandType.CLICK: {
+                    let id;
+                    if (command.target.a11yData) {
+                        id = (_a = command.target.a11yData) === null || _a === void 0 ? void 0 : _a.id;
+                    }
+                    else {
+                        const locator = yield this.locateElement(command.target.elementDescriptor, disableCache);
+                        id = locator.id;
+                    }
+                    const elementInteracted = yield this.browser.click({
+                        id,
+                    }, {
+                        doubleClick: command.doubleClick,
+                        rightClick: command.rightClick,
+                    });
+                    const result = {
+                        type: ExecuteResultType.COMMAND,
+                        urlAfterCommand: this.browser.url,
+                        succeedImmediately: false,
+                        elementInteracted,
+                    };
+                    if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
+                        result.succeedImmediately = true;
+                        result.succeedImmediatelyReason = "URL changed";
+                    }
+                    return result;
+                }
+                case preset_PresetCommandType.SELECT_OPTION: {
+                    let id;
+                    if (command.target.a11yData) {
+                        id = (_b = command.target.a11yData) === null || _b === void 0 ? void 0 : _b.id;
+                    }
+                    else {
+                        const locator = yield this.locateElement(command.target.elementDescriptor, disableCache);
+                        id = locator.id;
+                    }
+                    const elementInteracted = yield this.browser.selectOption({
+                        id,
+                    }, command.option);
+                    return {
+                        type: ExecuteResultType.COMMAND,
+                        succeedImmediately: false,
+                        urlAfterCommand: this.browser.url,
+                        elementInteracted,
                     };
                 }
-                else {
-                    const browserState = await this.getBrowserState();
-                    const history = this.getSerializedHistory(urlBeforeCommand, browserState);
-                    params = {
-                        goal: command.assertion,
-                        url: urlBeforeCommand,
-                        // used for text only
-                        browserState,
-                        history,
-                        lastCommand: this.lastExecutedCommand,
-                        numPrevious: this.commandHistory.length,
+                case preset_PresetCommandType.TYPE: {
+                    let elementInteracted;
+                    const target = command.target;
+                    if (target.a11yData) {
+                        elementInteracted = yield this.browser.click({
+                            id: target.a11yData.id,
+                        });
+                    }
+                    else if (target.elementDescriptor.length > 0) {
+                        const locator = yield this.locateElement(command.target.elementDescriptor, disableCache);
+                        elementInteracted = yield this.browser.click({
+                            id: locator.id,
+                        });
+                    }
+                    yield this.browser.type(command.value, {
+                        clearContent: command.clearContent,
+                        pressKeysSequentially: command.pressKeysSequentially,
+                    });
+                    if (command.pressEnter) {
+                        yield this.browser.press("Enter");
+                    }
+                    const result = {
+                        type: ExecuteResultType.COMMAND,
+                        urlAfterCommand: this.browser.url,
+                        succeedImmediately: false,
+                        elementInteracted,
                     };
+                    if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
+                        result.succeedImmediately = true;
+                        result.succeedImmediatelyReason = "URL changed";
+                    }
+                    return result;
                 }
-                const result = await this.generator.getAssertionResult(params, command.useVision, command.disableCache);
-                if (result.relevantElements) {
-                    // highlight relevant elements
-                    void Promise.all(result.relevantElements.map((id) => this.browser.highlight({ id })));
-                }
-                return result;
+                case preset_PresetCommandType.PRESS:
+                    yield this.browser.press(command.value);
+                    const result = {
+                        type: ExecuteResultType.COMMAND,
+                        urlAfterCommand: this.browser.url,
+                        succeedImmediately: false,
+                    };
+                    if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
+                        result.succeedImmediately = true;
+                        result.succeedImmediatelyReason = "URL changed";
+                    }
+                    return result;
+                default:
+                    const assertUnreachable = (_x) => {
+                        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+                    };
+                    return assertUnreachable(command);
             }
-            case preset_PresetCommandType.NAVIGATE:
-                await this.browser.navigate(command.url);
-                break;
-            case preset_PresetCommandType.GO_BACK:
-                await this.browser.goBack();
-                break;
-            case preset_PresetCommandType.GO_FORWARD:
-                await this.browser.goForward();
-                break;
-            case preset_PresetCommandType.SCROLL_DOWN:
-                await this.browser.scrollDown();
-                break;
-            case preset_PresetCommandType.SCROLL_UP:
-                await this.browser.scrollUp();
-                break;
-            case preset_PresetCommandType.WAIT:
-                await this.browser.wait(command.delay * 1000);
-                break;
-            case preset_PresetCommandType.REFRESH:
-                await this.browser.refresh();
-                break;
-            case preset_PresetCommandType.CLICK: {
-                let id;
-                if (command.target.a11yData) {
-                    id = command.target.a11yData?.id;
-                }
-                else {
-                    const locator = await this.locateElement(command.target.elementDescriptor, disableCache);
-                    id = locator.id;
-                }
-                const elementInteracted = await this.browser.click({
-                    id,
-                }, {
-                    doubleClick: command.doubleClick,
-                    rightClick: command.rightClick,
-                });
-                const result = {
-                    type: ExecuteResultType.COMMAND,
-                    urlAfterCommand: this.browser.url,
-                    succeedImmediately: false,
-                    elementInteracted,
-                };
-                if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
-                    result.succeedImmediately = true;
-                    result.succeedImmediatelyReason = "URL changed";
-                }
-                return result;
-            }
-            case preset_PresetCommandType.SELECT_OPTION: {
-                let id;
-                if (command.target.a11yData) {
-                    id = command.target.a11yData?.id;
-                }
-                else {
-                    const locator = await this.locateElement(command.target.elementDescriptor, disableCache);
-                    id = locator.id;
-                }
-                const elementInteracted = await this.browser.selectOption({
-                    id,
-                }, command.option);
-                return {
-                    type: ExecuteResultType.COMMAND,
-                    succeedImmediately: false,
-                    urlAfterCommand: this.browser.url,
-                    elementInteracted,
-                };
-            }
-            case preset_PresetCommandType.TYPE: {
-                let elementInteracted;
-                const target = command.target;
-                if (target.a11yData) {
-                    elementInteracted = await this.browser.click({
-                        id: target.a11yData.id,
-                    });
-                }
-                else if (target.elementDescriptor.length > 0) {
-                    const locator = await this.locateElement(command.target.elementDescriptor, disableCache);
-                    elementInteracted = await this.browser.click({
-                        id: locator.id,
-                    });
-                }
-                await this.browser.type(command.value, {
-                    clearContent: command.clearContent,
-                    pressKeysSequentially: command.pressKeysSequentially,
-                });
-                if (command.pressEnter) {
-                    await this.browser.press("Enter");
-                }
-                const result = {
-                    type: ExecuteResultType.COMMAND,
-                    urlAfterCommand: this.browser.url,
-                    succeedImmediately: false,
-                    elementInteracted,
-                };
-                if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
-                    result.succeedImmediately = true;
-                    result.succeedImmediatelyReason = "URL changed";
-                }
-                return result;
-            }
-            case preset_PresetCommandType.PRESS:
-                await this.browser.press(command.value);
-                const result = {
-                    type: ExecuteResultType.COMMAND,
-                    urlAfterCommand: this.browser.url,
-                    succeedImmediately: false,
-                };
-                if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
-                    result.succeedImmediately = true;
-                    result.succeedImmediatelyReason = "URL changed";
-                }
-                return result;
-            default:
-                const assertUnreachable = (_x) => {
-                    throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-                };
-                return assertUnreachable(command);
-        }
-        return {
-            type: ExecuteResultType.COMMAND,
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url,
-        };
+            return {
+                type: ExecuteResultType.COMMAND,
+                succeedImmediately: false,
+                urlAfterCommand: this.browser.url,
+            };
+        });
     }
-    async sendCommandToBrowser(command, disableCache) {
-        switch (command.type) {
-            /**
-             * Control flow
-             */
-            case ControlFlowCommandType.SUCCESS:
-            case ControlFlowCommandType.FAILURE:
-                return {
-                    type: ExecuteResultType.COMMAND,
-                    succeedImmediately: false,
-                    urlAfterCommand: this.browser.url,
-                };
-            /**
-             * Preset action
-             */
-            default:
-                const result = await this.executePresetStep(command, disableCache);
-                if (result.type !== "command") {
-                    // AI should never generate 'assertion' results
-                    throw new Error(`Unexpected preset result type ${result.type} from executing AI action`);
-                }
-                return result;
-        }
+    sendCommandToBrowser(command, disableCache) {
+        return controller_awaiter(this, void 0, void 0, function* () {
+            switch (command.type) {
+                /**
+                 * Control flow
+                 */
+                case ControlFlowCommandType.SUCCESS:
+                case ControlFlowCommandType.FAILURE:
+                    return {
+                        type: ExecuteResultType.COMMAND,
+                        succeedImmediately: false,
+                        urlAfterCommand: this.browser.url,
+                    };
+                /**
+                 * Preset action
+                 */
+                default:
+                    const result = yield this.executePresetStep(command, disableCache);
+                    if (result.type !== "command") {
+                        // AI should never generate 'assertion' results
+                        throw new Error(`Unexpected preset result type ${result.type} from executing AI action`);
+                    }
+                    return result;
+            }
+        });
     }
 }
 
@@ -2764,6 +2874,15 @@ class AgentController {
 var fetch_retry = __nccwpck_require__(62);
 var fetch_retry_default = /*#__PURE__*/__nccwpck_require__.n(fetch_retry);
 ;// CONCATENATED MODULE: ../../packages/web-agent/src/generators/api-generator.ts
+var api_generator_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 
 
 
@@ -2774,72 +2893,83 @@ class APIGenerator {
         this.baseURL = params.baseURL;
         this.apiKey = params.apiKey;
     }
-    async getElementLocation(context, disableCache) {
-        const result = await this.sendRequest(`/${API_VERSION}/web-agent/locate-element`, {
-            browserState: context.browserState,
-            goal: context.goal,
-            disableCache,
-        });
-        return locator_AILocatorSchema.parse(result);
-    }
-    async getAssertionResult(context, useVision, disableCache) {
-        if (useVision) {
-            const result = await this.sendRequest(`/${API_VERSION}/web-agent/assertion`, {
-                url: context.url,
+    getElementLocation(context, disableCache) {
+        return api_generator_awaiter(this, void 0, void 0, function* () {
+            const result = yield this.sendRequest(`/${API_VERSION}/web-agent/locate-element`, {
+                browserState: context.browserState,
                 goal: context.goal,
-                screenshot: context.screenshot?.toString("base64"),
                 disableCache,
-                vision: true,
+            });
+            return locator_AILocatorSchema.parse(result);
+        });
+    }
+    getAssertionResult(context, useVision, disableCache) {
+        var _a;
+        return api_generator_awaiter(this, void 0, void 0, function* () {
+            if (useVision) {
+                const result = yield this.sendRequest(`/${API_VERSION}/web-agent/assertion`, {
+                    url: context.url,
+                    goal: context.goal,
+                    screenshot: (_a = context.screenshot) === null || _a === void 0 ? void 0 : _a.toString("base64"),
+                    disableCache,
+                    vision: true,
+                });
+                return execute_results_ExecuteAssertionResultSchema.parse(result);
+            }
+            const result = yield this.sendRequest(`/${API_VERSION}/web-agent/assertion`, {
+                url: context.url,
+                browserState: context.browserState,
+                goal: context.goal,
+                history: context.history,
+                numPrevious: context.numPrevious,
+                lastCommand: context.lastCommand,
+                disableCache,
+                vision: false,
             });
             return execute_results_ExecuteAssertionResultSchema.parse(result);
-        }
-        const result = await this.sendRequest(`/${API_VERSION}/web-agent/assertion`, {
-            url: context.url,
-            browserState: context.browserState,
-            goal: context.goal,
-            history: context.history,
-            numPrevious: context.numPrevious,
-            lastCommand: context.lastCommand,
-            disableCache,
-            vision: false,
         });
-        return execute_results_ExecuteAssertionResultSchema.parse(result);
     }
-    async getProposedCommand(context, disableCache) {
-        const result = await this.sendRequest(`/${API_VERSION}/web-agent/next-command`, {
-            url: context.url,
-            browserState: context.browserState,
-            goal: context.goal,
-            history: context.history,
-            numPrevious: context.numPrevious,
-            lastCommand: context.lastCommand,
-            disableCache,
+    getProposedCommand(context, disableCache) {
+        return api_generator_awaiter(this, void 0, void 0, function* () {
+            const result = yield this.sendRequest(`/${API_VERSION}/web-agent/next-command`, {
+                url: context.url,
+                browserState: context.browserState,
+                goal: context.goal,
+                history: context.history,
+                numPrevious: context.numPrevious,
+                lastCommand: context.lastCommand,
+                disableCache,
+            });
+            return ai_commands_AICommandSchema.parse(result);
         });
-        return ai_commands_AICommandSchema.parse(result);
     }
-    async getGranularGoals(context, disableCache) {
-        const result = await this.sendRequest(`/${API_VERSION}/web-agent/split-goal`, {
-            url: context.url,
-            goal: context.goal,
-            disableCache,
+    getGranularGoals(context, disableCache) {
+        return api_generator_awaiter(this, void 0, void 0, function* () {
+            const result = yield this.sendRequest(`/${API_VERSION}/web-agent/split-goal`, {
+                url: context.url,
+                goal: context.goal,
+                disableCache,
+            });
+            return external_zod_namespaceObject.string().array().parse(result);
         });
-        return external_zod_namespaceObject.string().array().parse(result);
     }
-    async sendRequest(path, body) {
-        const response = await fetch(`${this.baseURL}${path}`, {
-            retries: 3,
-            retryDelay: 1000,
-            method: "POST",
-            body: JSON.stringify(body),
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${this.apiKey}`,
-            },
+    sendRequest(path, body) {
+        return api_generator_awaiter(this, void 0, void 0, function* () {
+            const response = yield fetch(`${this.baseURL}${path}`, {
+                retries: 3,
+                retryDelay: 1000,
+                method: "POST",
+                body: JSON.stringify(body),
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${this.apiKey}`,
+                },
+            });
+            if (!response.ok) {
+                throw new Error(`Request to ${path} failed with status ${response.status}: ${yield response.text()}`);
+            }
+            return response.json();
         });
-        if (!response.ok) {
-            throw new Error(`Request to ${path} failed with status ${response.status}: ${await response.text()}`);
-        }
-        return response.json();
     }
 }
 
@@ -2852,7 +2982,6 @@ class APIGenerator {
 
 })();
 
-var __webpack_exports__APIGenerator = __webpack_exports__._w;
-var __webpack_exports__AgentController = __webpack_exports__.Yt;
-var __webpack_exports__ChromeBrowser = __webpack_exports__.DE;
-export { __webpack_exports__APIGenerator as APIGenerator, __webpack_exports__AgentController as AgentController, __webpack_exports__ChromeBrowser as ChromeBrowser };
+module.exports = __webpack_exports__;
+/******/ })()
+;
