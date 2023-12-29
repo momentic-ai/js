@@ -1,31 +1,3 @@
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -47,17 +19,11 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
-// src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  APIGenerator: () => APIGenerator,
-  AgentController: () => AgentController,
-  ChromeBrowser: () => ChromeBrowser
-});
-module.exports = __toCommonJS(src_exports);
-
 // ../../packages/web-agent/src/browsers/chrome.ts
-var import_playwright = require("playwright");
+import {
+  chromium,
+  devices
+} from "playwright";
 
 // ../../packages/web-agent/src/utils/url.ts
 var urlChanged = (url1, url2) => {
@@ -67,7 +33,7 @@ var urlChanged = (url1, url2) => {
 };
 
 // ../../packages/types/src/a11y-targets.ts
-var z = __toESM(require("zod"), 1);
+import * as z from "zod";
 var A11yTargetWithCacheSchema = z.object({
   // a11y ID
   id: z.number().int(),
@@ -81,15 +47,15 @@ var A11yTargetWithCacheSchema = z.object({
 });
 
 // ../../packages/types/src/assertions.ts
-var import_zod = require("zod");
-var LLMAssertionEvalSchema = import_zod.z.object({
-  thoughts: import_zod.z.string(),
-  result: import_zod.z.boolean(),
-  relevantElements: import_zod.z.array(import_zod.z.number()).optional()
+import { z as z2 } from "zod";
+var LLMAssertionEvalSchema = z2.object({
+  thoughts: z2.string(),
+  result: z2.boolean(),
+  relevantElements: z2.array(z2.number()).optional()
 });
 
 // ../../packages/types/src/ai-commands.ts
-var z4 = __toESM(require("zod"), 1);
+import * as z4 from "zod";
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -106,8 +72,8 @@ var EmptyA11yTreeError = class extends Error {
 };
 
 // ../../packages/types/src/preset.ts
-var import_dedent = __toESM(require("dedent"), 1);
-var z3 = __toESM(require("zod"), 1);
+import dedent from "dedent";
+import * as z3 from "zod";
 var ElementDescriptorSchema = z3.object({
   // natural language passed to LLM
   elementDescriptor: z3.string(),
@@ -164,7 +130,7 @@ var ClickCommandSchema = CommonCommandSchema.merge(
     rightClick: z3.boolean().default(false)
   })
 ).describe(
-  import_dedent.default`CLICK <id> - click on the element that has the specified id.
+  dedent`CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
@@ -265,10 +231,10 @@ var LLMOutputSchema = z4.object({
 var NumericStringSchema = z4.string().pipe(z4.coerce.number());
 
 // ../../packages/types/src/command-results.ts
-var z6 = __toESM(require("zod"), 1);
+import * as z6 from "zod";
 
 // ../../packages/types/src/steps.ts
-var z5 = __toESM(require("zod"), 1);
+import * as z5 from "zod";
 var StepType = /* @__PURE__ */ ((StepType2) => {
   StepType2["AI_ACTION"] = "AI_ACTION";
   StepType2["PRESET_ACTION"] = "PRESET_ACTION";
@@ -384,7 +350,7 @@ var ResultSchema = z6.discriminatedUnion("type", [
 ]);
 
 // ../../packages/types/src/execute-results.ts
-var z7 = __toESM(require("zod"), 1);
+import * as z7 from "zod";
 var ExecuteCommandHistoryEntrySchema = z7.object({
   // type of command executed
   type: z7.nativeEnum(StepType),
@@ -402,11 +368,11 @@ var ExecuteAssertionResultSchema = z7.object({
 });
 
 // ../../packages/types/src/goal-splitter.ts
-var import_zod2 = require("zod");
-var InstructionsSchema = import_zod2.z.string().array();
+import { z as z8 } from "zod";
+var InstructionsSchema = z8.string().array();
 
 // ../../packages/types/src/locator.ts
-var z9 = __toESM(require("zod"), 1);
+import * as z9 from "zod";
 var AILocatorSchema = z9.object({
   thoughts: z9.string(),
   // a11y id
@@ -416,23 +382,23 @@ var AILocatorSchema = z9.object({
 });
 
 // ../../packages/types/src/modules.ts
-var import_zod3 = require("zod");
-var ModuleMetadataSchema = import_zod3.z.object({
-  id: import_zod3.z.string(),
-  createdAt: import_zod3.z.coerce.date(),
-  createdBy: import_zod3.z.string(),
-  organizationId: import_zod3.z.string().or(import_zod3.z.null()),
-  name: import_zod3.z.string(),
-  schemaVersion: import_zod3.z.string(),
+import { z as z10 } from "zod";
+var ModuleMetadataSchema = z10.object({
+  id: z10.string(),
+  createdAt: z10.coerce.date(),
+  createdBy: z10.string(),
+  organizationId: z10.string().or(z10.null()),
+  name: z10.string(),
+  schemaVersion: z10.string(),
   // this is only used in the client and is not stored in the db
-  numSteps: import_zod3.z.number()
+  numSteps: z10.number()
 });
-var ModuleSchema = import_zod3.z.object({
+var ModuleSchema = z10.object({
   steps: AllowedModuleStepSchema.array()
 }).merge(ModuleMetadataSchema.omit({ numSteps: true }));
 
 // ../../packages/types/src/runs.ts
-var import_zod4 = require("zod");
+import { z as z11 } from "zod";
 var RunTrigger = {
   WEBHOOK: "WEBHOOK",
   CRON: "CRON",
@@ -445,31 +411,31 @@ var RunStatusEnum = {
   FAILED: "FAILED",
   CANCELLED: "CANCELLED"
 };
-var DateOrStringSchema = import_zod4.z.string().pipe(import_zod4.z.coerce.date()).or(import_zod4.z.date());
-var RunMetadataSchema = import_zod4.z.object({
-  id: import_zod4.z.string(),
+var DateOrStringSchema = z11.string().pipe(z11.coerce.date()).or(z11.date());
+var RunMetadataSchema = z11.object({
+  id: z11.string(),
   createdAt: DateOrStringSchema,
-  createdBy: import_zod4.z.string(),
-  organizationId: import_zod4.z.string().or(import_zod4.z.null()),
-  scheduledAt: DateOrStringSchema.or(import_zod4.z.null()),
-  startedAt: DateOrStringSchema.or(import_zod4.z.null()),
-  finishedAt: DateOrStringSchema.or(import_zod4.z.null()),
-  testId: import_zod4.z.string().or(import_zod4.z.null()),
-  status: import_zod4.z.nativeEnum(RunStatusEnum),
-  trigger: import_zod4.z.nativeEnum(RunTrigger),
-  test: import_zod4.z.object({
-    name: import_zod4.z.string(),
-    id: import_zod4.z.string()
-  }).or(import_zod4.z.null())
+  createdBy: z11.string(),
+  organizationId: z11.string().or(z11.null()),
+  scheduledAt: DateOrStringSchema.or(z11.null()),
+  startedAt: DateOrStringSchema.or(z11.null()),
+  finishedAt: DateOrStringSchema.or(z11.null()),
+  testId: z11.string().or(z11.null()),
+  status: z11.nativeEnum(RunStatusEnum),
+  trigger: z11.nativeEnum(RunTrigger),
+  test: z11.object({
+    name: z11.string(),
+    id: z11.string()
+  }).or(z11.null())
 });
 var RunWithTestSchema = RunMetadataSchema.merge(
-  import_zod4.z.object({
+  z11.object({
     results: ResultSchema.array(),
-    test: import_zod4.z.object({
-      name: import_zod4.z.string(),
-      id: import_zod4.z.string(),
-      baseUrl: import_zod4.z.string()
-    }).or(import_zod4.z.null())
+    test: z11.object({
+      name: z11.string(),
+      id: z11.string(),
+      baseUrl: z11.string()
+    }).or(z11.null())
   })
 );
 
@@ -545,56 +511,56 @@ function serializePresetCommand(command) {
 }
 
 // ../../packages/types/src/test.ts
-var import_zod6 = require("zod");
+import { z as z13 } from "zod";
 
 // ../../packages/types/src/test-settings.ts
-var import_cron_validator = require("cron-validator");
-var import_zod5 = require("zod");
-var TestAdvancedSettingsSchema = import_zod5.z.object({
-  availableAsModule: import_zod5.z.boolean().default(false),
-  disableAICaching: import_zod5.z.boolean().default(false)
+import { isValidCron } from "cron-validator";
+import { z as z12 } from "zod";
+var TestAdvancedSettingsSchema = z12.object({
+  availableAsModule: z12.boolean().default(false),
+  disableAICaching: z12.boolean().default(false)
 });
-var ScheduleSettingsSchema = import_zod5.z.object({
-  cron: import_zod5.z.string().refine(
+var ScheduleSettingsSchema = z12.object({
+  cron: z12.string().refine(
     (v) => {
-      return (0, import_cron_validator.isValidCron)(v);
+      return isValidCron(v);
     },
     { message: "Invalid cron expression." }
   ).default("0 0 */1 * *"),
-  enabled: import_zod5.z.boolean().default(false),
-  timeZone: import_zod5.z.string().default("America/Los_Angeles"),
+  enabled: z12.boolean().default(false),
+  timeZone: z12.string().default("America/Los_Angeles"),
   // this is used for removing repeatable jobs (not set by user)
-  jobKey: import_zod5.z.string().optional()
+  jobKey: z12.string().optional()
 });
-var WebhookSchema = import_zod5.z.object({
-  lastStatus: import_zod5.z.number().optional(),
-  url: import_zod5.z.string().url()
+var WebhookSchema = z12.object({
+  lastStatus: z12.number().optional(),
+  url: z12.string().url()
 });
-var WebhookSettingsSchema = import_zod5.z.array(WebhookSchema).default([]);
-var TestSettingsSchema = import_zod5.z.object({
-  name: import_zod5.z.string().min(1),
-  baseUrl: import_zod5.z.string().url(),
+var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
+var TestSettingsSchema = z12.object({
+  name: z12.string().min(1),
+  baseUrl: z12.string().url(),
   advanced: TestAdvancedSettingsSchema
 });
 
 // ../../packages/types/src/test.ts
-var ResolvedTestSchema = import_zod6.z.object({
-  id: import_zod6.z.string(),
-  name: import_zod6.z.string(),
-  baseUrl: import_zod6.z.string(),
-  steps: import_zod6.z.array(ResolvedStepSchema),
-  createdAt: import_zod6.z.coerce.date(),
-  updatedAt: import_zod6.z.coerce.date(),
-  createdBy: import_zod6.z.string(),
-  organizationId: import_zod6.z.string().or(import_zod6.z.null()),
-  schemaVersion: import_zod6.z.string(),
+var ResolvedTestSchema = z13.object({
+  id: z13.string(),
+  name: z13.string(),
+  baseUrl: z13.string(),
+  steps: z13.array(ResolvedStepSchema),
+  createdAt: z13.coerce.date(),
+  updatedAt: z13.coerce.date(),
+  createdBy: z13.string(),
+  organizationId: z13.string().or(z13.null()),
+  schemaVersion: z13.string(),
   advanced: TestAdvancedSettingsSchema,
   schedule: ScheduleSettingsSchema,
   webhooks: WebhookSettingsSchema
 });
 
 // ../../packages/types/src/context.ts
-var z14 = __toESM(require("zod"), 1);
+import * as z14 from "zod";
 var DynamicContextSchema = z14.object({
   // user goal or instruction
   goal: z14.string(),
@@ -611,7 +577,7 @@ var DynamicContextSchema = z14.object({
 });
 
 // ../../packages/types/src/public-api.ts
-var z15 = __toESM(require("zod"), 1);
+import * as z15 from "zod";
 var GeneratorOptionsSchema = z15.object({
   disableCache: z15.boolean()
 });
@@ -1048,7 +1014,7 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield import_playwright.chromium.launch({ headless: true });
+      const browser = yield chromium.launch({ headless: true });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -1056,7 +1022,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         },
         // comment out the below if you are on Mac OS but you're using a monitor
         deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: import_playwright.devices["Desktop Chrome"].userAgent,
+        userAgent: devices["Desktop Chrome"].userAgent,
         geolocation: { latitude: 37.7749, longitude: -122.4194 },
         // san francisco
         locale: "en-US",
@@ -1726,12 +1692,12 @@ var _ChromeBrowser = class _ChromeBrowser {
     });
   }
 };
-_ChromeBrowser.USER_AGENT = import_playwright.devices["Desktop Chrome"].userAgent;
+_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/controller.ts
-var import_dedent2 = __toESM(require("dedent"), 1);
-var import_diff_lines = __toESM(require("diff-lines"), 1);
+import dedent2 from "dedent";
+import diffLines from "diff-lines";
 var MAX_HISTORY_CHAR_LENGTH = 1e4;
 var AgentController = class {
   constructor({ browser, config, generator, logger }) {
@@ -1917,7 +1883,7 @@ var AgentController = class {
             `  URL CHANGE: '${log.urlBeforeCommand}' -> '${currentURL}'`
           );
         } else {
-          const browserStateDiff = (0, import_diff_lines.default)(
+          const browserStateDiff = diffLines(
             log.browserStateBeforeCommand,
             currentPageState,
             {
@@ -1940,7 +1906,7 @@ var AgentController = class {
     return historyLines.join("\n");
   }
   getListHistory() {
-    return import_dedent2.default`Here are the commands that you have successfully executed:
+    return dedent2`Here are the commands that you have successfully executed:
     ${this.commandHistory.filter((cmd) => cmd.type === "AI_ACTION" /* AI_ACTION */).map((cmd) => `- ${cmd.serializedCommand}`).join("\n")}`;
   }
   /**
@@ -2211,9 +2177,9 @@ var AgentController = class {
 };
 
 // ../../packages/web-agent/src/generators/api-generator.ts
-var import_fetch_retry = __toESM(require("fetch-retry"), 1);
-var z16 = __toESM(require("zod"), 1);
-var fetch = (0, import_fetch_retry.default)(global.fetch);
+import fetchRetry from "fetch-retry";
+import * as z16 from "zod";
+var fetch = fetchRetry(global.fetch);
 var API_VERSION = "v1";
 var APIGenerator = class {
   constructor(params) {
@@ -2316,9 +2282,8 @@ var APIGenerator = class {
     });
   }
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   APIGenerator,
   AgentController,
   ChromeBrowser
-});
+};
