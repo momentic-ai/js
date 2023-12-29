@@ -14,7 +14,6 @@ out
 
 # Production
 build
-dist
 
 # Misc
 .DS_Store
