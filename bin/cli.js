@@ -1,89 +1,17 @@
 #!/usr/bin/env node
-"use strict";
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __objRest = (source, exclude) => {
-  var target = {};
-  for (var prop in source)
-    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
-      target[prop] = source[prop];
-  if (source != null && __getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(source)) {
-      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
-        target[prop] = source[prop];
-    }
-  return target;
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
 
 // src/cli.ts
-var import_chalk = __toESM(require("chalk"));
-var import_commander = require("commander");
-var import_execa = require("execa");
-var import_wait_on = __toESM(require("wait-on"));
+import chalk from "chalk";
+import { Command as Command4, Option } from "commander";
+import { execa } from "execa";
+import waitOnFn from "wait-on";
 
 // ../../packages/types/src/commands.ts
-var import_dedent = __toESM(require("dedent"), 1);
-var z2 = __toESM(require("zod"), 1);
+import dedent from "dedent";
+import * as z2 from "zod";
 
 // ../../packages/types/src/a11y-targets.ts
-var z = __toESM(require("zod"), 1);
+import * as z from "zod";
 var A11yTargetWithCacheSchema = z.object({
   // a11y ID
   id: z.number().int(),
@@ -171,7 +99,7 @@ var ClickCommandSchema = CommonCommandSchema.merge(
     rightClick: z2.boolean().default(false)
   })
 ).describe(
-  import_dedent.default`CLICK <id> - click on the element that has the specified id.
+  dedent`CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
@@ -273,7 +201,7 @@ var AICommandSchema = z2.discriminatedUnion("type", [
 ]);
 
 // ../../packages/types/src/steps.ts
-var z3 = __toESM(require("zod"), 1);
+import * as z3 from "zod";
 var StepType = /* @__PURE__ */ ((StepType2) => {
   StepType2["AI_ACTION"] = "AI_ACTION";
   StepType2["PRESET_ACTION"] = "PRESET_ACTION";
@@ -316,18 +244,21 @@ var ResolvedStepSchema = z3.union([
 ]);
 
 // ../../packages/web-agent/src/browsers/chrome.ts
-var import_playwright = require("playwright");
+import {
+  chromium,
+  devices
+} from "playwright";
 
 // ../../packages/types/src/assertions.ts
-var import_zod = require("zod");
-var AIAssertionResultSchema = import_zod.z.object({
-  thoughts: import_zod.z.string(),
-  result: import_zod.z.boolean(),
-  relevantElements: import_zod.z.array(import_zod.z.number()).optional()
+import { z as z4 } from "zod";
+var AIAssertionResultSchema = z4.object({
+  thoughts: z4.string(),
+  result: z4.boolean(),
+  relevantElements: z4.array(z4.number()).optional()
 });
 
 // ../../packages/types/src/ai-command-generation.ts
-var import_zod2 = require("zod");
+import { z as z5 } from "zod";
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -344,14 +275,14 @@ var EmptyA11yTreeError = class extends Error {
 };
 
 // ../../packages/types/src/ai-command-generation.ts
-var LLMOutputSchema = import_zod2.z.object({
-  command: import_zod2.z.string(),
-  thoughts: import_zod2.z.string()
+var LLMOutputSchema = z5.object({
+  command: z5.string(),
+  thoughts: z5.string()
 });
-var NumericStringSchema = import_zod2.z.string().pipe(import_zod2.z.coerce.number());
+var NumericStringSchema = z5.string().pipe(z5.coerce.number());
 
 // ../../packages/types/src/command-results.ts
-var z6 = __toESM(require("zod"), 1);
+import * as z6 from "zod";
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
   ResultStatus2["SUCCESS"] = "SUCCESS";
   ResultStatus2["FAILED"] = "FAILED";
@@ -423,9 +354,9 @@ var ResultSchema = z6.discriminatedUnion("type", [
 ]);
 
 // ../../packages/types/src/cookies.ts
-var import_set_cookie_parser = require("set-cookie-parser");
+import { parseString } from "set-cookie-parser";
 function parseCookieString(cookie) {
-  const parsedCookie = (0, import_set_cookie_parser.parseString)(cookie);
+  const parsedCookie = parseString(cookie);
   if (!parsedCookie.name) {
     throw new Error("Name missing from cookie");
   }
@@ -448,15 +379,16 @@ function parseCookieString(cookie) {
   if (!parsedCookie.path && parsedCookie.domain) {
     parsedCookie.path = "/";
   }
-  const result = __spreadProps(__spreadValues({}, parsedCookie), {
+  const result = {
+    ...parsedCookie,
     expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
     sameSite
-  });
+  };
   return result;
 }
 
 // ../../packages/types/src/execute-results.ts
-var z7 = __toESM(require("zod"), 1);
+import * as z7 from "zod";
 var ExecuteCommandHistoryEntrySchema = z7.object({
   // type of command executed
   type: z7.nativeEnum(StepType),
@@ -469,11 +401,11 @@ var ExecuteCommandHistoryEntrySchema = z7.object({
 });
 
 // ../../packages/types/src/goal-splitter.ts
-var import_zod3 = require("zod");
-var InstructionsSchema = import_zod3.z.string().array();
+import { z as z8 } from "zod";
+var InstructionsSchema = z8.string().array();
 
 // ../../packages/types/src/locator.ts
-var z9 = __toESM(require("zod"), 1);
+import * as z9 from "zod";
 var AILocatorSchema = z9.object({
   thoughts: z9.string(),
   // a11y id
@@ -483,23 +415,23 @@ var AILocatorSchema = z9.object({
 });
 
 // ../../packages/types/src/modules.ts
-var import_zod4 = require("zod");
-var ModuleMetadataSchema = import_zod4.z.object({
-  id: import_zod4.z.string(),
-  createdAt: import_zod4.z.coerce.date(),
-  createdBy: import_zod4.z.string(),
-  organizationId: import_zod4.z.string().or(import_zod4.z.null()),
-  name: import_zod4.z.string(),
-  schemaVersion: import_zod4.z.string(),
+import { z as z10 } from "zod";
+var ModuleMetadataSchema = z10.object({
+  id: z10.string(),
+  createdAt: z10.coerce.date(),
+  createdBy: z10.string(),
+  organizationId: z10.string().or(z10.null()),
+  name: z10.string(),
+  schemaVersion: z10.string(),
   // this is only used in the client and is not stored in the db
-  numSteps: import_zod4.z.number()
+  numSteps: z10.number()
 });
-var ModuleSchema = import_zod4.z.object({
+var ModuleSchema = z10.object({
   steps: AllowedModuleStepSchema.array()
 }).merge(ModuleMetadataSchema.omit({ numSteps: true }));
 
 // ../../packages/types/src/runs.ts
-var import_zod5 = require("zod");
+import { z as z11 } from "zod";
 var RunTrigger = {
   WEBHOOK: "WEBHOOK",
   CRON: "CRON",
@@ -512,31 +444,31 @@ var RunStatusEnum = {
   FAILED: "FAILED",
   CANCELLED: "CANCELLED"
 };
-var DateOrStringSchema = import_zod5.z.string().pipe(import_zod5.z.coerce.date()).or(import_zod5.z.date());
-var RunMetadataSchema = import_zod5.z.object({
-  id: import_zod5.z.string(),
+var DateOrStringSchema = z11.string().pipe(z11.coerce.date()).or(z11.date());
+var RunMetadataSchema = z11.object({
+  id: z11.string(),
   createdAt: DateOrStringSchema,
-  createdBy: import_zod5.z.string(),
-  organizationId: import_zod5.z.string().or(import_zod5.z.null()),
-  scheduledAt: DateOrStringSchema.or(import_zod5.z.null()),
-  startedAt: DateOrStringSchema.or(import_zod5.z.null()),
-  finishedAt: DateOrStringSchema.or(import_zod5.z.null()),
-  testId: import_zod5.z.string().or(import_zod5.z.null()),
-  status: import_zod5.z.nativeEnum(RunStatusEnum),
-  trigger: import_zod5.z.nativeEnum(RunTrigger),
-  test: import_zod5.z.object({
-    name: import_zod5.z.string(),
-    id: import_zod5.z.string()
-  }).or(import_zod5.z.null())
+  createdBy: z11.string(),
+  organizationId: z11.string().or(z11.null()),
+  scheduledAt: DateOrStringSchema.or(z11.null()),
+  startedAt: DateOrStringSchema.or(z11.null()),
+  finishedAt: DateOrStringSchema.or(z11.null()),
+  testId: z11.string().or(z11.null()),
+  status: z11.nativeEnum(RunStatusEnum),
+  trigger: z11.nativeEnum(RunTrigger),
+  test: z11.object({
+    name: z11.string(),
+    id: z11.string()
+  }).or(z11.null())
 });
 var RunWithTestSchema = RunMetadataSchema.merge(
-  import_zod5.z.object({
+  z11.object({
     results: ResultSchema.array(),
-    test: import_zod5.z.object({
-      name: import_zod5.z.string(),
-      id: import_zod5.z.string(),
-      baseUrl: import_zod5.z.string()
-    }).or(import_zod5.z.null())
+    test: z11.object({
+      name: z11.string(),
+      id: z11.string(),
+      baseUrl: z11.string()
+    }).or(z11.null())
   })
 );
 
@@ -641,56 +573,56 @@ var CARD_DESCRIPTIONS = {
 };
 
 // ../../packages/types/src/test.ts
-var import_zod7 = require("zod");
+import { z as z13 } from "zod";
 
 // ../../packages/types/src/test-settings.ts
-var import_cron_validator = require("cron-validator");
-var import_zod6 = require("zod");
-var TestAdvancedSettingsSchema = import_zod6.z.object({
-  availableAsModule: import_zod6.z.boolean().default(false),
-  disableAICaching: import_zod6.z.boolean().default(false)
+import { isValidCron } from "cron-validator";
+import { z as z12 } from "zod";
+var TestAdvancedSettingsSchema = z12.object({
+  availableAsModule: z12.boolean().default(false),
+  disableAICaching: z12.boolean().default(false)
 });
-var ScheduleSettingsSchema = import_zod6.z.object({
-  cron: import_zod6.z.string().refine(
+var ScheduleSettingsSchema = z12.object({
+  cron: z12.string().refine(
     (v) => {
-      return (0, import_cron_validator.isValidCron)(v);
+      return isValidCron(v);
     },
     { message: "Invalid cron expression." }
   ).default("0 0 */1 * *"),
-  enabled: import_zod6.z.boolean().default(false),
-  timeZone: import_zod6.z.string().default("America/Los_Angeles"),
+  enabled: z12.boolean().default(false),
+  timeZone: z12.string().default("America/Los_Angeles"),
   // this is used for removing repeatable jobs (not set by user)
-  jobKey: import_zod6.z.string().optional()
+  jobKey: z12.string().optional()
 });
-var WebhookSchema = import_zod6.z.object({
-  lastStatus: import_zod6.z.number().optional(),
-  url: import_zod6.z.string().url()
+var WebhookSchema = z12.object({
+  lastStatus: z12.number().optional(),
+  url: z12.string().url()
 });
-var WebhookSettingsSchema = import_zod6.z.array(WebhookSchema).default([]);
-var TestSettingsSchema = import_zod6.z.object({
-  name: import_zod6.z.string().min(1),
-  baseUrl: import_zod6.z.string().url(),
+var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
+var TestSettingsSchema = z12.object({
+  name: z12.string().min(1),
+  baseUrl: z12.string().url(),
   advanced: TestAdvancedSettingsSchema
 });
 
 // ../../packages/types/src/test.ts
-var ResolvedTestSchema = import_zod7.z.object({
-  id: import_zod7.z.string(),
-  name: import_zod7.z.string(),
-  baseUrl: import_zod7.z.string(),
-  steps: import_zod7.z.array(ResolvedStepSchema),
-  createdAt: import_zod7.z.coerce.date(),
-  updatedAt: import_zod7.z.coerce.date(),
-  createdBy: import_zod7.z.string(),
-  organizationId: import_zod7.z.string().or(import_zod7.z.null()),
-  schemaVersion: import_zod7.z.string(),
+var ResolvedTestSchema = z13.object({
+  id: z13.string(),
+  name: z13.string(),
+  baseUrl: z13.string(),
+  steps: z13.array(ResolvedStepSchema),
+  createdAt: z13.coerce.date(),
+  updatedAt: z13.coerce.date(),
+  createdBy: z13.string(),
+  organizationId: z13.string().or(z13.null()),
+  schemaVersion: z13.string(),
   advanced: TestAdvancedSettingsSchema,
   schedule: ScheduleSettingsSchema,
   webhooks: WebhookSettingsSchema
 });
 
 // ../../packages/types/src/context.ts
-var z14 = __toESM(require("zod"), 1);
+import * as z14 from "zod";
 var DynamicContextSchema = z14.object({
   // user goal or instruction
   goal: z14.string(),
@@ -707,7 +639,7 @@ var DynamicContextSchema = z14.object({
 });
 
 // ../../packages/types/src/public-api.ts
-var z15 = __toESM(require("zod"), 1);
+import * as z15 from "zod";
 var GeneratorOptionsSchema = z15.object({
   disableCache: z15.boolean()
 });
@@ -788,6 +720,18 @@ var defaultA11yNodeSerializeParams = {
   noProperties: false
 };
 var ProcessedA11yNode = class {
+  id;
+  role;
+  name;
+  content;
+  properties;
+  // css-like selector from the root of the tree to the current node
+  pathFromRoot;
+  parent;
+  // md5 hash - set lazily in most cases (not used at the moment)
+  // md5Sum: string;
+  children;
+  backendNodeID;
   constructor(params) {
     this.id = params.id;
     this.role = params.role;
@@ -799,11 +743,10 @@ var ProcessedA11yNode = class {
     this.backendNodeID = params.backendNodeID;
   }
   getLogForm() {
-    var _a, _b;
     return JSON.stringify({
       id: this.id,
-      name: (_a = this.name) != null ? _a : "",
-      role: (_b = this.role) != null ? _b : "",
+      name: this.name ?? "",
+      role: this.role ?? "",
       backendNodeId: this.backendNodeID
     });
   }
@@ -896,7 +839,7 @@ function getNodePathIdentifier(node) {
   return `"${node.nodeId}"`;
 }
 function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
-  var _a, _b, _c, _d, _e, _f, _g;
+  var _a, _b, _c, _d, _e, _f;
   if (!parent && node.parentId) {
     throw new Error(
       `Got no parent for accessibility node ${node.nodeId}: ${JSON.stringify(
@@ -924,7 +867,7 @@ function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
     });
   }
   outputNodeMap.set(processedNode.id, processedNode);
-  const children = (_f = node.childIds) != null ? _f : [];
+  const children = node.childIds ?? [];
   for (const childId of children) {
     if (!childId) {
       continue;
@@ -949,7 +892,7 @@ function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
   }
   if (processedNode.children.length === 1 && processedNode.children[0].role === "StaticText") {
     const currentName = processedNode.name;
-    const childName = (_g = processedNode.children[0]) == null ? void 0 : _g.name;
+    const childName = (_f = processedNode.children[0]) == null ? void 0 : _f.name;
     if (currentName === childName || !childName) {
       processedNode.children = [];
     }
@@ -1152,14 +1095,20 @@ function isRequestRelevantForPageLoad(request, currentURL) {
 }
 
 // ../../packages/web-agent/src/browsers/chrome.ts
-function initCDPSession(cdpClient) {
-  return __async(this, null, function* () {
-    yield cdpClient.send("Accessibility.enable");
-    yield cdpClient.send("DOM.enable");
-    yield cdpClient.send("Overlay.enable");
-  });
+async function initCDPSession(cdpClient) {
+  await cdpClient.send("Accessibility.enable");
+  await cdpClient.send("DOM.enable");
+  await cdpClient.send("Overlay.enable");
 }
-var _ChromeBrowser = class _ChromeBrowser {
+var ChromeBrowser = class _ChromeBrowser {
+  browser;
+  context;
+  page;
+  // key is nodeId, according to the a11y tree
+  nodeMap = /* @__PURE__ */ new Map();
+  cdpClient;
+  logger;
+  baseURL;
   constructor({
     browser,
     context,
@@ -1168,8 +1117,6 @@ var _ChromeBrowser = class _ChromeBrowser {
     cdpClient,
     logger
   }) {
-    // key is nodeId, according to the a11y tree
-    this.nodeMap = /* @__PURE__ */ new Map();
     this.browser = browser;
     this.context = context;
     this.page = page;
@@ -1177,117 +1124,106 @@ var _ChromeBrowser = class _ChromeBrowser {
     this.cdpClient = cdpClient;
     this.logger = logger;
   }
+  static USER_AGENT = devices["Desktop Chrome"].userAgent;
   /**
    * Creates a new browser and waits for navigation to the given test URL.
    */
-  static init(_0, _1, _2) {
-    return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield import_playwright.chromium.launch({ headless: true });
-      const context = yield browser.newContext({
-        viewport: {
-          width: 1920,
-          height: 1080
-        },
-        // comment out the below if you are on Mac OS but you're using a monitor
-        deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: import_playwright.devices["Desktop Chrome"].userAgent,
-        geolocation: { latitude: 37.7749, longitude: -122.4194 },
-        // san francisco
-        locale: "en-US",
-        timezoneId: "America/Los_Angeles"
-      });
-      const page = yield context.newPage();
-      const cdpClient = yield context.newCDPSession(page);
-      const chrome = new _ChromeBrowser({
-        browser,
-        context,
-        page,
-        baseURL,
-        cdpClient,
-        logger
-      });
-      let completed = false;
-      const navigateAndInitCDP = () => __async(this, null, function* () {
-        try {
-          yield chrome.navigate(baseURL, false);
-          yield initCDPSession(cdpClient);
-        } catch (err) {
-          logger.error({ err }, "Failed to initialize chrome browser");
-        } finally {
-          completed = true;
-        }
-      });
-      void navigateAndInitCDP();
-      const sendScreenshot = () => __async(this, null, function* () {
-        if (!onScreenshot) {
-          return;
-        }
-        try {
-          onScreenshot({
-            viewport: chrome.viewport,
-            buffer: yield chrome.screenshot()
-          });
-        } catch (err) {
-          logger.error({ err }, "Failed to take screenshot");
-        }
-      });
-      void sendScreenshot();
-      const screenshotInterval = setInterval(() => {
-        void sendScreenshot();
-      }, 250);
-      const startTime = Date.now();
-      while (!completed && Date.now() - startTime < timeout) {
-        yield sleep(CHECK_INTERVAL_MS);
-      }
-      clearInterval(screenshotInterval);
-      if (!completed) {
-        logger.warn(
-          "Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?"
-        );
-      }
-      return chrome;
+  static async init(baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
+    const browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      viewport: {
+        width: 1920,
+        height: 1080
+      },
+      // comment out the below if you are on Mac OS but you're using a monitor
+      deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
+      userAgent: devices["Desktop Chrome"].userAgent,
+      geolocation: { latitude: 37.7749, longitude: -122.4194 },
+      // san francisco
+      locale: "en-US",
+      timezoneId: "America/Los_Angeles"
     });
+    const page = await context.newPage();
+    const cdpClient = await context.newCDPSession(page);
+    const chrome = new _ChromeBrowser({
+      browser,
+      context,
+      page,
+      baseURL,
+      cdpClient,
+      logger
+    });
+    let completed = false;
+    const navigateAndInitCDP = async () => {
+      try {
+        await chrome.navigate(baseURL, false);
+        await initCDPSession(cdpClient);
+      } catch (err) {
+        logger.error({ err }, "Failed to initialize chrome browser");
+      } finally {
+        completed = true;
+      }
+    };
+    void navigateAndInitCDP();
+    const sendScreenshot = async () => {
+      if (!onScreenshot) {
+        return;
+      }
+      try {
+        onScreenshot({
+          viewport: chrome.viewport,
+          buffer: await chrome.screenshot()
+        });
+      } catch (err) {
+        logger.error({ err }, "Failed to take screenshot");
+      }
+    };
+    void sendScreenshot();
+    const screenshotInterval = setInterval(() => {
+      void sendScreenshot();
+    }, 250);
+    const startTime = Date.now();
+    while (!completed && Date.now() - startTime < timeout) {
+      await sleep(CHECK_INTERVAL_MS);
+    }
+    clearInterval(screenshotInterval);
+    if (!completed) {
+      logger.warn(
+        "Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?"
+      );
+    }
+    return chrome;
   }
   // Things to do on every page load
-  pageSetup() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(addCursorScript);
-      yield this.page.evaluate(addIDsScript);
-    });
+  async pageSetup() {
+    await this.page.evaluate(addCursorScript);
+    await this.page.evaluate(addIDsScript);
   }
-  wait(timeoutMs) {
-    return __async(this, null, function* () {
-      yield this.page.waitForTimeout(timeoutMs);
-    });
+  async wait(timeoutMs) {
+    await this.page.waitForTimeout(timeoutMs);
   }
-  cleanup() {
-    return __async(this, null, function* () {
-      yield this.page.close();
-      yield this.context.close();
-      yield this.browser.close();
-    });
+  async cleanup() {
+    await this.page.close();
+    await this.context.close();
+    await this.browser.close();
   }
   get closed() {
     return this.page.isClosed() || !this.browser.isConnected();
   }
-  html() {
-    return __async(this, null, function* () {
-      return yield this.page.content();
-    });
+  async html() {
+    return await this.page.content();
   }
   get url() {
     return this.page.url();
   }
-  screenshot(quality = 100, scale = "device") {
-    return __async(this, null, function* () {
-      return yield this.page.screenshot({
-        fullPage: false,
-        quality,
-        scale,
-        type: "jpeg",
-        // allow the blinking text cursor thing to remain there
-        caret: "initial"
-      });
+  async screenshot(quality = 100, scale = "device") {
+    return await this.page.screenshot({
+      fullPage: false,
+      quality,
+      scale,
+      type: "jpeg",
+      // allow the blinking text cursor thing to remain there
+      caret: "initial"
     });
   }
   get viewport() {
@@ -1297,595 +1233,539 @@ var _ChromeBrowser = class _ChromeBrowser {
     }
     return viewport;
   }
-  navigate(url, wrapPossibleNavigation = true) {
-    return __async(this, null, function* () {
-      this.logger.debug(`Navigating to ${url}`);
-      const startTime = Date.now();
-      const doNav = () => __async(this, null, function* () {
-        try {
-          yield this.page.goto(url, {
-            timeout: MAX_LOAD_TIMEOUT_MS
-          });
-          this.logger.debug(
-            { url },
-            `Got load event in ${Math.floor(Date.now() - startTime)}ms`
-          );
-        } catch (e) {
-          this.logger.warn(
-            { url, type: "navigate", err: e },
-            "Timeout elapsed waiting for page to load, continuing anyways..."
-          );
-        }
-      });
-      if (wrapPossibleNavigation) {
-        yield this.wrapPossibleNavigation(doNav);
-      } else {
-        yield doNav();
-      }
-      if (CHROME_INTERNAL_URLS.has(this.url) && process.env.NODE_ENV === "production") {
-        throw new Error(
-          `${url} took too long to load \u{1F61E}. Please ensure the site and your internet are working.`
-        );
-      }
-      yield this.pageSetup();
-      this.logger.debug({ url }, "Navigation complete");
-    });
-  }
-  fill(_0, _1) {
-    return __async(this, arguments, function* (target, text, options = {}) {
-      const element = yield this.click(target, {
-        doubleClick: false,
-        rightClick: false
-      });
-      yield this.type(text, options);
-      return element;
-    });
-  }
-  type(_0) {
-    return __async(this, arguments, function* (text, options = {}) {
-      const { clearContent = true, pressKeysSequentially = false } = options;
-      if (clearContent) {
-        yield this.page.keyboard.press("Meta+A");
-        yield this.page.keyboard.press("Backspace");
-      }
-      if (pressKeysSequentially) {
-        yield this.page.keyboard.type(text);
-      } else {
-        yield this.page.keyboard.insertText(text);
-      }
-    });
-  }
-  clickByA11yID(_0) {
-    return __async(this, arguments, function* (index, options = {}) {
-      const node = this.nodeMap.get(`${index}`);
-      if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
-      }
-      const nodeClicked = yield this.clickUsingCDP(node, options);
-      yield this.highlightNode(nodeClicked);
-      return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    });
-  }
-  selectOptionByA11yID(index, option) {
-    return __async(this, null, function* () {
-      const node = this.nodeMap.get(`${index}`);
-      if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
-      }
-      if (!node.backendNodeID) {
-        throw new Error(
-          `Select target missing backend node id: ${node.getLogForm()}`
-        );
-      }
-      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
-      yield locator.selectOption(option, {
-        timeout: COMPLICATED_BROWSER_ACTION_TIMEOUT_MS
-      });
-      yield this.highlightNode(node);
-      return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    });
-  }
-  highlight(target) {
-    return __async(this, null, function* () {
+  async navigate(url, wrapPossibleNavigation = true) {
+    this.logger.debug(`Navigating to ${url}`);
+    const startTime = Date.now();
+    const doNav = async () => {
       try {
-        yield this.highlightByA11yID(target.id);
-      } catch (err) {
-        this.logger.warn({ err, target }, "Failed to highlight target");
-      }
-    });
-  }
-  highlightByA11yID(index) {
-    return __async(this, null, function* () {
-      const node = this.nodeMap.get(`${index}`);
-      if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
-      }
-      if (!node.backendNodeID) {
-        throw new Error(
-          `Select target missing backend node id: ${node.getLogForm()}`
+        await this.page.goto(url, {
+          timeout: MAX_LOAD_TIMEOUT_MS
+        });
+        this.logger.debug(
+          { url },
+          `Got load event in ${Math.floor(Date.now() - startTime)}ms`
+        );
+      } catch (e) {
+        this.logger.warn(
+          { url, type: "navigate", err: e },
+          "Timeout elapsed waiting for page to load, continuing anyways..."
         );
       }
-      yield this.highlightNode(node);
-    });
+    };
+    if (wrapPossibleNavigation) {
+      await this.wrapPossibleNavigation(doNav);
+    } else {
+      await doNav();
+    }
+    if (CHROME_INTERNAL_URLS.has(this.url) && process.env.NODE_ENV === "production") {
+      throw new Error(
+        `${url} took too long to load \u{1F61E}. Please ensure the site and your internet are working.`
+      );
+    }
+    await this.pageSetup();
+    this.logger.debug({ url }, "Navigation complete");
   }
-  highlightNode(node) {
-    return __async(this, null, function* () {
+  async fill(target, text, options = {}) {
+    const element = await this.click(target, {
+      doubleClick: false,
+      rightClick: false
+    });
+    await this.type(text, options);
+    return element;
+  }
+  async type(text, options = {}) {
+    const { clearContent = true, pressKeysSequentially = false } = options;
+    if (clearContent) {
+      await this.page.keyboard.press("Meta+A");
+      await this.page.keyboard.press("Backspace");
+    }
+    if (pressKeysSequentially) {
+      await this.page.keyboard.type(text);
+    } else {
+      await this.page.keyboard.insertText(text);
+    }
+  }
+  async clickByA11yID(index, options = {}) {
+    const node = this.nodeMap.get(`${index}`);
+    if (!node) {
+      throw new Error(`Could not find node in DOM with index: ${index}`);
+    }
+    const nodeClicked = await this.clickUsingCDP(node, options);
+    await this.highlightNode(nodeClicked);
+    return node.serialize({ noChildren: true, noProperties: true, noID: true });
+  }
+  async selectOptionByA11yID(index, option) {
+    const node = this.nodeMap.get(`${index}`);
+    if (!node) {
+      throw new Error(`Could not find node in DOM with index: ${index}`);
+    }
+    if (!node.backendNodeID) {
+      throw new Error(
+        `Select target missing backend node id: ${node.getLogForm()}`
+      );
+    }
+    const locator = await this.getLocatorFromBackendID(node.backendNodeID);
+    await locator.selectOption(option, {
+      timeout: COMPLICATED_BROWSER_ACTION_TIMEOUT_MS
+    });
+    await this.highlightNode(node);
+    return node.serialize({ noChildren: true, noProperties: true, noID: true });
+  }
+  async highlight(target) {
+    try {
+      await this.highlightByA11yID(target.id);
+    } catch (err) {
+      this.logger.warn({ err, target }, "Failed to highlight target");
+    }
+  }
+  async highlightByA11yID(index) {
+    const node = this.nodeMap.get(`${index}`);
+    if (!node) {
+      throw new Error(`Could not find node in DOM with index: ${index}`);
+    }
+    if (!node.backendNodeID) {
+      throw new Error(
+        `Select target missing backend node id: ${node.getLogForm()}`
+      );
+    }
+    await this.highlightNode(node);
+  }
+  async highlightNode(node) {
+    try {
+      await this.cdpClient.send("Overlay.highlightNode", {
+        highlightConfig: NODE_HIGHLIGHT_CONFIG,
+        backendNodeId: node.backendNodeID
+      });
+    } catch (err) {
+      this.logger.warn({ err }, "Failed to add node highlight");
+    }
+    const hideHighlight = async () => {
       try {
-        yield this.cdpClient.send("Overlay.highlightNode", {
-          highlightConfig: NODE_HIGHLIGHT_CONFIG,
+        await this.cdpClient.send("Overlay.hideHighlight", {
           backendNodeId: node.backendNodeID
         });
       } catch (err) {
-        this.logger.warn({ err }, "Failed to add node highlight");
+        this.logger.debug({ err }, "Failed to remove node highlight");
       }
-      const hideHighlight = () => __async(this, null, function* () {
-        try {
-          yield this.cdpClient.send("Overlay.hideHighlight", {
-            backendNodeId: node.backendNodeID
-          });
-        } catch (err) {
-          this.logger.debug({ err }, "Failed to remove node highlight");
-        }
-      });
-      setTimeout(() => {
-        void hideHighlight();
-      }, HIGHLIGHT_DURATION_MS);
-    });
+    };
+    setTimeout(() => {
+      void hideHighlight();
+    }, HIGHLIGHT_DURATION_MS);
   }
-  wrapPossibleNavigation(_0) {
-    return __async(this, arguments, function* (fn, timeoutMS = MAX_LOAD_TIMEOUT_MS) {
-      const startTime = Date.now();
-      const startURL = this.url;
-      let lastRequestReceived = Date.now();
-      const firedRequests = /* @__PURE__ */ new Map();
-      const finishedRequests = /* @__PURE__ */ new Map();
-      const requestFinishedListener = (request) => {
-        var _a;
-        const key = serializeRequest(request);
-        finishedRequests.set(key, ((_a = finishedRequests.get(key)) != null ? _a : 0) + 1);
-      };
-      const requestFiredListener = (request) => {
-        var _a;
-        if (!isRequestRelevantForPageLoad(request, this.url)) {
-          this.logger.debug(
-            {
-              uri: serializeRequest(request)
-            },
-            "Ignoring request for page load network stability"
-          );
-          return;
-        }
-        const key = serializeRequest(request);
+  async wrapPossibleNavigation(fn, timeoutMS = MAX_LOAD_TIMEOUT_MS) {
+    const startTime = Date.now();
+    const startURL = this.url;
+    let lastRequestReceived = Date.now();
+    const firedRequests = /* @__PURE__ */ new Map();
+    const finishedRequests = /* @__PURE__ */ new Map();
+    const requestFinishedListener = (request) => {
+      const key = serializeRequest(request);
+      finishedRequests.set(key, (finishedRequests.get(key) ?? 0) + 1);
+    };
+    const requestFiredListener = (request) => {
+      if (!isRequestRelevantForPageLoad(request, this.url)) {
         this.logger.debug(
           {
-            uri: key
+            uri: serializeRequest(request)
           },
-          "Request fired on page load, delaying network stability"
+          "Ignoring request for page load network stability"
         );
-        firedRequests.set(key, ((_a = firedRequests.get(key)) != null ? _a : 0) + 1);
-        lastRequestReceived = Date.now();
-      };
-      this.page.on("requestfinished", requestFinishedListener);
-      this.page.on("request", requestFiredListener);
-      let rejected = false;
-      const retPromise = fn().catch((e) => {
-        rejected = true;
-        if (e instanceof Error)
-          return e;
-        return new Error(`${e}`);
-      });
-      yield sleep(CHECK_INTERVAL_MS);
-      const unwrapAndThrowError = (p) => __async(this, null, function* () {
-        const v = yield p;
-        if (v instanceof Error) {
-          throw v;
-        }
-        return v;
-      });
-      let unfinishedRequests = /* @__PURE__ */ new Set();
-      const waitForNetworkIdle = () => __async(this, null, function* () {
-        while (!rejected && Date.now() - startTime < timeoutMS) {
-          unfinishedRequests = /* @__PURE__ */ new Set();
-          yield sleep(CHECK_INTERVAL_MS);
-          if (Date.now() - lastRequestReceived <= NETWORK_STABLE_DURATION_MS) {
-            continue;
-          }
-          let anyDifference = false;
-          for (const key of firedRequests.keys()) {
-            if (firedRequests.get(key) !== finishedRequests.get(key)) {
-              this.logger.debug({ uri: key }, "Waiting on request to finish");
-              anyDifference = true;
-              unfinishedRequests.add(key);
-            }
-          }
-          if (!anyDifference) {
-            this.logger.debug(
-              {
-                url: this.url,
-                requests: JSON.stringify(Array.from(firedRequests.entries()))
-              },
-              `Network idle in ${Math.floor(Date.now() - startTime)}ms`
-            );
-            return true;
-          }
-        }
-        if (!rejected) {
-          this.logger.warn(
-            {
-              url: this.url,
-              requests: JSON.stringify(Array.from(unfinishedRequests.entries()))
-            },
-            "Timeout elapsed waiting for network idle, continuing anyways..."
-          );
-        }
-        return false;
-      });
-      const waitResult = yield waitForNetworkIdle();
-      this.page.off("requestfinished", requestFinishedListener);
-      this.page.off("request", requestFiredListener);
-      if (!waitResult) {
-        return unwrapAndThrowError(retPromise);
+        return;
       }
-      if (!rejected && urlChanged(this.url, startURL)) {
-        this.logger.debug(
-          `Detected url change in wrapPossibleNavigation, waiting for load state`
-        );
-        try {
-          yield this.page.waitForLoadState("load", {
-            timeout: timeoutMS - (Date.now() - startTime)
-          });
-        } catch (e) {
-          this.logger.warn(
-            { url: this.url },
-            "Timeout elapsed waiting for load state to fire, continuing anyways..."
-          );
-        }
-      }
-      return unwrapAndThrowError(retPromise);
-    });
-  }
-  click(_0) {
-    return __async(this, arguments, function* (target, options = {}) {
-      const elementInteracted = yield this.wrapPossibleNavigation(
-        () => this.clickByA11yID(target.id, options)
-      );
-      return elementInteracted;
-    });
-  }
-  selectOption(target, option) {
-    return __async(this, null, function* () {
-      return this.selectOptionByA11yID(target.id, option);
-    });
-  }
-  press(key) {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(() => this.page.keyboard.press(key));
-    });
-  }
-  refresh() {
-    return __async(this, null, function* () {
-      yield this.page.reload();
-      yield this.pageSetup();
-    });
-  }
-  getA11yTree() {
-    return __async(this, null, function* () {
-      let processedTree = null;
-      let attempt = 0;
-      const url = this.url;
-      while (!processedTree) {
-        try {
-          this.logger.debug(`Getting a11y tree at ${url}`);
-          const graph = yield this.getRawA11yTree();
-          if (!graph.root || graph.allNodes.length === 0) {
-            throw new Error("No a11y tree found on page");
-          }
-          processedTree = processA11yTree(graph);
-        } catch (e) {
-          this.logger.error({ err: e, url }, "Error fetching a11y tree");
-          if (attempt === 0) {
-            yield sleep(1e3);
-            attempt++;
-          } else {
-            throw new Error(`Max retries exceeded fetching a11y tree: ${e}`);
-          }
-        }
-      }
-      if (!processedTree.root) {
-        this.logger.warn("A11y tree was pruned entirely");
-      }
-      this.nodeMap = processedTree.nodeMap;
-      return processedTree;
-    });
-  }
-  getRawA11yTree() {
-    return __async(this, null, function* () {
-      const url = this.page.url();
-      let lastTreeUpdateTimestamp = Date.now();
-      const treeUpdateListener = () => {
-        lastTreeUpdateTimestamp = Date.now();
-      };
-      this.cdpClient.addListener(
-        "Accessibility.nodesUpdated",
-        treeUpdateListener
-      );
-      let accessibilityTreeLoadFired = false;
-      const accessibilityLoadListener = () => {
-        this.logger.info({ url }, `A11y tree load event fired`);
-        accessibilityTreeLoadFired = true;
-      };
-      this.cdpClient.addListener(
-        "Accessibility.loadComplete",
-        accessibilityLoadListener
-      );
-      const a11yLoadStart = Date.now();
-      let timeoutTriggered = true;
-      while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
-        yield sleep(CHECK_INTERVAL_MS);
-        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
-          this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
-          continue;
-        }
-        if (Date.now() - lastTreeUpdateTimestamp >= A11Y_STABLE_DURATION_MS) {
-          this.logger.debug({ url }, `A11y tree not stable yet, waiting...`);
-          continue;
-        }
-        timeoutTriggered = false;
-        break;
-      }
+      const key = serializeRequest(request);
       this.logger.debug(
         {
-          duration: Date.now() - a11yLoadStart,
-          eventReceived: accessibilityTreeLoadFired,
-          timeoutTriggered
+          uri: key
         },
-        "A11y wait phase completed"
+        "Request fired on page load, delaying network stability"
       );
-      const { node: root } = yield this.cdpClient.send(
-        "Accessibility.getRootAXNode"
-      );
-      const { nodes } = yield this.cdpClient.send("Accessibility.queryAXTree", {
-        backendNodeId: root.backendDOMNodeId
-      });
-      this.cdpClient.removeListener(
-        "Accessibility.loadComplete",
-        accessibilityLoadListener
-      );
-      this.cdpClient.removeListener(
-        "Accessibility.nodesUpdated",
-        treeUpdateListener
-      );
-      return {
-        root,
-        allNodes: nodes
-      };
+      firedRequests.set(key, (firedRequests.get(key) ?? 0) + 1);
+      lastRequestReceived = Date.now();
+    };
+    this.page.on("requestfinished", requestFinishedListener);
+    this.page.on("request", requestFiredListener);
+    let rejected = false;
+    const retPromise = fn().catch((e) => {
+      rejected = true;
+      if (e instanceof Error)
+        return e;
+      return new Error(`${e}`);
     });
-  }
-  clickUsingVisualCoordinates(backendNodeId) {
-    return __async(this, null, function* () {
-      const location = yield this.getElementLocation(backendNodeId);
-      if (!location) {
-        throw new Error(
-          `Could not find element location with backend node id: ${backendNodeId}`
+    await sleep(CHECK_INTERVAL_MS);
+    const unwrapAndThrowError = async (p) => {
+      const v = await p;
+      if (v instanceof Error) {
+        throw v;
+      }
+      return v;
+    };
+    let unfinishedRequests = /* @__PURE__ */ new Set();
+    const waitForNetworkIdle = async () => {
+      while (!rejected && Date.now() - startTime < timeoutMS) {
+        unfinishedRequests = /* @__PURE__ */ new Set();
+        await sleep(CHECK_INTERVAL_MS);
+        if (Date.now() - lastRequestReceived <= NETWORK_STABLE_DURATION_MS) {
+          continue;
+        }
+        let anyDifference = false;
+        for (const key of firedRequests.keys()) {
+          if (firedRequests.get(key) !== finishedRequests.get(key)) {
+            this.logger.debug({ uri: key }, "Waiting on request to finish");
+            anyDifference = true;
+            unfinishedRequests.add(key);
+          }
+        }
+        if (!anyDifference) {
+          this.logger.debug(
+            {
+              url: this.url,
+              requests: JSON.stringify(Array.from(firedRequests.entries()))
+            },
+            `Network idle in ${Math.floor(Date.now() - startTime)}ms`
+          );
+          return true;
+        }
+      }
+      if (!rejected) {
+        this.logger.warn(
+          {
+            url: this.url,
+            requests: JSON.stringify(Array.from(unfinishedRequests.entries()))
+          },
+          "Timeout elapsed waiting for network idle, continuing anyways..."
         );
       }
-      this.logger.debug({ location }, "Executing mouse click");
-      yield this.page.mouse.click(location.centerX, location.centerY);
+      return false;
+    };
+    const waitResult = await waitForNetworkIdle();
+    this.page.off("requestfinished", requestFinishedListener);
+    this.page.off("request", requestFiredListener);
+    if (!waitResult) {
+      return unwrapAndThrowError(retPromise);
+    }
+    if (!rejected && urlChanged(this.url, startURL)) {
+      this.logger.debug(
+        `Detected url change in wrapPossibleNavigation, waiting for load state`
+      );
+      try {
+        await this.page.waitForLoadState("load", {
+          timeout: timeoutMS - (Date.now() - startTime)
+        });
+      } catch (e) {
+        this.logger.warn(
+          { url: this.url },
+          "Timeout elapsed waiting for load state to fire, continuing anyways..."
+        );
+      }
+    }
+    return unwrapAndThrowError(retPromise);
+  }
+  async click(target, options = {}) {
+    const elementInteracted = await this.wrapPossibleNavigation(
+      () => this.clickByA11yID(target.id, options)
+    );
+    return elementInteracted;
+  }
+  async selectOption(target, option) {
+    return this.selectOptionByA11yID(target.id, option);
+  }
+  async press(key) {
+    await this.wrapPossibleNavigation(() => this.page.keyboard.press(key));
+  }
+  async refresh() {
+    await this.page.reload();
+    await this.pageSetup();
+  }
+  async getA11yTree() {
+    let processedTree = null;
+    let attempt = 0;
+    const url = this.url;
+    while (!processedTree) {
+      try {
+        this.logger.debug(`Getting a11y tree at ${url}`);
+        const graph = await this.getRawA11yTree();
+        if (!graph.root || graph.allNodes.length === 0) {
+          throw new Error("No a11y tree found on page");
+        }
+        processedTree = processA11yTree(graph);
+      } catch (e) {
+        this.logger.error({ err: e, url }, "Error fetching a11y tree");
+        if (attempt === 0) {
+          await sleep(1e3);
+          attempt++;
+        } else {
+          throw new Error(`Max retries exceeded fetching a11y tree: ${e}`);
+        }
+      }
+    }
+    if (!processedTree.root) {
+      this.logger.warn("A11y tree was pruned entirely");
+    }
+    this.nodeMap = processedTree.nodeMap;
+    return processedTree;
+  }
+  async getRawA11yTree() {
+    const url = this.page.url();
+    let lastTreeUpdateTimestamp = Date.now();
+    const treeUpdateListener = () => {
+      lastTreeUpdateTimestamp = Date.now();
+    };
+    this.cdpClient.addListener(
+      "Accessibility.nodesUpdated",
+      treeUpdateListener
+    );
+    let accessibilityTreeLoadFired = false;
+    const accessibilityLoadListener = () => {
+      this.logger.info({ url }, `A11y tree load event fired`);
+      accessibilityTreeLoadFired = true;
+    };
+    this.cdpClient.addListener(
+      "Accessibility.loadComplete",
+      accessibilityLoadListener
+    );
+    const a11yLoadStart = Date.now();
+    let timeoutTriggered = true;
+    while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
+      await sleep(CHECK_INTERVAL_MS);
+      if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
+        this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
+        continue;
+      }
+      if (Date.now() - lastTreeUpdateTimestamp >= A11Y_STABLE_DURATION_MS) {
+        this.logger.debug({ url }, `A11y tree not stable yet, waiting...`);
+        continue;
+      }
+      timeoutTriggered = false;
+      break;
+    }
+    this.logger.debug(
+      {
+        duration: Date.now() - a11yLoadStart,
+        eventReceived: accessibilityTreeLoadFired,
+        timeoutTriggered
+      },
+      "A11y wait phase completed"
+    );
+    const { node: root } = await this.cdpClient.send(
+      "Accessibility.getRootAXNode"
+    );
+    const { nodes } = await this.cdpClient.send("Accessibility.queryAXTree", {
+      backendNodeId: root.backendDOMNodeId
     });
+    this.cdpClient.removeListener(
+      "Accessibility.loadComplete",
+      accessibilityLoadListener
+    );
+    this.cdpClient.removeListener(
+      "Accessibility.nodesUpdated",
+      treeUpdateListener
+    );
+    return {
+      root,
+      allNodes: nodes
+    };
+  }
+  async clickUsingVisualCoordinates(backendNodeId) {
+    const location = await this.getElementLocation(backendNodeId);
+    if (!location) {
+      throw new Error(
+        `Could not find element location with backend node id: ${backendNodeId}`
+      );
+    }
+    this.logger.debug({ location }, "Executing mouse click");
+    await this.page.mouse.click(location.centerX, location.centerY);
   }
   // Get the "id" attribute value from an HTML element.
-  getIDAttributeUsingCDP(objectId) {
-    return __async(this, null, function* () {
-      yield this.cdpClient.send("DOM.getDocument", { depth: 0 });
-      const cdpNodeResult = yield this.cdpClient.send("DOM.requestNode", {
-        objectId
-      });
-      const attrResult = yield this.cdpClient.send("DOM.getAttributes", {
-        nodeId: cdpNodeResult.nodeId
-      });
-      const attributes = attrResult.attributes;
-      const indexAttr = attributes.findIndex((s) => s === "data-momentic-id");
-      if (indexAttr === -1) {
-        return "";
-      }
-      return attributes[indexAttr + 1] || "";
+  async getIDAttributeUsingCDP(objectId) {
+    await this.cdpClient.send("DOM.getDocument", { depth: 0 });
+    const cdpNodeResult = await this.cdpClient.send("DOM.requestNode", {
+      objectId
     });
+    const attrResult = await this.cdpClient.send("DOM.getAttributes", {
+      nodeId: cdpNodeResult.nodeId
+    });
+    const attributes = attrResult.attributes;
+    const indexAttr = attributes.findIndex((s) => s === "data-momentic-id");
+    if (indexAttr === -1) {
+      return "";
+    }
+    return attributes[indexAttr + 1] || "";
   }
-  getLocatorFromBackendID(backendNodeId) {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(addIDsScript);
-      const cdpResolveResult = yield this.cdpClient.send("DOM.resolveNode", {
-        backendNodeId
-      });
-      if (!cdpResolveResult || !cdpResolveResult.object.objectId) {
-        throw new Error(`Could not resolve backend node ${backendNodeId}`);
+  async getLocatorFromBackendID(backendNodeId) {
+    await this.page.evaluate(addIDsScript);
+    const cdpResolveResult = await this.cdpClient.send("DOM.resolveNode", {
+      backendNodeId
+    });
+    if (!cdpResolveResult || !cdpResolveResult.object.objectId) {
+      throw new Error(`Could not resolve backend node ${backendNodeId}`);
+    }
+    try {
+      const id = await this.getIDAttributeUsingCDP(
+        cdpResolveResult.object.objectId
+      );
+      if (!id) {
+        throw new Error("Failed getting data-momentic-id attribute using CDP");
+      }
+      return this.page.locator(`[data-momentic-id="${id}"]`);
+    } catch (err) {
+      this.logger.error(
+        {
+          err
+        },
+        "Failed to get ID attribute"
+      );
+      throw err;
+    }
+  }
+  async clickUsingCDP(originalNode, options = {}) {
+    let clickAttempts = 0;
+    let candidateNode = originalNode;
+    while (clickAttempts < MAX_BROWSER_ACTION_ATTEMPTS) {
+      if (!candidateNode || candidateNode.role === "RootWebArea") {
+        throw new Error(
+          `Attempted to click node with no clickable surrounding elements: ${originalNode.getLogForm()}`
+        );
+      }
+      if (candidateNode.role === "StaticText") {
+        candidateNode = candidateNode.parent;
+        continue;
+      }
+      const candidateNodeID = candidateNode.backendNodeID;
+      if (!candidateNodeID) {
+        this.logger.warn(
+          { node: candidateNode.getLogForm() },
+          "Click candidate had no backend node ID"
+        );
+        candidateNode = candidateNode.parent;
+        continue;
       }
       try {
-        const id = yield this.getIDAttributeUsingCDP(
-          cdpResolveResult.object.objectId
-        );
-        if (!id) {
-          throw new Error("Failed getting data-momentic-id attribute using CDP");
+        const locator = await this.getLocatorFromBackendID(candidateNodeID);
+        if (options.doubleClick) {
+          await locator.dblclick({
+            timeout: BROWSER_ACTION_TIMEOUT_MS
+          });
+        } else {
+          await locator.click({
+            timeout: BROWSER_ACTION_TIMEOUT_MS,
+            button: options.rightClick ? "right" : "left"
+          });
         }
-        return this.page.locator(`[data-momentic-id="${id}"]`);
+        if (candidateNode.id !== originalNode.id) {
+          this.logger.info(
+            {
+              oldNode: originalNode.getLogForm(),
+              newNode: candidateNode.getLogForm()
+            },
+            `Redirected click successfully to new element`
+          );
+        }
+        return candidateNode;
       } catch (err) {
         this.logger.error(
-          {
-            err
-          },
-          "Failed to get ID attribute"
+          { err, node: candidateNode.getLogForm() },
+          "Failed click or click timed out"
         );
-        throw err;
+        clickAttempts++;
+        candidateNode = candidateNode.parent;
       }
-    });
-  }
-  clickUsingCDP(_0) {
-    return __async(this, arguments, function* (originalNode, options = {}) {
-      let clickAttempts = 0;
-      let candidateNode = originalNode;
-      while (clickAttempts < MAX_BROWSER_ACTION_ATTEMPTS) {
-        if (!candidateNode || candidateNode.role === "RootWebArea") {
-          throw new Error(
-            `Attempted to click node with no clickable surrounding elements: ${originalNode.getLogForm()}`
-          );
-        }
-        if (candidateNode.role === "StaticText") {
-          candidateNode = candidateNode.parent;
-          continue;
-        }
-        const candidateNodeID = candidateNode.backendNodeID;
-        if (!candidateNodeID) {
-          this.logger.warn(
-            { node: candidateNode.getLogForm() },
-            "Click candidate had no backend node ID"
-          );
-          candidateNode = candidateNode.parent;
-          continue;
-        }
-        try {
-          const locator = yield this.getLocatorFromBackendID(candidateNodeID);
-          if (options.doubleClick) {
-            yield locator.dblclick({
-              timeout: BROWSER_ACTION_TIMEOUT_MS
-            });
-          } else {
-            yield locator.click({
-              timeout: BROWSER_ACTION_TIMEOUT_MS,
-              button: options.rightClick ? "right" : "left"
-            });
-          }
-          if (candidateNode.id !== originalNode.id) {
-            this.logger.info(
-              {
-                oldNode: originalNode.getLogForm(),
-                newNode: candidateNode.getLogForm()
-              },
-              `Redirected click successfully to new element`
-            );
-          }
-          return candidateNode;
-        } catch (err) {
-          this.logger.error(
-            { err, node: candidateNode.getLogForm() },
-            "Failed click or click timed out"
-          );
-          clickAttempts++;
-          candidateNode = candidateNode.parent;
-        }
-      }
-      throw new Error(
-        `Max click redirection attempts exhausted on original element: ${originalNode.getLogForm()}`
-      );
-    });
+    }
+    throw new Error(
+      `Max click redirection attempts exhausted on original element: ${originalNode.getLogForm()}`
+    );
   }
   /**
    * Currently unused, but could be useful for vision model integration.
    * Gets x/y position of an a11y node.
    */
-  getElementLocation(backendNodeId) {
-    return __async(this, null, function* () {
-      const tree = yield this.cdpClient.send("DOMSnapshot.captureSnapshot", {
-        computedStyles: [],
-        includeDOMRects: true,
-        includePaintOrder: true
-      });
-      let devicePixelRatio = yield this.page.evaluate(
-        () => window.devicePixelRatio
+  async getElementLocation(backendNodeId) {
+    const tree = await this.cdpClient.send("DOMSnapshot.captureSnapshot", {
+      computedStyles: [],
+      includeDOMRects: true,
+      includePaintOrder: true
+    });
+    let devicePixelRatio = await this.page.evaluate(
+      () => window.devicePixelRatio
+    );
+    if (process.platform === "darwin" && devicePixelRatio === 1) {
+      devicePixelRatio = RETINA_WINDOW_SCALE_FACTOR;
+    }
+    const document2 = tree["documents"][0];
+    const layout = document2["layout"];
+    const nodes = document2["nodes"];
+    const nodeNames = nodes["nodeName"] || [];
+    const backendNodeIds = nodes["backendNodeId"] || [];
+    const layoutNodeIndex = layout["nodeIndex"];
+    const bounds = layout["bounds"];
+    let cursor2 = -1;
+    for (let i = 0; i < nodeNames.length; i++) {
+      if (backendNodeIds[i] === backendNodeId) {
+        cursor2 = layoutNodeIndex.indexOf(i);
+        break;
+      }
+    }
+    if (cursor2 === -1) {
+      throw new Error(
+        `Could not find any backend node with ID ${backendNodeId}`
       );
-      if (process.platform === "darwin" && devicePixelRatio === 1) {
-        devicePixelRatio = RETINA_WINDOW_SCALE_FACTOR;
+    }
+    let [x = 0, y = 0, width = 0, height = 0] = bounds[cursor2];
+    x /= devicePixelRatio;
+    y /= devicePixelRatio;
+    width /= devicePixelRatio;
+    height /= devicePixelRatio;
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    return { centerX, centerY };
+  }
+  async scrollUp() {
+    await this.page.evaluate(() => {
+      (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop - window.innerHeight;
+    });
+    await this.page.evaluate(() => {
+      (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
+    });
+  }
+  async scrollDown() {
+    await this.page.evaluate(() => {
+      (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
+    });
+  }
+  async goForward() {
+    await this.wrapPossibleNavigation(
+      () => this.page.goForward({ timeout: MAX_LOAD_TIMEOUT_MS })
+    );
+    await this.pageSetup();
+  }
+  async goBack() {
+    await this.wrapPossibleNavigation(
+      () => this.page.goBack({ timeout: MAX_LOAD_TIMEOUT_MS })
+    );
+    await this.pageSetup();
+  }
+  async switchToPage(urlSubstring) {
+    const allPages = await this.context.pages();
+    for (let i = 0; i < allPages.length; i++) {
+      const page = allPages[i];
+      if (page.url().includes(urlSubstring)) {
+        this.page = page;
+        await page.waitForLoadState("load", {
+          timeout: MAX_LOAD_TIMEOUT_MS
+        });
+        await this.pageSetup();
+        this.cdpClient = await this.context.newCDPSession(page);
+        await initCDPSession(this.cdpClient);
+        this.logger.info(`Switching to tab ${i} with url ${page.url()}`);
+        return;
       }
-      const document2 = tree["documents"][0];
-      const layout = document2["layout"];
-      const nodes = document2["nodes"];
-      const nodeNames = nodes["nodeName"] || [];
-      const backendNodeIds = nodes["backendNodeId"] || [];
-      const layoutNodeIndex = layout["nodeIndex"];
-      const bounds = layout["bounds"];
-      let cursor2 = -1;
-      for (let i = 0; i < nodeNames.length; i++) {
-        if (backendNodeIds[i] === backendNodeId) {
-          cursor2 = layoutNodeIndex.indexOf(i);
-          break;
-        }
-      }
-      if (cursor2 === -1) {
-        throw new Error(
-          `Could not find any backend node with ID ${backendNodeId}`
-        );
-      }
-      let [x = 0, y = 0, width = 0, height = 0] = bounds[cursor2];
-      x /= devicePixelRatio;
-      y /= devicePixelRatio;
-      width /= devicePixelRatio;
-      height /= devicePixelRatio;
-      const centerX = x + width / 2;
-      const centerY = y + height / 2;
-      return { centerX, centerY };
-    });
+    }
+    throw new Error(`Could not find page with url containing ${urlSubstring}`);
   }
-  scrollUp() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop - window.innerHeight;
-      });
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
-      });
-    });
-  }
-  scrollDown() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
-      });
-    });
-  }
-  goForward() {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(
-        () => this.page.goForward({ timeout: MAX_LOAD_TIMEOUT_MS })
-      );
-      yield this.pageSetup();
-    });
-  }
-  goBack() {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(
-        () => this.page.goBack({ timeout: MAX_LOAD_TIMEOUT_MS })
-      );
-      yield this.pageSetup();
-    });
-  }
-  switchToPage(urlSubstring) {
-    return __async(this, null, function* () {
-      const allPages = yield this.context.pages();
-      for (let i = 0; i < allPages.length; i++) {
-        const page = allPages[i];
-        if (page.url().includes(urlSubstring)) {
-          this.page = page;
-          yield page.waitForLoadState("load", {
-            timeout: MAX_LOAD_TIMEOUT_MS
-          });
-          yield this.pageSetup();
-          this.cdpClient = yield this.context.newCDPSession(page);
-          yield initCDPSession(this.cdpClient);
-          this.logger.info(`Switching to tab ${i} with url ${page.url()}`);
-          return;
-        }
-      }
-      throw new Error(`Could not find page with url containing ${urlSubstring}`);
-    });
-  }
-  setCookie(cookie) {
-    return __async(this, null, function* () {
-      const cookieSettings = parseCookieString(cookie);
-      yield this.context.addCookies([cookieSettings]);
-    });
+  async setCookie(cookie) {
+    const cookieSettings = parseCookieString(cookie);
+    await this.context.addCookies([cookieSettings]);
   }
 };
-_ChromeBrowser.USER_AGENT = import_playwright.devices["Desktop Chrome"].userAgent;
-var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/configs/controller.ts
 var A11Y_CONTROLLER_CONFIG = {
@@ -1897,10 +1777,22 @@ var A11Y_CONTROLLER_CONFIG = {
 var DEFAULT_CONTROLLER_CONFIG = A11Y_CONTROLLER_CONFIG;
 
 // ../../packages/web-agent/src/controller.ts
-var import_dedent2 = __toESM(require("dedent"), 1);
-var import_diff_lines = __toESM(require("diff-lines"), 1);
+import dedent2 from "dedent";
+import diffLines from "diff-lines";
 var MAX_HISTORY_CHAR_LENGTH = 1e4;
 var AgentController = class {
+  // Instance of browser to interact with
+  browser;
+  // Stack of queued-up instructions
+  pendingInstructions;
+  // manager for all AI generation
+  generator;
+  // Stack of commands previously executed.
+  // Top of stack can be a pending command that hasn't been executed yet.
+  // Should not contain intermediate successes due to granular commands.
+  commandHistory;
+  config;
+  logger;
   constructor({ browser, config, generator, logger }) {
     this.browser = browser;
     this.generator = generator;
@@ -1935,20 +1827,16 @@ var AgentController = class {
   /**
    * Reset controller and browser state.
    */
-  resetState() {
-    return __async(this, null, function* () {
-      this.resetHistory();
-      yield this.browser.navigate(this.browser.baseURL);
-    });
+  async resetState() {
+    this.resetHistory();
+    await this.browser.navigate(this.browser.baseURL);
   }
   /**
    * Get the browser state as a string
    */
-  getBrowserState() {
-    return __async(this, null, function* () {
-      const a11yTree = yield this.browser.getA11yTree();
-      return a11yTree.serialize();
-    });
+  async getBrowserState() {
+    const a11yTree = await this.browser.getA11yTree();
+    return a11yTree.serialize();
   }
   getSerializedHistory(url, currentBrowserState) {
     let history;
@@ -1959,105 +1847,99 @@ var AgentController = class {
     }
     return history;
   }
-  splitUserGoal(type, goal, disableCache) {
-    return __async(this, null, function* () {
-      if (type === "AI_ACTION" /* AI_ACTION */ && goal.match(/[,!;.]|(?:and)|(?:then)/) && this.config.useGoalSplitter) {
-        const granularInstructions = yield this.generator.getGranularGoals(
-          { goal, url: this.browser.url },
-          disableCache
-        );
-        this.pendingInstructions = granularInstructions.reverse();
-      } else {
-        this.pendingInstructions = [goal];
-      }
-    });
+  async splitUserGoal(type, goal, disableCache) {
+    if (type === "AI_ACTION" /* AI_ACTION */ && goal.match(/[,!;.]|(?:and)|(?:then)/) && this.config.useGoalSplitter) {
+      const granularInstructions = await this.generator.getGranularGoals(
+        { goal, url: this.browser.url },
+        disableCache
+      );
+      this.pendingInstructions = granularInstructions.reverse();
+    } else {
+      this.pendingInstructions = [goal];
+    }
   }
   /**
    * Given previously executed commands, generate command for the current prompt.
    * Should only be used for AI action.
    */
-  promptToCommand(type, goal, disableCache) {
-    return __async(this, null, function* () {
-      if (this.pendingInstructions.length === 0) {
-        yield this.splitUserGoal(type, goal, disableCache);
-      }
-      const currInstruction = this.pendingInstructions[this.pendingInstructions.length - 1];
-      this.logger.info({ goal: currInstruction }, "Starting prompt translation");
-      const getBrowserStateStart = Date.now();
-      const url = this.browser.url;
-      const browserState = yield this.getBrowserState();
-      this.logger.info(
-        {
-          duration: Date.now() - getBrowserStateStart,
-          url
-        },
-        "Got browser state"
-      );
-      const numPrevious = this.commandHistory.length;
-      this.commandHistory.push({
-        state: "PENDING",
-        browserStateBeforeCommand: browserState,
-        urlBeforeCommand: url,
-        type
-      });
-      const history = this.getSerializedHistory(url, browserState);
-      const getCommandProposalStart = Date.now();
-      const proposedCommand = yield this.generator.getProposedCommand(
-        {
-          url,
-          numPrevious,
-          browserState,
-          history,
-          goal: currInstruction,
-          lastCommand: this.lastExecutedCommand
-        },
-        disableCache
-      );
-      this.logger.info(
-        { duration: Date.now() - getCommandProposalStart },
-        "Got proposed command"
-      );
-      if (proposedCommand.type === "SUCCESS" /* SUCCESS */) {
-        const finishedInstruction = this.pendingInstructions.pop();
-        this.logger.info(
-          {
-            finishedInstruction,
-            remainingInstructions: this.pendingInstructions
-          },
-          "Removing pending instruction due to SUCCESS"
-        );
-        if (this.pendingInstructions.length !== 0) {
-          this.commandHistory.pop();
-          return this.promptToCommand(type, "", disableCache);
-        }
-      } else if (
-        // on failure, we don't continue to execute
-        proposedCommand.type === "FAILURE"
-      ) {
-        this.logger.info(
-          {
-            remainingInstructions: this.pendingInstructions
-          },
-          "Removing pending instructions due to FAILURE"
-        );
-        this.pendingInstructions = [];
-      }
-      return proposedCommand;
+  async promptToCommand(type, goal, disableCache) {
+    if (this.pendingInstructions.length === 0) {
+      await this.splitUserGoal(type, goal, disableCache);
+    }
+    const currInstruction = this.pendingInstructions[this.pendingInstructions.length - 1];
+    this.logger.info({ goal: currInstruction }, "Starting prompt translation");
+    const getBrowserStateStart = Date.now();
+    const url = this.browser.url;
+    const browserState = await this.getBrowserState();
+    this.logger.info(
+      {
+        duration: Date.now() - getBrowserStateStart,
+        url
+      },
+      "Got browser state"
+    );
+    const numPrevious = this.commandHistory.length;
+    this.commandHistory.push({
+      state: "PENDING",
+      browserStateBeforeCommand: browserState,
+      urlBeforeCommand: url,
+      type
     });
+    const history = this.getSerializedHistory(url, browserState);
+    const getCommandProposalStart = Date.now();
+    const proposedCommand = await this.generator.getProposedCommand(
+      {
+        url,
+        numPrevious,
+        browserState,
+        history,
+        goal: currInstruction,
+        lastCommand: this.lastExecutedCommand
+      },
+      disableCache
+    );
+    this.logger.info(
+      { duration: Date.now() - getCommandProposalStart },
+      "Got proposed command"
+    );
+    if (proposedCommand.type === "SUCCESS" /* SUCCESS */) {
+      const finishedInstruction = this.pendingInstructions.pop();
+      this.logger.info(
+        {
+          finishedInstruction,
+          remainingInstructions: this.pendingInstructions
+        },
+        "Removing pending instruction due to SUCCESS"
+      );
+      if (this.pendingInstructions.length !== 0) {
+        this.commandHistory.pop();
+        return this.promptToCommand(type, "", disableCache);
+      }
+    } else if (
+      // on failure, we don't continue to execute
+      proposedCommand.type === "FAILURE"
+    ) {
+      this.logger.info(
+        {
+          remainingInstructions: this.pendingInstructions
+        },
+        "Removing pending instructions due to FAILURE"
+      );
+      this.pendingInstructions = [];
+    }
+    return proposedCommand;
   }
-  locateElement(description, disableCache) {
-    return __async(this, null, function* () {
-      const locator = yield this.generator.getElementLocation(
-        { browserState: yield this.getBrowserState(), goal: description },
-        disableCache
+  async locateElement(description, disableCache) {
+    const locator = await this.generator.getElementLocation(
+      { browserState: await this.getBrowserState(), goal: description },
+      disableCache
+    );
+    if (locator.id < 0) {
+      throw new Error(
+        `Unable to locate element with description: ${description}`
       );
-      if (locator.id < 0) {
-        throw new Error(
-          `Unable to locate element with description: ${description}`
-        );
-      }
-      return locator;
-    });
+    }
+    return locator;
   }
   /**
    * Construct a detailed history that can be passed to the LLM.
@@ -2084,7 +1966,7 @@ var AgentController = class {
             `  URL CHANGE: '${log.urlBeforeCommand}' -> '${currentURL}'`
           );
         } else {
-          const browserStateDiff = (0, import_diff_lines.default)(
+          const browserStateDiff = diffLines(
             log.browserStateBeforeCommand,
             currentPageState,
             {
@@ -2107,7 +1989,7 @@ var AgentController = class {
     return historyLines.join("\n");
   }
   getListHistory() {
-    return import_dedent2.default`Here are the commands that you have successfully executed:
+    return dedent2`Here are the commands that you have successfully executed:
     ${this.commandHistory.filter((cmd) => cmd.type === "AI_ACTION" /* AI_ACTION */).map((cmd) => `- ${cmd.serializedCommand}`).join("\n")}`;
   }
   /**
@@ -2115,108 +1997,104 @@ var AgentController = class {
    * @param [stateless=false] Execute this command in a stateless fashion, without modifying any controller state such as
    * pending instructions. Useful when executing cached instructions.
    */
-  executeCommand(command, disableCache, stateless = false) {
-    return __async(this, null, function* () {
-      const pendingHistory = this.commandHistory[this.commandHistory.length - 1];
-      if (!stateless) {
-        if (!pendingHistory || pendingHistory.state !== "PENDING") {
-          throw new Error(
-            "Executing command but there is no pending entry in the history"
-          );
-        }
-      } else {
-        yield this.browser.getA11yTree();
-      }
-      let result;
-      try {
-        const executionStart = Date.now();
-        result = yield this.executePresetStep(
-          command,
-          disableCache
-        );
-        this.logger.info(
-          { result, duration: Date.now() - executionStart },
-          "Got execution result"
-        );
-      } catch (e) {
-        if (e instanceof Error) {
-          throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
-            cause: e
-          });
-        }
-        throw new BrowserExecutionError(
-          `Unexpected throw from executing command`,
-          {
-            cause: new Error(`${e}`)
-          }
+  async executeCommand(command, disableCache, stateless = false) {
+    const pendingHistory = this.commandHistory[this.commandHistory.length - 1];
+    if (!stateless) {
+      if (!pendingHistory || pendingHistory.state !== "PENDING") {
+        throw new Error(
+          "Executing command but there is no pending entry in the history"
         );
       }
-      if (result.succeedImmediately && !stateless) {
-        this.pendingInstructions.pop();
-        if (this.pendingInstructions.length > 0) {
-          result.succeedImmediately = false;
-        }
-      }
-      if (result.elementInteracted && "target" in command && !command.target.elementDescriptor) {
-        command.target.elementDescriptor = result.elementInteracted.trim();
-      }
-      if (!stateless) {
-        pendingHistory.generatedStep = command;
-        pendingHistory.serializedCommand = serializeCommand(command);
-        pendingHistory.state = "DONE";
-      }
-      return result;
-    });
-  }
-  executeAssertion(urlBeforeCommand, command) {
-    return __async(this, null, function* () {
-      let params;
-      if (command.useVision) {
-        params = {
-          goal: command.assertion,
-          url: urlBeforeCommand,
-          // used for vision only
-          screenshot: yield this.browser.screenshot(),
-          // unused for visual assertion
-          browserState: "",
-          history: "",
-          numPrevious: -1,
-          lastCommand: null
-        };
-      } else {
-        const browserState = yield this.getBrowserState();
-        const history = this.getSerializedHistory(urlBeforeCommand, browserState);
-        params = {
-          goal: command.assertion,
-          url: urlBeforeCommand,
-          // used for text only
-          browserState,
-          history,
-          lastCommand: this.lastExecutedCommand,
-          numPrevious: this.commandHistory.length
-        };
-      }
-      const assertionEval = yield this.generator.getAssertionResult(
-        params,
-        command.useVision,
-        command.disableCache
+    } else {
+      await this.browser.getA11yTree();
+    }
+    let result;
+    try {
+      const executionStart = Date.now();
+      result = await this.executePresetStep(
+        command,
+        disableCache
       );
-      if (assertionEval.relevantElements) {
-        void Promise.all(
-          assertionEval.relevantElements.map(
-            (id) => this.browser.highlight({ id })
-          )
-        );
+      this.logger.info(
+        { result, duration: Date.now() - executionStart },
+        "Got execution result"
+      );
+    } catch (e) {
+      if (e instanceof Error) {
+        throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
+          cause: e
+        });
       }
-      if (!assertionEval.result) {
-        throw new Error(assertionEval.thoughts);
+      throw new BrowserExecutionError(
+        `Unexpected throw from executing command`,
+        {
+          cause: new Error(`${e}`)
+        }
+      );
+    }
+    if (result.succeedImmediately && !stateless) {
+      this.pendingInstructions.pop();
+      if (this.pendingInstructions.length > 0) {
+        result.succeedImmediately = false;
       }
-      return {
-        succeedImmediately: false,
-        thoughts: assertionEval.thoughts,
-        urlAfterCommand: urlBeforeCommand
+    }
+    if (result.elementInteracted && "target" in command && !command.target.elementDescriptor) {
+      command.target.elementDescriptor = result.elementInteracted.trim();
+    }
+    if (!stateless) {
+      pendingHistory.generatedStep = command;
+      pendingHistory.serializedCommand = serializeCommand(command);
+      pendingHistory.state = "DONE";
+    }
+    return result;
+  }
+  async executeAssertion(urlBeforeCommand, command) {
+    let params;
+    if (command.useVision) {
+      params = {
+        goal: command.assertion,
+        url: urlBeforeCommand,
+        // used for vision only
+        screenshot: await this.browser.screenshot(),
+        // unused for visual assertion
+        browserState: "",
+        history: "",
+        numPrevious: -1,
+        lastCommand: null
       };
-    });
+    } else {
+      const browserState = await this.getBrowserState();
+      const history = this.getSerializedHistory(urlBeforeCommand, browserState);
+      params = {
+        goal: command.assertion,
+        url: urlBeforeCommand,
+        // used for text only
+        browserState,
+        history,
+        lastCommand: this.lastExecutedCommand,
+        numPrevious: this.commandHistory.length
+      };
+    }
+    const assertionEval = await this.generator.getAssertionResult(
+      params,
+      command.useVision,
+      command.disableCache
+    );
+    if (assertionEval.relevantElements) {
+      void Promise.all(
+        assertionEval.relevantElements.map(
+          (id) => this.browser.highlight({ id })
+        )
+      );
+    }
+    if (!assertionEval.result) {
+      throw new Error(assertionEval.thoughts);
+    }
+    return {
+      succeedImmediately: false,
+      thoughts: assertionEval.thoughts,
+      urlAfterCommand: urlBeforeCommand
+    };
   }
   /**
    * Executes a preset command.
@@ -2224,265 +2102,255 @@ var AgentController = class {
    * For assertions, an AssertionResult with thoughts is returned.
    * Throws on failure.
    */
-  executePresetStep(command, disableCache) {
-    return __async(this, null, function* () {
-      var _a, _b, _c;
-      const urlBeforeCommand = this.browser.url;
-      switch (command.type) {
-        case "SUCCESS" /* SUCCESS */:
-          if ((_a = command.condition) == null ? void 0 : _a.assertion.trim()) {
-            return this.executeAssertion(urlBeforeCommand, command.condition);
-          }
-          return {
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url
-          };
-        case "AI_ASSERTION" /* AI_ASSERTION */: {
-          return this.executeAssertion(urlBeforeCommand, command);
+  async executePresetStep(command, disableCache) {
+    var _a, _b, _c;
+    const urlBeforeCommand = this.browser.url;
+    switch (command.type) {
+      case "SUCCESS" /* SUCCESS */:
+        if ((_a = command.condition) == null ? void 0 : _a.assertion.trim()) {
+          return this.executeAssertion(urlBeforeCommand, command.condition);
         }
-        case "NAVIGATE" /* NAVIGATE */:
-          yield this.browser.navigate(command.url);
-          break;
-        case "GO_BACK" /* GO_BACK */:
-          yield this.browser.goBack();
-          break;
-        case "GO_FORWARD" /* GO_FORWARD */:
-          yield this.browser.goForward();
-          break;
-        case "SCROLL_DOWN" /* SCROLL_DOWN */:
-          yield this.browser.scrollDown();
-          break;
-        case "SCROLL_UP" /* SCROLL_UP */:
-          yield this.browser.scrollUp();
-          break;
-        case "WAIT" /* WAIT */:
-          yield this.browser.wait(command.delay * 1e3);
-          break;
-        case "REFRESH" /* REFRESH */:
-          yield this.browser.refresh();
-          break;
-        case "CLICK" /* CLICK */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.click(
-            {
-              id
-            },
-            {
-              doubleClick: command.doubleClick,
-              rightClick: command.rightClick
-            }
-          );
-          const result2 = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false,
-            elementInteracted
-          };
-          if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
-            result2.succeedImmediately = true;
-            result2.succeedImmediatelyReason = "URL changed";
-          }
-          return result2;
-        }
-        case "SELECT_OPTION" /* SELECT_OPTION */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_c = command.target.a11yData) == null ? void 0 : _c.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.selectOption(
-            {
-              id
-            },
-            command.option
-          );
-          return {
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url,
-            elementInteracted
-          };
-        }
-        case "TAB" /* TAB */:
-          yield this.browser.switchToPage(command.url);
-          break;
-        case "COOKIE" /* COOKIE */:
-          yield this.browser.setCookie(command.value);
-          break;
-        case "TYPE" /* TYPE */: {
-          let elementInteracted;
-          const target = command.target;
-          if (target.a11yData) {
-            elementInteracted = yield this.browser.click({
-              id: target.a11yData.id
-            });
-          } else if (target.elementDescriptor.length > 0) {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            elementInteracted = yield this.browser.click({
-              id: locator.id
-            });
-          }
-          yield this.browser.type(command.value, {
-            clearContent: command.clearContent,
-            pressKeysSequentially: command.pressKeysSequentially
-          });
-          if (command.pressEnter) {
-            yield this.browser.press("Enter");
-          }
-          const result2 = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false,
-            elementInteracted
-          };
-          if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
-            result2.succeedImmediately = true;
-            result2.succeedImmediatelyReason = "URL changed";
-          }
-          return result2;
-        }
-        case "PRESS" /* PRESS */:
-          yield this.browser.press(command.value);
-          const result = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false
-          };
-          if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
-            result.succeedImmediately = true;
-            result.succeedImmediatelyReason = "URL changed";
-          }
-          return result;
-        default:
-          const assertUnreachable = (_x) => {
-            throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-          };
-          return assertUnreachable(command);
+        return {
+          succeedImmediately: false,
+          urlAfterCommand: this.browser.url
+        };
+      case "AI_ASSERTION" /* AI_ASSERTION */: {
+        return this.executeAssertion(urlBeforeCommand, command);
       }
-      return {
-        succeedImmediately: false,
-        urlAfterCommand: this.browser.url
-      };
-    });
+      case "NAVIGATE" /* NAVIGATE */:
+        await this.browser.navigate(command.url);
+        break;
+      case "GO_BACK" /* GO_BACK */:
+        await this.browser.goBack();
+        break;
+      case "GO_FORWARD" /* GO_FORWARD */:
+        await this.browser.goForward();
+        break;
+      case "SCROLL_DOWN" /* SCROLL_DOWN */:
+        await this.browser.scrollDown();
+        break;
+      case "SCROLL_UP" /* SCROLL_UP */:
+        await this.browser.scrollUp();
+        break;
+      case "WAIT" /* WAIT */:
+        await this.browser.wait(command.delay * 1e3);
+        break;
+      case "REFRESH" /* REFRESH */:
+        await this.browser.refresh();
+        break;
+      case "CLICK" /* CLICK */: {
+        let id;
+        if (command.target.a11yData) {
+          id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
+        } else {
+          const locator = await this.locateElement(
+            command.target.elementDescriptor,
+            disableCache
+          );
+          id = locator.id;
+        }
+        const elementInteracted = await this.browser.click(
+          {
+            id
+          },
+          {
+            doubleClick: command.doubleClick,
+            rightClick: command.rightClick
+          }
+        );
+        const result2 = {
+          urlAfterCommand: this.browser.url,
+          succeedImmediately: false,
+          elementInteracted
+        };
+        if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
+          result2.succeedImmediately = true;
+          result2.succeedImmediatelyReason = "URL changed";
+        }
+        return result2;
+      }
+      case "SELECT_OPTION" /* SELECT_OPTION */: {
+        let id;
+        if (command.target.a11yData) {
+          id = (_c = command.target.a11yData) == null ? void 0 : _c.id;
+        } else {
+          const locator = await this.locateElement(
+            command.target.elementDescriptor,
+            disableCache
+          );
+          id = locator.id;
+        }
+        const elementInteracted = await this.browser.selectOption(
+          {
+            id
+          },
+          command.option
+        );
+        return {
+          succeedImmediately: false,
+          urlAfterCommand: this.browser.url,
+          elementInteracted
+        };
+      }
+      case "TAB" /* TAB */:
+        await this.browser.switchToPage(command.url);
+        break;
+      case "COOKIE" /* COOKIE */:
+        await this.browser.setCookie(command.value);
+        break;
+      case "TYPE" /* TYPE */: {
+        let elementInteracted;
+        const target = command.target;
+        if (target.a11yData) {
+          elementInteracted = await this.browser.click({
+            id: target.a11yData.id
+          });
+        } else if (target.elementDescriptor.length > 0) {
+          const locator = await this.locateElement(
+            command.target.elementDescriptor,
+            disableCache
+          );
+          elementInteracted = await this.browser.click({
+            id: locator.id
+          });
+        }
+        await this.browser.type(command.value, {
+          clearContent: command.clearContent,
+          pressKeysSequentially: command.pressKeysSequentially
+        });
+        if (command.pressEnter) {
+          await this.browser.press("Enter");
+        }
+        const result2 = {
+          urlAfterCommand: this.browser.url,
+          succeedImmediately: false,
+          elementInteracted
+        };
+        if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
+          result2.succeedImmediately = true;
+          result2.succeedImmediatelyReason = "URL changed";
+        }
+        return result2;
+      }
+      case "PRESS" /* PRESS */:
+        await this.browser.press(command.value);
+        const result = {
+          urlAfterCommand: this.browser.url,
+          succeedImmediately: false
+        };
+        if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
+          result.succeedImmediately = true;
+          result.succeedImmediatelyReason = "URL changed";
+        }
+        return result;
+      default:
+        const assertUnreachable = (_x) => {
+          throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+        };
+        return assertUnreachable(command);
+    }
+    return {
+      succeedImmediately: false,
+      urlAfterCommand: this.browser.url
+    };
   }
 };
 
 // ../../packages/web-agent/src/generators/api-generator.ts
-var import_fetch_retry = __toESM(require("fetch-retry"), 1);
-var fetch2 = (0, import_fetch_retry.default)(global.fetch);
+import fetchRetry from "fetch-retry";
+var fetch2 = fetchRetry(global.fetch);
 var API_VERSION = "v1";
 var APIGenerator = class {
+  baseURL;
+  apiKey;
   constructor(params) {
     this.baseURL = params.baseURL;
     this.apiKey = params.apiKey;
   }
-  getElementLocation(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/locate-element`,
-        {
-          browserState: context.browserState,
-          goal: context.goal,
-          disableCache
-        }
-      );
-      return LocateResponseSchema.parse(result);
-    });
-  }
-  getAssertionResult(context, useVision, disableCache) {
-    return __async(this, null, function* () {
-      var _a;
-      if (useVision) {
-        const result2 = yield this.sendRequest(
-          `/${API_VERSION}/web-agent/assertion`,
-          {
-            url: context.url,
-            goal: context.goal,
-            screenshot: (_a = context.screenshot) == null ? void 0 : _a.toString("base64"),
-            disableCache,
-            vision: true
-          }
-        );
-        return GetAssertionResponseSchema.parse(result2);
+  async getElementLocation(context, disableCache) {
+    const result = await this.sendRequest(
+      `/${API_VERSION}/web-agent/locate-element`,
+      {
+        browserState: context.browserState,
+        goal: context.goal,
+        disableCache
       }
-      const result = yield this.sendRequest(
+    );
+    return LocateResponseSchema.parse(result);
+  }
+  async getAssertionResult(context, useVision, disableCache) {
+    var _a;
+    if (useVision) {
+      const result2 = await this.sendRequest(
         `/${API_VERSION}/web-agent/assertion`,
         {
           url: context.url,
-          browserState: context.browserState,
           goal: context.goal,
-          history: context.history,
-          numPrevious: context.numPrevious,
-          lastCommand: context.lastCommand,
+          screenshot: (_a = context.screenshot) == null ? void 0 : _a.toString("base64"),
           disableCache,
-          vision: false
+          vision: true
         }
       );
-      return GetAssertionResponseSchema.parse(result);
-    });
-  }
-  getProposedCommand(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/next-command`,
-        {
-          url: context.url,
-          browserState: context.browserState,
-          goal: context.goal,
-          history: context.history,
-          numPrevious: context.numPrevious,
-          lastCommand: context.lastCommand,
-          disableCache
-        }
-      );
-      return GetNextCommandResponseSchema.parse(result);
-    });
-  }
-  getGranularGoals(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/split-goal`,
-        {
-          url: context.url,
-          goal: context.goal,
-          disableCache
-        }
-      );
-      return SplitGoalResponseSchema.parse(result);
-    });
-  }
-  sendRequest(path, body) {
-    return __async(this, null, function* () {
-      const response = yield fetch2(`${this.baseURL}${path}`, {
-        retries: 3,
-        retryDelay: 1e3,
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Request to ${path} failed with status ${response.status}: ${yield response.text()}`
-        );
+      return GetAssertionResponseSchema.parse(result2);
+    }
+    const result = await this.sendRequest(
+      `/${API_VERSION}/web-agent/assertion`,
+      {
+        url: context.url,
+        browserState: context.browserState,
+        goal: context.goal,
+        history: context.history,
+        numPrevious: context.numPrevious,
+        lastCommand: context.lastCommand,
+        disableCache,
+        vision: false
       }
-      return response.json();
+    );
+    return GetAssertionResponseSchema.parse(result);
+  }
+  async getProposedCommand(context, disableCache) {
+    const result = await this.sendRequest(
+      `/${API_VERSION}/web-agent/next-command`,
+      {
+        url: context.url,
+        browserState: context.browserState,
+        goal: context.goal,
+        history: context.history,
+        numPrevious: context.numPrevious,
+        lastCommand: context.lastCommand,
+        disableCache
+      }
+    );
+    return GetNextCommandResponseSchema.parse(result);
+  }
+  async getGranularGoals(context, disableCache) {
+    const result = await this.sendRequest(
+      `/${API_VERSION}/web-agent/split-goal`,
+      {
+        url: context.url,
+        goal: context.goal,
+        disableCache
+      }
+    );
+    return SplitGoalResponseSchema.parse(result);
+  }
+  async sendRequest(path, body) {
+    const response = await fetch2(`${this.baseURL}${path}`, {
+      retries: 3,
+      retryDelay: 1e3,
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`
+      }
     });
+    if (!response.ok) {
+      throw new Error(
+        `Request to ${path} failed with status ${response.status}: ${await response.text()}`
+      );
+    }
+    return response.json();
   }
 };
 
@@ -2492,72 +2360,62 @@ var version = "1.0.0";
 // src/api-client.ts
 var API_VERSION2 = "v1";
 var APIClient = class {
+  baseURL;
+  apiKey;
   constructor(params) {
     this.baseURL = params.baseURL;
     this.apiKey = params.apiKey;
   }
-  getRun(runId) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
-        method: "GET"
-      });
-      return GetRunResponseSchema.parse(result);
+  async getRun(runId) {
+    const result = await this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
+      method: "GET"
+    });
+    return GetRunResponseSchema.parse(result);
+  }
+  async createRun(body) {
+    const result = await this.sendRequest(`/${API_VERSION2}/runs`, {
+      method: "POST",
+      body
+    });
+    return CreateRunResponseSchema.parse(result);
+  }
+  async updateRun(runId, body) {
+    await this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
+      method: "PATCH",
+      body
     });
   }
-  createRun(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/runs`, {
-        method: "POST",
-        body
-      });
-      return CreateRunResponseSchema.parse(result);
+  async getTest(testId) {
+    const result = await this.sendRequest(`/${API_VERSION2}/tests/${testId}`, {
+      method: "GET"
     });
+    return GetTestResponseSchema.parse(result);
   }
-  updateRun(runId, body) {
-    return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
-        method: "PATCH",
-        body
-      });
+  async uploadScreenshot(body) {
+    const result = await this.sendRequest(`/${API_VERSION2}/screenshots`, {
+      method: "POST",
+      body
     });
+    return CreateScreenshotResponseSchema.parse(result);
   }
-  getTest(testId) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/tests/${testId}`, {
-        method: "GET"
-      });
-      return GetTestResponseSchema.parse(result);
-    });
-  }
-  uploadScreenshot(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/screenshots`, {
-        method: "POST",
-        body
-      });
-      return CreateScreenshotResponseSchema.parse(result);
-    });
-  }
-  sendRequest(path, options) {
-    return __async(this, null, function* () {
-      const response = yield fetch(`${this.baseURL}${path}`, {
-        method: options.method,
-        body: options.body ? JSON.stringify(options.body) : void 0,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Request to ${path} failed with status ${response.status}: ${yield response.text()}`
-        );
+  async sendRequest(path, options) {
+    const response = await fetch(`${this.baseURL}${path}`, {
+      method: options.method,
+      body: options.body ? JSON.stringify(options.body) : void 0,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${this.apiKey}`
       }
-      if (response.status === 204) {
-        return response.text();
-      }
-      return response.json();
     });
+    if (!response.ok) {
+      throw new Error(
+        `Request to ${path} failed with status ${response.status}: ${await response.text()}`
+      );
+    }
+    if (response.status === 204) {
+      return response.text();
+    }
+    return response.json();
   }
 };
 
@@ -2565,29 +2423,25 @@ var APIClient = class {
 var MAX_COMMANDS_PER_STEP = 20;
 
 // ../../packages/execute/src/steps/ai.ts
-var executeAIStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    logger,
-    advanced
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "logger",
-    "advanced"
-  ]);
-  var _a2, _b2, _c, _d, _e, _f, _g;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+var executeAIStep = async ({
+  controller,
+  step,
+  logger,
+  advanced,
+  ...callbacks
+}) => {
+  var _a, _b, _c, _d, _e, _f;
+  (_a = callbacks.onStarted) == null ? void 0 : _a.call(callbacks);
   controller.resetHistory();
-  const result = __spreadProps(__spreadValues({}, step), {
+  const result = {
+    ...step,
     startedAt: /* @__PURE__ */ new Date(),
     userAgent: ChromeBrowser.USER_AGENT,
     // placeholder values
     finishedAt: /* @__PURE__ */ new Date(),
     results: [],
     status: "SUCCESS" /* SUCCESS */
-  });
+  };
   try {
     let commandIndex = 0;
     let useSavedCommands = step.commands && step.commands.length > 0;
@@ -2599,8 +2453,8 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
       }
       let command;
       const startedAt = /* @__PURE__ */ new Date();
-      const beforeScreenshotBuffer = yield controller.browser.screenshot();
-      const beforeScreenshot = yield callbacks.onSaveScreenshot(
+      const beforeScreenshotBuffer = await controller.browser.screenshot();
+      const beforeScreenshot = await callbacks.onSaveScreenshot(
         beforeScreenshotBuffer
       );
       if (useSavedCommands) {
@@ -2611,7 +2465,7 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
           );
         }
       } else {
-        command = yield controller.promptToCommand(
+        command = await controller.promptToCommand(
           step.type,
           step.text,
           advanced.disableAICaching
@@ -2623,7 +2477,7 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
         result.message = command.thoughts;
         break;
       }
-      (_b2 = callbacks.onCommandGenerated) == null ? void 0 : _b2.call(callbacks, {
+      (_b = callbacks.onCommandGenerated) == null ? void 0 : _b.call(callbacks, {
         commandIndex,
         message: CARD_DISPLAY_NAMES[command.type] || `Unknown command (${command.type})`
       });
@@ -2640,7 +2494,7 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
         `Executing command ${commandIndex}: ${serializeCommand(command)}`
       );
       try {
-        const executionResult = yield controller.executeCommand(
+        const executionResult = await controller.executeCommand(
           command,
           advanced.disableAICaching,
           useSavedCommands
@@ -2651,8 +2505,8 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
           message: serializeCommand(command),
           command
         });
-        const afterScreenshotBuffer = yield controller.browser.screenshot();
-        const afterScreenshot = yield callbacks.onSaveScreenshot(
+        const afterScreenshotBuffer = await controller.browser.screenshot();
+        const afterScreenshot = await callbacks.onSaveScreenshot(
           afterScreenshotBuffer
         );
         cmdResult.afterScreenshot = afterScreenshot;
@@ -2670,7 +2524,7 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
         if (command.type === "SUCCESS" /* SUCCESS */) {
           result.finishedAt = /* @__PURE__ */ new Date();
           result.status = "SUCCESS" /* SUCCESS */;
-          result.message = (_d = executionResult.thoughts) != null ? _d : "All commands completed.";
+          result.message = executionResult.thoughts ?? "All commands completed.";
           break;
         }
         if (executionResult.succeedImmediately && !useSavedCommands) {
@@ -2680,14 +2534,15 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
           command = {
             type: "SUCCESS" /* SUCCESS */
           };
-          (_e = callbacks.onCommandExecuted) == null ? void 0 : _e.call(callbacks, {
+          (_d = callbacks.onCommandExecuted) == null ? void 0 : _d.call(callbacks, {
             commandIndex: commandIndex + 1,
             message: serializeCommand(command),
             command
           });
-          result.results.push(__spreadProps(__spreadValues({}, presetActionResult), {
+          result.results.push({
+            ...presetActionResult,
             command
-          }));
+          });
           break;
         }
       } catch (err) {
@@ -2724,57 +2579,54 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
     result.status = "FAILED" /* FAILED */;
   }
   if (result.status === "SUCCESS" /* SUCCESS */) {
-    (_f = callbacks.onSuccess) == null ? void 0 : _f.call(callbacks, {
+    (_e = callbacks.onSuccess) == null ? void 0 : _e.call(callbacks, {
       message: result.message || "AI step succeeded.",
       startedAt: result.startedAt.getTime(),
       durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
     });
   } else {
-    (_g = callbacks.onFailure) == null ? void 0 : _g.call(callbacks, {
+    (_f = callbacks.onFailure) == null ? void 0 : _f.call(callbacks, {
       message: result.message || "AI step errored.",
       startedAt: result.startedAt.getTime(),
       durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
     });
   }
   return result;
-});
+};
 
 // ../../packages/execute/src/steps/preset.ts
-var executePresetStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    advanced
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "advanced"
-  ]);
-  var _a2, _b2, _c;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+var executePresetStep = async ({
+  controller,
+  step,
+  advanced,
+  ...callbacks
+}) => {
+  var _a, _b, _c;
+  (_a = callbacks.onStarted) == null ? void 0 : _a.call(callbacks);
   const startedAt = /* @__PURE__ */ new Date();
   const beforeUrl = controller.browser.url;
-  const beforeScreenshotBuffer = yield controller.browser.screenshot();
-  const beforeScreenshot = yield callbacks.onSaveScreenshot(
+  const beforeScreenshotBuffer = await controller.browser.screenshot();
+  const beforeScreenshot = await callbacks.onSaveScreenshot(
     beforeScreenshotBuffer
   );
   try {
-    const execResult = yield controller.executePresetStep(
+    const execResult = await controller.executePresetStep(
       step.command,
       advanced.disableAICaching
     );
-    const afterScreenshotBuffer = yield controller.browser.screenshot();
-    const afterScreenshot = yield callbacks.onSaveScreenshot(
+    const afterScreenshotBuffer = await controller.browser.screenshot();
+    const afterScreenshot = await callbacks.onSaveScreenshot(
       afterScreenshotBuffer
     );
     const finishedAt = /* @__PURE__ */ new Date();
-    const result = __spreadProps(__spreadValues({}, step), {
+    const result = {
+      ...step,
       startedAt,
       finishedAt,
       // placeholder values
       status: "SUCCESS" /* SUCCESS */,
       results: []
-    });
+    };
     let message = "Successfully executed preset action.";
     if (step.command.type === "AI_ASSERTION" /* AI_ASSERTION */) {
       message = execResult.thoughts || "Assertion passed.";
@@ -2792,7 +2644,7 @@ var executePresetStep = (_a) => __async(void 0, null, function* () {
     result.status = "SUCCESS" /* SUCCESS */;
     result.results = [cmdMetadata];
     result.message = message;
-    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
+    (_b = callbacks.onSuccess) == null ? void 0 : _b.call(callbacks, {
       message,
       startedAt: startedAt.getTime(),
       durationMs: finishedAt.getTime() - startedAt.getTime()
@@ -2800,7 +2652,8 @@ var executePresetStep = (_a) => __async(void 0, null, function* () {
     return result;
   } catch (err) {
     const finishedAt = /* @__PURE__ */ new Date();
-    const result = __spreadProps(__spreadValues({}, step), {
+    const result = {
+      ...step,
       startedAt,
       finishedAt,
       status: "FAILED" /* FAILED */,
@@ -2818,7 +2671,7 @@ var executePresetStep = (_a) => __async(void 0, null, function* () {
           message: `${err}`
         }
       ]
-    });
+    };
     (_c = callbacks.onFailure) == null ? void 0 : _c.call(callbacks, {
       message: `${err}`,
       startedAt: startedAt.getTime(),
@@ -2826,23 +2679,18 @@ var executePresetStep = (_a) => __async(void 0, null, function* () {
     });
     return result;
   }
-});
+};
 
 // ../../packages/execute/src/steps/module.ts
-var executeModuleStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    advanced,
-    logger
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "advanced",
-    "logger"
-  ]);
-  var _a2, _b2, _c;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+var executeModuleStep = async ({
+  controller,
+  step,
+  advanced,
+  logger,
+  ...callbacks
+}) => {
+  var _a, _b, _c;
+  (_a = callbacks.onStarted) == null ? void 0 : _a.call(callbacks);
   const result = {
     type: "MODULE" /* MODULE */,
     moduleId: step.moduleId,
@@ -2859,19 +2707,19 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
     let moduleStepResult;
     switch (moduleStep.type) {
       case "PRESET_ACTION" /* PRESET_ACTION */:
-        moduleStepResult = yield executePresetStep({
+        moduleStepResult = await executePresetStep({
           controller,
           step: moduleStep,
           advanced,
           logger,
           onSaveScreenshot: callbacks.onSaveScreenshot,
           onStarted() {
-            var _a3;
-            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
+            var _a2;
+            (_a2 = callbacks.onStepStarted) == null ? void 0 : _a2.call(callbacks, { index: i });
           },
           onSuccess({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
+            var _a2;
+            (_a2 = callbacks.onStepSuccess) == null ? void 0 : _a2.call(callbacks, {
               index: i,
               message,
               startedAt,
@@ -2879,8 +2727,8 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
             });
           },
           onFailure({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
+            var _a2;
+            (_a2 = callbacks.onStepFailure) == null ? void 0 : _a2.call(callbacks, {
               index: i,
               message,
               startedAt,
@@ -2890,19 +2738,19 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
         });
         break;
       case "AI_ACTION" /* AI_ACTION */:
-        moduleStepResult = yield executeAIStep({
+        moduleStepResult = await executeAIStep({
           controller,
           step: moduleStep,
           advanced,
           logger,
           onSaveScreenshot: callbacks.onSaveScreenshot,
           onStarted() {
-            var _a3;
-            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
+            var _a2;
+            (_a2 = callbacks.onStepStarted) == null ? void 0 : _a2.call(callbacks, { index: i });
           },
           onSuccess({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
+            var _a2;
+            (_a2 = callbacks.onStepSuccess) == null ? void 0 : _a2.call(callbacks, {
               index: i,
               message,
               startedAt,
@@ -2910,8 +2758,8 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
             });
           },
           onFailure({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
+            var _a2;
+            (_a2 = callbacks.onStepFailure) == null ? void 0 : _a2.call(callbacks, {
               index: i,
               message,
               startedAt,
@@ -2919,12 +2767,12 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
             });
           },
           onCommandGenerated({ commandIndex, message }) {
-            var _a3;
-            (_a3 = callbacks.onCommandGenerated) == null ? void 0 : _a3.call(callbacks, { index: i, commandIndex, message });
+            var _a2;
+            (_a2 = callbacks.onCommandGenerated) == null ? void 0 : _a2.call(callbacks, { index: i, commandIndex, message });
           },
           onCommandExecuted({ commandIndex, message, command }) {
-            var _a3;
-            (_a3 = callbacks.onCommandExecuted) == null ? void 0 : _a3.call(callbacks, {
+            var _a2;
+            (_a2 = callbacks.onCommandExecuted) == null ? void 0 : _a2.call(callbacks, {
               index: i,
               commandIndex,
               message,
@@ -2945,21 +2793,22 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
       result.finishedAt = /* @__PURE__ */ new Date();
       for (let j = i + 1; j < step.steps.length; j++) {
         const skippedStep = step.steps[j];
-        const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
+        const skippedResult = {
+          ...skippedStep,
           status: "CANCELLED" /* CANCELLED */,
           startedAt: /* @__PURE__ */ new Date(),
           finishedAt: /* @__PURE__ */ new Date(),
           userAgent: ChromeBrowser.USER_AGENT,
           results: [],
           message: "Cancelled due to previous failure."
-        });
+        };
         result.results.push(skippedResult);
       }
       break;
     }
   }
   if (result.status === "SUCCESS" /* SUCCESS */) {
-    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
+    (_b = callbacks.onSuccess) == null ? void 0 : _b.call(callbacks, {
       message: "Executed module step.",
       startedAt: result.startedAt.getTime(),
       durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
@@ -2972,20 +2821,20 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
     });
   }
   return result;
-});
+};
 
 // ../../packages/execute/src/test.ts
-var executeTest = (_0) => __async(void 0, [_0], function* ({
+var executeTest = async ({
   test,
   runId,
   controller,
   logger,
   onUpdateRun,
   onSaveScreenshot
-}) {
+}) => {
   const advanced = TestAdvancedSettingsSchema.parse(test.advanced);
   logger.info(`Starting run ${runId} for test ${test.id}`);
-  yield onUpdateRun({
+  await onUpdateRun({
     status: "RUNNING",
     startedAt: /* @__PURE__ */ new Date()
   });
@@ -2996,7 +2845,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
     let result;
     switch (step.type) {
       case "PRESET_ACTION" /* PRESET_ACTION */:
-        result = yield executePresetStep({
+        result = await executePresetStep({
           controller,
           step,
           advanced,
@@ -3005,7 +2854,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
         });
         break;
       case "AI_ACTION" /* AI_ACTION */:
-        result = yield executeAIStep({
+        result = await executeAIStep({
           controller,
           step,
           advanced,
@@ -3014,7 +2863,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
         });
         break;
       case "RESOLVED_MODULE":
-        result = yield executeModuleStep({
+        result = await executeModuleStep({
           controller,
           step,
           advanced,
@@ -3029,7 +2878,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
         return assertUnreachable(step);
     }
     results.push(result);
-    yield onUpdateRun({
+    await onUpdateRun({
       results
     });
     if (result.status === "FAILED" /* FAILED */) {
@@ -3043,26 +2892,28 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
             startedAt: /* @__PURE__ */ new Date(),
             userAgent: ChromeBrowser.USER_AGENT,
             results: skippedStep.steps.map((s) => {
-              return __spreadProps(__spreadValues({}, s), {
+              return {
+                ...s,
                 status: "CANCELLED" /* CANCELLED */,
                 startedAt: /* @__PURE__ */ new Date(),
                 finishedAt: /* @__PURE__ */ new Date(),
                 userAgent: ChromeBrowser.USER_AGENT,
                 results: []
-              });
+              };
             }),
             finishedAt: /* @__PURE__ */ new Date(),
             status: "CANCELLED" /* CANCELLED */
           };
           results.push(skippedResult);
         } else {
-          const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
+          const skippedResult = {
+            ...skippedStep,
             status: "CANCELLED" /* CANCELLED */,
             startedAt: /* @__PURE__ */ new Date(),
             finishedAt: /* @__PURE__ */ new Date(),
             userAgent: ChromeBrowser.USER_AGENT,
             results: []
-          });
+          };
           results.push(skippedResult);
         }
       }
@@ -3071,14 +2922,14 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
       break;
     }
   }
-  yield onUpdateRun({
+  await onUpdateRun({
     status: failed ? "FAILED" : "PASSED",
     finishedAt: /* @__PURE__ */ new Date(),
     results
   });
-  yield controller.browser.cleanup();
+  await controller.browser.cleanup();
   return failed;
-});
+};
 
 // src/run-test.ts
 var consoleLogger = {
@@ -3090,79 +2941,77 @@ var consoleLogger = {
   flush: () => {
   }
 };
-function runTest(_0) {
-  return __async(this, arguments, function* ({
-    testId,
-    apiClient,
-    generator
-  }) {
-    const test = yield apiClient.getTest(testId);
-    const browser = yield ChromeBrowser.init(test.baseUrl, consoleLogger);
-    const controller = new AgentController({
-      browser,
-      generator,
-      config: DEFAULT_CONTROLLER_CONFIG,
-      logger: consoleLogger
-    });
-    const run = yield apiClient.createRun({
-      testId
-    });
-    let failed = true;
-    try {
-      failed = yield executeTest({
-        test,
-        runId: run.id,
-        controller,
-        logger: consoleLogger,
-        onSaveScreenshot: (buffer) => __async(this, null, function* () {
-          const { key } = yield apiClient.uploadScreenshot({
-            screenshot: buffer.toString("base64")
-          });
-          return key;
-        }),
-        onUpdateRun: (data) => __async(this, null, function* () {
-          yield apiClient.updateRun(run.id, data);
-        })
-      });
-    } catch (err) {
-      yield apiClient.updateRun(run.id, {
-        status: "FAILED",
-        finishedAt: /* @__PURE__ */ new Date()
-      });
-    }
-    return failed;
+async function runTest({
+  testId,
+  apiClient,
+  generator
+}) {
+  const test = await apiClient.getTest(testId);
+  const browser = await ChromeBrowser.init(test.baseUrl, consoleLogger);
+  const controller = new AgentController({
+    browser,
+    generator,
+    config: DEFAULT_CONTROLLER_CONFIG,
+    logger: consoleLogger
   });
+  const run = await apiClient.createRun({
+    testId
+  });
+  let failed = true;
+  try {
+    failed = await executeTest({
+      test,
+      runId: run.id,
+      controller,
+      logger: consoleLogger,
+      onSaveScreenshot: async (buffer) => {
+        const { key } = await apiClient.uploadScreenshot({
+          screenshot: buffer.toString("base64")
+        });
+        return key;
+      },
+      onUpdateRun: async (data) => {
+        await apiClient.updateRun(run.id, data);
+      }
+    });
+  } catch (err) {
+    await apiClient.updateRun(run.id, {
+      status: "FAILED",
+      finishedAt: /* @__PURE__ */ new Date()
+    });
+  }
+  return failed;
 }
 
 // src/cli.ts
-var program = new import_commander.Command();
+var program = new Command4();
 program.name("momentic").description("Momentic CLI").version(version);
 program.command("run-tests").addOption(
-  new import_commander.Option(
+  new Option(
     "--tests <tests...>",
     "specify tests to run"
   ).makeOptionMandatory(true)
 ).addOption(
-  new import_commander.Option(
+  new Option(
     "--start <command>",
     "specify start command"
   ).makeOptionMandatory(true)
 ).addOption(
-  new import_commander.Option("--wait-on <url>", "specify url to wait on").makeOptionMandatory(
+  new Option("--wait-on <url>", "specify url to wait on").makeOptionMandatory(
     true
   )
 ).addOption(
-  new import_commander.Option(
+  new Option(
     "--wait-on-timeout <timeout>",
     "specify how long to wait on url"
   ).default(60, "one minute")
 ).addOption(
-  new import_commander.Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
-).action((options) => __async(exports, null, function* () {
+  new Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
+).action(async (options) => {
   const { tests, start, waitOn, waitOnTimeout, apiKey } = options;
   console.log({ tests, start, waitOn, waitOnTimeout, apiKey });
-  void (0, import_execa.execa)(start);
-  yield (0, import_wait_on.default)({
+  void execa(start);
+  await waitOnFn({
     resources: [waitOn],
     timeout: waitOnTimeout * 1e3
   });
@@ -3182,24 +3031,22 @@ program.command("run-tests").addOption(
     });
     return { failed, testId };
   });
-  const results = yield Promise.all(promises);
+  const results = await Promise.all(promises);
   const failedResults = results.filter((result) => result.failed);
   if (failedResults.length > 0) {
     console.log(
-      import_chalk.default.red(
+      chalk.red(
         `Failed ${failedResults.length} out of ${results.length} tests`
       )
     );
     failedResults.forEach((result) => {
-      console.log(import_chalk.default.red(`- ${result.testId}`));
+      console.log(chalk.red(`- ${result.testId}`));
     });
     process.exit(1);
   }
-  console.log(import_chalk.default.green(`All ${results.length} tests passed!`));
-}));
-function main() {
-  return __async(this, null, function* () {
-    yield program.parseAsync(process.argv);
-  });
+  console.log(chalk.green(`All ${results.length} tests passed!`));
+});
+async function main() {
+  await program.parseAsync(process.argv);
 }
 void main();
