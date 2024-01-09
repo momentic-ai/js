@@ -1,7 +1,13 @@
+#!/usr/bin/env node
+"use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -17,6 +23,34 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __objRest = (source, exclude) => {
+  var target = {};
+  for (var prop in source)
+    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
+      target[prop] = source[prop];
+  if (source != null && __getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(source)) {
+      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
+        target[prop] = source[prop];
+    }
+  return target;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -38,12 +72,18 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
+// src/cli.ts
+var import_chalk = __toESM(require("chalk"));
+var import_commander = require("commander");
+var import_execa = require("execa");
+var import_wait_on = __toESM(require("wait-on"));
+
 // ../../packages/types/src/commands.ts
-import dedent from "dedent";
-import * as z2 from "zod";
+var import_dedent = __toESM(require("dedent"), 1);
+var z2 = __toESM(require("zod"), 1);
 
 // ../../packages/types/src/a11y-targets.ts
-import * as z from "zod";
+var z = __toESM(require("zod"), 1);
 var A11yTargetWithCacheSchema = z.object({
   // a11y ID
   id: z.number().int(),
@@ -131,7 +171,7 @@ var ClickCommandSchema = CommonCommandSchema.merge(
     rightClick: z2.boolean().default(false)
   })
 ).describe(
-  dedent`CLICK <id> - click on the element that has the specified id.
+  import_dedent.default`CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
@@ -233,7 +273,7 @@ var AICommandSchema = z2.discriminatedUnion("type", [
 ]);
 
 // ../../packages/types/src/steps.ts
-import * as z3 from "zod";
+var z3 = __toESM(require("zod"), 1);
 var StepType = /* @__PURE__ */ ((StepType2) => {
   StepType2["AI_ACTION"] = "AI_ACTION";
   StepType2["PRESET_ACTION"] = "PRESET_ACTION";
@@ -276,21 +316,18 @@ var ResolvedStepSchema = z3.union([
 ]);
 
 // ../../packages/web-agent/src/browsers/chrome.ts
-import {
-  chromium,
-  devices
-} from "playwright";
+var import_playwright = require("playwright");
 
 // ../../packages/types/src/assertions.ts
-import { z as z4 } from "zod";
-var AIAssertionResultSchema = z4.object({
-  thoughts: z4.string(),
-  result: z4.boolean(),
-  relevantElements: z4.array(z4.number()).optional()
+var import_zod = require("zod");
+var AIAssertionResultSchema = import_zod.z.object({
+  thoughts: import_zod.z.string(),
+  result: import_zod.z.boolean(),
+  relevantElements: import_zod.z.array(import_zod.z.number()).optional()
 });
 
 // ../../packages/types/src/ai-command-generation.ts
-import { z as z5 } from "zod";
+var import_zod2 = require("zod");
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -307,14 +344,14 @@ var EmptyA11yTreeError = class extends Error {
 };
 
 // ../../packages/types/src/ai-command-generation.ts
-var LLMOutputSchema = z5.object({
-  command: z5.string(),
-  thoughts: z5.string()
+var LLMOutputSchema = import_zod2.z.object({
+  command: import_zod2.z.string(),
+  thoughts: import_zod2.z.string()
 });
-var NumericStringSchema = z5.string().pipe(z5.coerce.number());
+var NumericStringSchema = import_zod2.z.string().pipe(import_zod2.z.coerce.number());
 
 // ../../packages/types/src/command-results.ts
-import * as z6 from "zod";
+var z6 = __toESM(require("zod"), 1);
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
   ResultStatus2["SUCCESS"] = "SUCCESS";
   ResultStatus2["FAILED"] = "FAILED";
@@ -386,9 +423,9 @@ var ResultSchema = z6.discriminatedUnion("type", [
 ]);
 
 // ../../packages/types/src/cookies.ts
-import { parseString } from "set-cookie-parser";
+var import_set_cookie_parser = require("set-cookie-parser");
 function parseCookieString(cookie) {
-  const parsedCookie = parseString(cookie);
+  const parsedCookie = (0, import_set_cookie_parser.parseString)(cookie);
   if (!parsedCookie.name) {
     throw new Error("Name missing from cookie");
   }
@@ -419,7 +456,7 @@ function parseCookieString(cookie) {
 }
 
 // ../../packages/types/src/execute-results.ts
-import * as z7 from "zod";
+var z7 = __toESM(require("zod"), 1);
 var ExecuteCommandHistoryEntrySchema = z7.object({
   // type of command executed
   type: z7.nativeEnum(StepType),
@@ -432,11 +469,11 @@ var ExecuteCommandHistoryEntrySchema = z7.object({
 });
 
 // ../../packages/types/src/goal-splitter.ts
-import { z as z8 } from "zod";
-var InstructionsSchema = z8.string().array();
+var import_zod3 = require("zod");
+var InstructionsSchema = import_zod3.z.string().array();
 
 // ../../packages/types/src/locator.ts
-import * as z9 from "zod";
+var z9 = __toESM(require("zod"), 1);
 var AILocatorSchema = z9.object({
   thoughts: z9.string(),
   // a11y id
@@ -446,23 +483,23 @@ var AILocatorSchema = z9.object({
 });
 
 // ../../packages/types/src/modules.ts
-import { z as z10 } from "zod";
-var ModuleMetadataSchema = z10.object({
-  id: z10.string(),
-  createdAt: z10.coerce.date(),
-  createdBy: z10.string(),
-  organizationId: z10.string().or(z10.null()),
-  name: z10.string(),
-  schemaVersion: z10.string(),
+var import_zod4 = require("zod");
+var ModuleMetadataSchema = import_zod4.z.object({
+  id: import_zod4.z.string(),
+  createdAt: import_zod4.z.coerce.date(),
+  createdBy: import_zod4.z.string(),
+  organizationId: import_zod4.z.string().or(import_zod4.z.null()),
+  name: import_zod4.z.string(),
+  schemaVersion: import_zod4.z.string(),
   // this is only used in the client and is not stored in the db
-  numSteps: z10.number()
+  numSteps: import_zod4.z.number()
 });
-var ModuleSchema = z10.object({
+var ModuleSchema = import_zod4.z.object({
   steps: AllowedModuleStepSchema.array()
 }).merge(ModuleMetadataSchema.omit({ numSteps: true }));
 
 // ../../packages/types/src/runs.ts
-import { z as z11 } from "zod";
+var import_zod5 = require("zod");
 var RunTrigger = {
   WEBHOOK: "WEBHOOK",
   CRON: "CRON",
@@ -475,31 +512,31 @@ var RunStatusEnum = {
   FAILED: "FAILED",
   CANCELLED: "CANCELLED"
 };
-var DateOrStringSchema = z11.string().pipe(z11.coerce.date()).or(z11.date());
-var RunMetadataSchema = z11.object({
-  id: z11.string(),
+var DateOrStringSchema = import_zod5.z.string().pipe(import_zod5.z.coerce.date()).or(import_zod5.z.date());
+var RunMetadataSchema = import_zod5.z.object({
+  id: import_zod5.z.string(),
   createdAt: DateOrStringSchema,
-  createdBy: z11.string(),
-  organizationId: z11.string().or(z11.null()),
-  scheduledAt: DateOrStringSchema.or(z11.null()),
-  startedAt: DateOrStringSchema.or(z11.null()),
-  finishedAt: DateOrStringSchema.or(z11.null()),
-  testId: z11.string().or(z11.null()),
-  status: z11.nativeEnum(RunStatusEnum),
-  trigger: z11.nativeEnum(RunTrigger),
-  test: z11.object({
-    name: z11.string(),
-    id: z11.string()
-  }).or(z11.null())
+  createdBy: import_zod5.z.string(),
+  organizationId: import_zod5.z.string().or(import_zod5.z.null()),
+  scheduledAt: DateOrStringSchema.or(import_zod5.z.null()),
+  startedAt: DateOrStringSchema.or(import_zod5.z.null()),
+  finishedAt: DateOrStringSchema.or(import_zod5.z.null()),
+  testId: import_zod5.z.string().or(import_zod5.z.null()),
+  status: import_zod5.z.nativeEnum(RunStatusEnum),
+  trigger: import_zod5.z.nativeEnum(RunTrigger),
+  test: import_zod5.z.object({
+    name: import_zod5.z.string(),
+    id: import_zod5.z.string()
+  }).or(import_zod5.z.null())
 });
 var RunWithTestSchema = RunMetadataSchema.merge(
-  z11.object({
+  import_zod5.z.object({
     results: ResultSchema.array(),
-    test: z11.object({
-      name: z11.string(),
-      id: z11.string(),
-      baseUrl: z11.string()
-    }).or(z11.null())
+    test: import_zod5.z.object({
+      name: import_zod5.z.string(),
+      id: import_zod5.z.string(),
+      baseUrl: import_zod5.z.string()
+    }).or(import_zod5.z.null())
   })
 );
 
@@ -604,56 +641,56 @@ var CARD_DESCRIPTIONS = {
 };
 
 // ../../packages/types/src/test.ts
-import { z as z13 } from "zod";
+var import_zod7 = require("zod");
 
 // ../../packages/types/src/test-settings.ts
-import { isValidCron } from "cron-validator";
-import { z as z12 } from "zod";
-var TestAdvancedSettingsSchema = z12.object({
-  availableAsModule: z12.boolean().default(false),
-  disableAICaching: z12.boolean().default(false)
+var import_cron_validator = require("cron-validator");
+var import_zod6 = require("zod");
+var TestAdvancedSettingsSchema = import_zod6.z.object({
+  availableAsModule: import_zod6.z.boolean().default(false),
+  disableAICaching: import_zod6.z.boolean().default(false)
 });
-var ScheduleSettingsSchema = z12.object({
-  cron: z12.string().refine(
+var ScheduleSettingsSchema = import_zod6.z.object({
+  cron: import_zod6.z.string().refine(
     (v) => {
-      return isValidCron(v);
+      return (0, import_cron_validator.isValidCron)(v);
     },
     { message: "Invalid cron expression." }
   ).default("0 0 */1 * *"),
-  enabled: z12.boolean().default(false),
-  timeZone: z12.string().default("America/Los_Angeles"),
+  enabled: import_zod6.z.boolean().default(false),
+  timeZone: import_zod6.z.string().default("America/Los_Angeles"),
   // this is used for removing repeatable jobs (not set by user)
-  jobKey: z12.string().optional()
+  jobKey: import_zod6.z.string().optional()
 });
-var WebhookSchema = z12.object({
-  lastStatus: z12.number().optional(),
-  url: z12.string().url()
+var WebhookSchema = import_zod6.z.object({
+  lastStatus: import_zod6.z.number().optional(),
+  url: import_zod6.z.string().url()
 });
-var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
-var TestSettingsSchema = z12.object({
-  name: z12.string().min(1),
-  baseUrl: z12.string().url(),
+var WebhookSettingsSchema = import_zod6.z.array(WebhookSchema).default([]);
+var TestSettingsSchema = import_zod6.z.object({
+  name: import_zod6.z.string().min(1),
+  baseUrl: import_zod6.z.string().url(),
   advanced: TestAdvancedSettingsSchema
 });
 
 // ../../packages/types/src/test.ts
-var ResolvedTestSchema = z13.object({
-  id: z13.string(),
-  name: z13.string(),
-  baseUrl: z13.string(),
-  steps: z13.array(ResolvedStepSchema),
-  createdAt: z13.coerce.date(),
-  updatedAt: z13.coerce.date(),
-  createdBy: z13.string(),
-  organizationId: z13.string().or(z13.null()),
-  schemaVersion: z13.string(),
+var ResolvedTestSchema = import_zod7.z.object({
+  id: import_zod7.z.string(),
+  name: import_zod7.z.string(),
+  baseUrl: import_zod7.z.string(),
+  steps: import_zod7.z.array(ResolvedStepSchema),
+  createdAt: import_zod7.z.coerce.date(),
+  updatedAt: import_zod7.z.coerce.date(),
+  createdBy: import_zod7.z.string(),
+  organizationId: import_zod7.z.string().or(import_zod7.z.null()),
+  schemaVersion: import_zod7.z.string(),
   advanced: TestAdvancedSettingsSchema,
   schedule: ScheduleSettingsSchema,
   webhooks: WebhookSettingsSchema
 });
 
 // ../../packages/types/src/context.ts
-import * as z14 from "zod";
+var z14 = __toESM(require("zod"), 1);
 var DynamicContextSchema = z14.object({
   // user goal or instruction
   goal: z14.string(),
@@ -670,7 +707,7 @@ var DynamicContextSchema = z14.object({
 });
 
 // ../../packages/types/src/public-api.ts
-import * as z15 from "zod";
+var z15 = __toESM(require("zod"), 1);
 var GeneratorOptionsSchema = z15.object({
   disableCache: z15.boolean()
 });
@@ -709,9 +746,12 @@ var SplitGoalResponseSchema = z15.string().array();
 var QueueBodySchema = z15.object({
   testIds: z15.string().array()
 });
+var GetTestResponseSchema = ResolvedTestSchema;
 var CreateRunBodySchema = z15.object({
   testId: z15.string()
 });
+var CreateRunResponseSchema = RunWithTestSchema;
+var GetRunResponseSchema = RunWithTestSchema;
 var UpdateRunBodySchema = z15.object({
   finishedAt: z15.coerce.date(),
   results: ResultSchema.array(),
@@ -1142,7 +1182,7 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield chromium.launch({ headless: true });
+      const browser = yield import_playwright.chromium.launch({ headless: true });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -1150,7 +1190,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         },
         // comment out the below if you are on Mac OS but you're using a monitor
         deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: devices["Desktop Chrome"].userAgent,
+        userAgent: import_playwright.devices["Desktop Chrome"].userAgent,
         geolocation: { latitude: 37.7749, longitude: -122.4194 },
         // san francisco
         locale: "en-US",
@@ -1844,7 +1884,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     });
   }
 };
-_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
+_ChromeBrowser.USER_AGENT = import_playwright.devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/configs/controller.ts
@@ -1857,8 +1897,8 @@ var A11Y_CONTROLLER_CONFIG = {
 var DEFAULT_CONTROLLER_CONFIG = A11Y_CONTROLLER_CONFIG;
 
 // ../../packages/web-agent/src/controller.ts
-import dedent2 from "dedent";
-import diffLines from "diff-lines";
+var import_dedent2 = __toESM(require("dedent"), 1);
+var import_diff_lines = __toESM(require("diff-lines"), 1);
 var MAX_HISTORY_CHAR_LENGTH = 1e4;
 var AgentController = class {
   constructor({ browser, config, generator, logger }) {
@@ -2044,7 +2084,7 @@ var AgentController = class {
             `  URL CHANGE: '${log.urlBeforeCommand}' -> '${currentURL}'`
           );
         } else {
-          const browserStateDiff = diffLines(
+          const browserStateDiff = (0, import_diff_lines.default)(
             log.browserStateBeforeCommand,
             currentPageState,
             {
@@ -2067,7 +2107,7 @@ var AgentController = class {
     return historyLines.join("\n");
   }
   getListHistory() {
-    return dedent2`Here are the commands that you have successfully executed:
+    return import_dedent2.default`Here are the commands that you have successfully executed:
     ${this.commandHistory.filter((cmd) => cmd.type === "AI_ACTION" /* AI_ACTION */).map((cmd) => `- ${cmd.serializedCommand}`).join("\n")}`;
   }
   /**
@@ -2341,8 +2381,8 @@ var AgentController = class {
 };
 
 // ../../packages/web-agent/src/generators/api-generator.ts
-import fetchRetry from "fetch-retry";
-var fetch = fetchRetry(global.fetch);
+var import_fetch_retry = __toESM(require("fetch-retry"), 1);
+var fetch2 = (0, import_fetch_retry.default)(global.fetch);
 var API_VERSION = "v1";
 var APIGenerator = class {
   constructor(params) {
@@ -2426,7 +2466,7 @@ var APIGenerator = class {
   }
   sendRequest(path, body) {
     return __async(this, null, function* () {
-      const response = yield fetch(`${this.baseURL}${path}`, {
+      const response = yield fetch2(`${this.baseURL}${path}`, {
         retries: 3,
         retryDelay: 1e3,
         method: "POST",
@@ -2445,11 +2485,721 @@ var APIGenerator = class {
     });
   }
 };
-export {
-  APIGenerator,
-  AgentController,
-  ChromeBrowser,
-  CommandType,
-  DEFAULT_CONTROLLER_CONFIG,
-  StepType
+
+// package.json
+var version = "1.0.0";
+
+// src/api-client.ts
+var API_VERSION2 = "v1";
+var APIClient = class {
+  constructor(params) {
+    this.baseURL = params.baseURL;
+    this.apiKey = params.apiKey;
+  }
+  getRun(runId) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
+        method: "GET"
+      });
+      return GetRunResponseSchema.parse(result);
+    });
+  }
+  createRun(body) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION2}/runs`, {
+        method: "POST",
+        body
+      });
+      return CreateRunResponseSchema.parse(result);
+    });
+  }
+  updateRun(runId, body) {
+    return __async(this, null, function* () {
+      yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
+        method: "PATCH",
+        body
+      });
+    });
+  }
+  getTest(testId) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION2}/tests/${testId}`, {
+        method: "GET"
+      });
+      return GetTestResponseSchema.parse(result);
+    });
+  }
+  uploadScreenshot(body) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION2}/screenshots`, {
+        method: "POST",
+        body
+      });
+      return CreateScreenshotResponseSchema.parse(result);
+    });
+  }
+  sendRequest(path, options) {
+    return __async(this, null, function* () {
+      const response = yield fetch(`${this.baseURL}${path}`, {
+        method: options.method,
+        body: options.body ? JSON.stringify(options.body) : void 0,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error(
+          `Request to ${path} failed with status ${response.status}: ${yield response.text()}`
+        );
+      }
+      if (response.status === 204) {
+        return response.text();
+      }
+      return response.json();
+    });
+  }
 };
+
+// ../../packages/execute/src/constants.ts
+var MAX_COMMANDS_PER_STEP = 20;
+
+// ../../packages/execute/src/steps/ai.ts
+var executeAIStep = (_a) => __async(void 0, null, function* () {
+  var _b = _a, {
+    controller,
+    step,
+    logger,
+    advanced
+  } = _b, callbacks = __objRest(_b, [
+    "controller",
+    "step",
+    "logger",
+    "advanced"
+  ]);
+  var _a2, _b2, _c, _d, _e, _f, _g;
+  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+  controller.resetHistory();
+  const result = __spreadProps(__spreadValues({}, step), {
+    startedAt: /* @__PURE__ */ new Date(),
+    userAgent: ChromeBrowser.USER_AGENT,
+    // placeholder values
+    finishedAt: /* @__PURE__ */ new Date(),
+    results: [],
+    status: "SUCCESS" /* SUCCESS */
+  });
+  try {
+    let commandIndex = 0;
+    let useSavedCommands = step.commands && step.commands.length > 0;
+    while (true) {
+      if (commandIndex > MAX_COMMANDS_PER_STEP) {
+        throw new Error(
+          `Exceeded max number of commands per step (${MAX_COMMANDS_PER_STEP})`
+        );
+      }
+      let command;
+      const startedAt = /* @__PURE__ */ new Date();
+      const beforeScreenshotBuffer = yield controller.browser.screenshot();
+      const beforeScreenshot = yield callbacks.onSaveScreenshot(
+        beforeScreenshotBuffer
+      );
+      if (useSavedCommands) {
+        command = step.commands[commandIndex];
+        if (!command) {
+          throw new Error(
+            `Saved command at index ${commandIndex} is undefined.`
+          );
+        }
+      } else {
+        command = yield controller.promptToCommand(
+          step.type,
+          step.text,
+          advanced.disableAICaching
+        );
+      }
+      if (command.type === "FAILURE") {
+        result.finishedAt = /* @__PURE__ */ new Date();
+        result.status = "FAILED" /* FAILED */;
+        result.message = command.thoughts;
+        break;
+      }
+      (_b2 = callbacks.onCommandGenerated) == null ? void 0 : _b2.call(callbacks, {
+        commandIndex,
+        message: CARD_DISPLAY_NAMES[command.type] || `Unknown command (${command.type})`
+      });
+      const cmdResult = {
+        beforeScreenshot,
+        beforeUrl: controller.browser.url,
+        startedAt,
+        viewport: controller.browser.viewport,
+        // placeholder values
+        finishedAt: /* @__PURE__ */ new Date(),
+        status: "SUCCESS" /* SUCCESS */
+      };
+      logger.info(
+        `Executing command ${commandIndex}: ${serializeCommand(command)}`
+      );
+      try {
+        const executionResult = yield controller.executeCommand(
+          command,
+          advanced.disableAICaching,
+          useSavedCommands
+        );
+        cmdResult.elementInteracted = executionResult.elementInteracted;
+        (_c = callbacks.onCommandExecuted) == null ? void 0 : _c.call(callbacks, {
+          commandIndex,
+          message: serializeCommand(command),
+          command
+        });
+        const afterScreenshotBuffer = yield controller.browser.screenshot();
+        const afterScreenshot = yield callbacks.onSaveScreenshot(
+          afterScreenshotBuffer
+        );
+        cmdResult.afterScreenshot = afterScreenshot;
+        cmdResult.afterUrl = controller.browser.url;
+        cmdResult.finishedAt = /* @__PURE__ */ new Date();
+        const presetActionResult = {
+          status: "SUCCESS" /* SUCCESS */,
+          startedAt: cmdResult.startedAt,
+          finishedAt: cmdResult.finishedAt,
+          type: "PRESET_ACTION" /* PRESET_ACTION */,
+          command,
+          results: [cmdResult]
+        };
+        result.results.push(presetActionResult);
+        if (command.type === "SUCCESS" /* SUCCESS */) {
+          result.finishedAt = /* @__PURE__ */ new Date();
+          result.status = "SUCCESS" /* SUCCESS */;
+          result.message = (_d = executionResult.thoughts) != null ? _d : "All commands completed.";
+          break;
+        }
+        if (executionResult.succeedImmediately && !useSavedCommands) {
+          result.finishedAt = /* @__PURE__ */ new Date();
+          result.status = "SUCCESS" /* SUCCESS */;
+          result.message = executionResult.succeedImmediatelyReason;
+          command = {
+            type: "SUCCESS" /* SUCCESS */
+          };
+          (_e = callbacks.onCommandExecuted) == null ? void 0 : _e.call(callbacks, {
+            commandIndex: commandIndex + 1,
+            message: serializeCommand(command),
+            command
+          });
+          result.results.push(__spreadProps(__spreadValues({}, presetActionResult), {
+            command
+          }));
+          break;
+        }
+      } catch (err) {
+        if (useSavedCommands) {
+          useSavedCommands = false;
+          commandIndex = 0;
+          result.results = [];
+          continue;
+        }
+        cmdResult.status = "FAILED" /* FAILED */;
+        cmdResult.message = `${err}`;
+        cmdResult.finishedAt = /* @__PURE__ */ new Date();
+        cmdResult.afterScreenshot = void 0;
+        cmdResult.afterUrl = controller.browser.url;
+        result.results.push({
+          status: "FAILED" /* FAILED */,
+          startedAt: cmdResult.startedAt,
+          finishedAt: cmdResult.finishedAt,
+          type: "PRESET_ACTION" /* PRESET_ACTION */,
+          command,
+          results: [cmdResult],
+          message: `${err}`
+        });
+        result.status = "FAILED" /* FAILED */;
+        result.finishedAt = /* @__PURE__ */ new Date();
+        result.message = `${err}`;
+        break;
+      }
+      commandIndex++;
+    }
+  } catch (err) {
+    result.message = `${err}`;
+    result.finishedAt = /* @__PURE__ */ new Date();
+    result.status = "FAILED" /* FAILED */;
+  }
+  if (result.status === "SUCCESS" /* SUCCESS */) {
+    (_f = callbacks.onSuccess) == null ? void 0 : _f.call(callbacks, {
+      message: result.message || "AI step succeeded.",
+      startedAt: result.startedAt.getTime(),
+      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
+    });
+  } else {
+    (_g = callbacks.onFailure) == null ? void 0 : _g.call(callbacks, {
+      message: result.message || "AI step errored.",
+      startedAt: result.startedAt.getTime(),
+      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
+    });
+  }
+  return result;
+});
+
+// ../../packages/execute/src/steps/preset.ts
+var executePresetStep = (_a) => __async(void 0, null, function* () {
+  var _b = _a, {
+    controller,
+    step,
+    advanced
+  } = _b, callbacks = __objRest(_b, [
+    "controller",
+    "step",
+    "advanced"
+  ]);
+  var _a2, _b2, _c;
+  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+  const startedAt = /* @__PURE__ */ new Date();
+  const beforeUrl = controller.browser.url;
+  const beforeScreenshotBuffer = yield controller.browser.screenshot();
+  const beforeScreenshot = yield callbacks.onSaveScreenshot(
+    beforeScreenshotBuffer
+  );
+  try {
+    const execResult = yield controller.executePresetStep(
+      step.command,
+      advanced.disableAICaching
+    );
+    const afterScreenshotBuffer = yield controller.browser.screenshot();
+    const afterScreenshot = yield callbacks.onSaveScreenshot(
+      afterScreenshotBuffer
+    );
+    const finishedAt = /* @__PURE__ */ new Date();
+    const result = __spreadProps(__spreadValues({}, step), {
+      startedAt,
+      finishedAt,
+      // placeholder values
+      status: "SUCCESS" /* SUCCESS */,
+      results: []
+    });
+    let message = "Successfully executed preset action.";
+    if (step.command.type === "AI_ASSERTION" /* AI_ASSERTION */) {
+      message = execResult.thoughts || "Assertion passed.";
+    }
+    const cmdMetadata = {
+      beforeUrl,
+      beforeScreenshot,
+      afterUrl: controller.browser.url,
+      afterScreenshot,
+      startedAt,
+      finishedAt,
+      viewport: controller.browser.viewport,
+      status: "SUCCESS" /* SUCCESS */
+    };
+    result.status = "SUCCESS" /* SUCCESS */;
+    result.results = [cmdMetadata];
+    result.message = message;
+    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
+      message,
+      startedAt: startedAt.getTime(),
+      durationMs: finishedAt.getTime() - startedAt.getTime()
+    });
+    return result;
+  } catch (err) {
+    const finishedAt = /* @__PURE__ */ new Date();
+    const result = __spreadProps(__spreadValues({}, step), {
+      startedAt,
+      finishedAt,
+      status: "FAILED" /* FAILED */,
+      message: `${err}`,
+      results: [
+        {
+          beforeUrl,
+          beforeScreenshot,
+          afterUrl: controller.browser.url,
+          afterScreenshot: void 0,
+          startedAt,
+          finishedAt,
+          viewport: controller.browser.viewport,
+          status: "FAILED" /* FAILED */,
+          message: `${err}`
+        }
+      ]
+    });
+    (_c = callbacks.onFailure) == null ? void 0 : _c.call(callbacks, {
+      message: `${err}`,
+      startedAt: startedAt.getTime(),
+      durationMs: finishedAt.getTime() - startedAt.getTime()
+    });
+    return result;
+  }
+});
+
+// ../../packages/execute/src/steps/module.ts
+var executeModuleStep = (_a) => __async(void 0, null, function* () {
+  var _b = _a, {
+    controller,
+    step,
+    advanced,
+    logger
+  } = _b, callbacks = __objRest(_b, [
+    "controller",
+    "step",
+    "advanced",
+    "logger"
+  ]);
+  var _a2, _b2, _c;
+  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
+  const result = {
+    type: "MODULE" /* MODULE */,
+    moduleId: step.moduleId,
+    startedAt: /* @__PURE__ */ new Date(),
+    userAgent: ChromeBrowser.USER_AGENT,
+    // placeholder values
+    results: [],
+    finishedAt: /* @__PURE__ */ new Date(),
+    status: "SUCCESS" /* SUCCESS */
+  };
+  for (let i = 0; i < step.steps.length; i++) {
+    const moduleStep = step.steps[i];
+    logger.info({ i, moduleStep }, `Starting module step`);
+    let moduleStepResult;
+    switch (moduleStep.type) {
+      case "PRESET_ACTION" /* PRESET_ACTION */:
+        moduleStepResult = yield executePresetStep({
+          controller,
+          step: moduleStep,
+          advanced,
+          logger,
+          onSaveScreenshot: callbacks.onSaveScreenshot,
+          onStarted() {
+            var _a3;
+            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
+          },
+          onSuccess({ message, startedAt, durationMs }) {
+            var _a3;
+            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
+              index: i,
+              message,
+              startedAt,
+              durationMs
+            });
+          },
+          onFailure({ message, startedAt, durationMs }) {
+            var _a3;
+            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
+              index: i,
+              message,
+              startedAt,
+              durationMs
+            });
+          }
+        });
+        break;
+      case "AI_ACTION" /* AI_ACTION */:
+        moduleStepResult = yield executeAIStep({
+          controller,
+          step: moduleStep,
+          advanced,
+          logger,
+          onSaveScreenshot: callbacks.onSaveScreenshot,
+          onStarted() {
+            var _a3;
+            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
+          },
+          onSuccess({ message, startedAt, durationMs }) {
+            var _a3;
+            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
+              index: i,
+              message,
+              startedAt,
+              durationMs
+            });
+          },
+          onFailure({ message, startedAt, durationMs }) {
+            var _a3;
+            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
+              index: i,
+              message,
+              startedAt,
+              durationMs
+            });
+          },
+          onCommandGenerated({ commandIndex, message }) {
+            var _a3;
+            (_a3 = callbacks.onCommandGenerated) == null ? void 0 : _a3.call(callbacks, { index: i, commandIndex, message });
+          },
+          onCommandExecuted({ commandIndex, message, command }) {
+            var _a3;
+            (_a3 = callbacks.onCommandExecuted) == null ? void 0 : _a3.call(callbacks, {
+              index: i,
+              commandIndex,
+              message,
+              command
+            });
+          }
+        });
+        break;
+      default:
+        const assertUnreachable = (_x) => {
+          throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+        };
+        return assertUnreachable(moduleStep);
+    }
+    result.results.push(moduleStepResult);
+    if (moduleStepResult.status === "FAILED" /* FAILED */) {
+      result.status = "FAILED" /* FAILED */;
+      result.finishedAt = /* @__PURE__ */ new Date();
+      for (let j = i + 1; j < step.steps.length; j++) {
+        const skippedStep = step.steps[j];
+        const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
+          status: "CANCELLED" /* CANCELLED */,
+          startedAt: /* @__PURE__ */ new Date(),
+          finishedAt: /* @__PURE__ */ new Date(),
+          userAgent: ChromeBrowser.USER_AGENT,
+          results: [],
+          message: "Cancelled due to previous failure."
+        });
+        result.results.push(skippedResult);
+      }
+      break;
+    }
+  }
+  if (result.status === "SUCCESS" /* SUCCESS */) {
+    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
+      message: "Executed module step.",
+      startedAt: result.startedAt.getTime(),
+      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
+    });
+  } else {
+    (_c = callbacks.onFailure) == null ? void 0 : _c.call(callbacks, {
+      message: "Failed to execute module step.",
+      startedAt: result.startedAt.getTime(),
+      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
+    });
+  }
+  return result;
+});
+
+// ../../packages/execute/src/test.ts
+var executeTest = (_0) => __async(void 0, [_0], function* ({
+  test,
+  runId,
+  controller,
+  logger,
+  onUpdateRun,
+  onSaveScreenshot
+}) {
+  const advanced = TestAdvancedSettingsSchema.parse(test.advanced);
+  logger.info(`Starting run ${runId} for test ${test.id}`);
+  yield onUpdateRun({
+    status: "RUNNING",
+    startedAt: /* @__PURE__ */ new Date()
+  });
+  let failed = false;
+  const results = [];
+  for (let i = 0; i < test.steps.length; i++) {
+    const step = test.steps[i];
+    let result;
+    switch (step.type) {
+      case "PRESET_ACTION" /* PRESET_ACTION */:
+        result = yield executePresetStep({
+          controller,
+          step,
+          advanced,
+          logger,
+          onSaveScreenshot
+        });
+        break;
+      case "AI_ACTION" /* AI_ACTION */:
+        result = yield executeAIStep({
+          controller,
+          step,
+          advanced,
+          logger,
+          onSaveScreenshot
+        });
+        break;
+      case "RESOLVED_MODULE":
+        result = yield executeModuleStep({
+          controller,
+          step,
+          advanced,
+          logger,
+          onSaveScreenshot
+        });
+        break;
+      default:
+        const assertUnreachable = (_x) => {
+          throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+        };
+        return assertUnreachable(step);
+    }
+    results.push(result);
+    yield onUpdateRun({
+      results
+    });
+    if (result.status === "FAILED" /* FAILED */) {
+      failed = true;
+      for (let j = i + 1; j < test.steps.length; j++) {
+        const skippedStep = test.steps[j];
+        if (skippedStep.type === "RESOLVED_MODULE") {
+          const skippedResult = {
+            type: "MODULE" /* MODULE */,
+            moduleId: skippedStep.moduleId,
+            startedAt: /* @__PURE__ */ new Date(),
+            userAgent: ChromeBrowser.USER_AGENT,
+            results: skippedStep.steps.map((s) => {
+              return __spreadProps(__spreadValues({}, s), {
+                status: "CANCELLED" /* CANCELLED */,
+                startedAt: /* @__PURE__ */ new Date(),
+                finishedAt: /* @__PURE__ */ new Date(),
+                userAgent: ChromeBrowser.USER_AGENT,
+                results: []
+              });
+            }),
+            finishedAt: /* @__PURE__ */ new Date(),
+            status: "CANCELLED" /* CANCELLED */
+          };
+          results.push(skippedResult);
+        } else {
+          const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
+            status: "CANCELLED" /* CANCELLED */,
+            startedAt: /* @__PURE__ */ new Date(),
+            finishedAt: /* @__PURE__ */ new Date(),
+            userAgent: ChromeBrowser.USER_AGENT,
+            results: []
+          });
+          results.push(skippedResult);
+        }
+      }
+    }
+    if (failed) {
+      break;
+    }
+  }
+  yield onUpdateRun({
+    status: failed ? "FAILED" : "PASSED",
+    finishedAt: /* @__PURE__ */ new Date(),
+    results
+  });
+  yield controller.browser.cleanup();
+  return failed;
+});
+
+// src/run-test.ts
+var consoleLogger = {
+  info: console.log,
+  error: console.error,
+  debug: console.debug,
+  warn: console.warn,
+  child: () => consoleLogger,
+  flush: () => {
+  }
+};
+function runTest(_0) {
+  return __async(this, arguments, function* ({
+    testId,
+    apiClient,
+    generator
+  }) {
+    const test = yield apiClient.getTest(testId);
+    const browser = yield ChromeBrowser.init(test.baseUrl, consoleLogger);
+    const controller = new AgentController({
+      browser,
+      generator,
+      config: DEFAULT_CONTROLLER_CONFIG,
+      logger: consoleLogger
+    });
+    const run = yield apiClient.createRun({
+      testId
+    });
+    let failed = true;
+    try {
+      failed = yield executeTest({
+        test,
+        runId: run.id,
+        controller,
+        logger: consoleLogger,
+        onSaveScreenshot: (buffer) => __async(this, null, function* () {
+          const { key } = yield apiClient.uploadScreenshot({
+            screenshot: buffer.toString("base64")
+          });
+          return key;
+        }),
+        onUpdateRun: (data) => __async(this, null, function* () {
+          yield apiClient.updateRun(run.id, data);
+        })
+      });
+    } catch (err) {
+      yield apiClient.updateRun(run.id, {
+        status: "FAILED",
+        finishedAt: /* @__PURE__ */ new Date()
+      });
+    }
+    return failed;
+  });
+}
+
+// src/cli.ts
+var program = new import_commander.Command();
+program.name("momentic").description("Momentic CLI").version(version);
+program.command("run-tests").addOption(
+  new import_commander.Option(
+    "--tests <tests...>",
+    "specify tests to run"
+  ).makeOptionMandatory(true)
+).addOption(
+  new import_commander.Option(
+    "--start <command>",
+    "specify start command"
+  ).makeOptionMandatory(true)
+).addOption(
+  new import_commander.Option("--wait-on <url>", "specify url to wait on").makeOptionMandatory(
+    true
+  )
+).addOption(
+  new import_commander.Option(
+    "--wait-on-timeout <timeout>",
+    "specify how long to wait on url"
+  ).default(60, "one minute")
+).addOption(
+  new import_commander.Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
+).action((options) => __async(exports, null, function* () {
+  const { tests, start, waitOn, waitOnTimeout, apiKey } = options;
+  console.log({ tests, start, waitOn, waitOnTimeout, apiKey });
+  void (0, import_execa.execa)(start);
+  yield (0, import_wait_on.default)({
+    resources: [waitOn],
+    timeout: waitOnTimeout * 1e3
+  });
+  const apiClient = new APIClient({
+    baseURL: "https://api.momentic.ai",
+    apiKey
+  });
+  const apiGenerator = new APIGenerator({
+    baseURL: "https://api.momentic.ai",
+    apiKey
+  });
+  const promises = tests.map((testId) => {
+    const failed = runTest({
+      testId,
+      apiClient,
+      generator: apiGenerator
+    });
+    return { failed, testId };
+  });
+  const results = yield Promise.all(promises);
+  const failedResults = results.filter((result) => result.failed);
+  if (failedResults.length > 0) {
+    console.log(
+      import_chalk.default.red(
+        `Failed ${failedResults.length} out of ${results.length} tests`
+      )
+    );
+    failedResults.forEach((result) => {
+      console.log(import_chalk.default.red(`- ${result.testId}`));
+    });
+    process.exit(1);
+  }
+  console.log(import_chalk.default.green(`All ${results.length} tests passed!`));
+}));
+function main() {
+  return __async(this, null, function* () {
+    yield program.parseAsync(process.argv);
+  });
+}
+void main();
