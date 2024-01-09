@@ -1,17 +1,10 @@
 {
   "name": "momentic",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "The Momentic SDK for Node.js",
+  "type": "module",
   "main": "./dist/index.js",
-  "module": "./dist/index.mjs",
-  "exports": {
-    "./package.json": "./package.json",
-    ".": {
-      "import": "./dist/index.mjs",
-      "module": "./dist/index.mjs",
-      "require": "./dist/index.js"
-    }
-  },
+  "exports": "./dist/index.js",
   "bin": {
     "momentic": "./bin/cli.js"
   },
