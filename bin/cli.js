@@ -1,9 +1,12 @@
 #!/usr/bin/env node
 
 // src/cli.ts
+import exec from "@actions/exec";
+import io from "@actions/io";
 import chalk from "chalk";
 import { Command as Command4, Option } from "commander";
-import { $ } from "execa";
+import quote from "quote";
+import parseArgsStringToArgv2 from "string-argv";
 import waitOnFn from "wait-on";
 
 // ../../packages/types/src/commands.ts
@@ -258,6 +261,7 @@ var AIAssertionResultSchema = z4.object({
 });
 
 // ../../packages/types/src/ai-command-generation.ts
+import parseArgsStringToArgv from "string-argv";
 import { z as z5 } from "zod";
 
 // ../../packages/types/src/errors.ts
@@ -3009,8 +3013,7 @@ program.command("run-tests").addOption(
   new Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
 ).action(async (options) => {
   const { tests, start, waitOn, waitOnTimeout, apiKey } = options;
-  console.log({ tests, start, waitOn, waitOnTimeout, apiKey });
-  void $`${start}`;
+  await execCommand(start, false);
   await waitOnFn({
     resources: [waitOn],
     timeout: waitOnTimeout * 1e3
@@ -3046,6 +3049,15 @@ program.command("run-tests").addOption(
   }
   console.log(chalk.green(`All ${results.length} tests passed!`));
 });
+var execCommand = async (fullCommand, waitToFinish = true) => {
+  const args = parseArgsStringToArgv2(fullCommand);
+  const toolPath = await io.which(args[0], true);
+  const toolArguments = args.slice(1);
+  const promise = exec.exec(quote(toolPath), toolArguments);
+  if (waitToFinish) {
+    return promise;
+  }
+};
 async function main() {
   await program.parseAsync(process.argv);
 }

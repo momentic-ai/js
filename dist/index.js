@@ -250,6 +250,7 @@ var AIAssertionResultSchema = z4.object({
 });
 
 // ../../packages/types/src/ai-command-generation.ts
+import parseArgsStringToArgv from "string-argv";
 import { z as z5 } from "zod";
 
 // ../../packages/types/src/errors.ts
