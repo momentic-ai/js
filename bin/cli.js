@@ -2935,7 +2935,7 @@ var executeTest = async ({
   return failed;
 };
 
-// src/run-test.ts
+// src/logger.ts
 var consoleLogger = {
   info: console.log,
   error: console.error,
@@ -2945,6 +2945,8 @@ var consoleLogger = {
   flush: () => {
   }
 };
+
+// src/run-test.ts
 async function runTest({
   testId,
   apiClient,
@@ -2979,6 +2981,7 @@ async function runTest({
       }
     });
   } catch (err) {
+    consoleLogger.error(err);
     await apiClient.updateRun(run.id, {
       status: "FAILED",
       finishedAt: /* @__PURE__ */ new Date()
@@ -3026,8 +3029,8 @@ program.command("run-tests").addOption(
     baseURL: "https://api.momentic.ai",
     apiKey
   });
-  const promises = tests.map((testId) => {
-    const failed = runTest({
+  const promises = tests.map(async (testId) => {
+    const failed = await runTest({
       testId,
       apiClient,
       generator: apiGenerator
@@ -3039,7 +3042,7 @@ program.command("run-tests").addOption(
   if (failedResults.length > 0) {
     console.log(
       chalk.red(
-        `Failed ${failedResults.length} out of ${results.length} tests`
+        `Failed ${failedResults.length} out of ${results.length} tests:`
       )
     );
     failedResults.forEach((result) => {
