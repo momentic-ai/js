@@ -1,3 +1,22 @@
+var __defProp = Object.defineProperty;
+var __defProps = Object.defineProperties;
+var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropSymbols = Object.getOwnPropertySymbols;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __propIsEnum = Object.prototype.propertyIsEnumerable;
+var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __spreadValues = (a, b) => {
+  for (var prop in b || (b = {}))
+    if (__hasOwnProp.call(b, prop))
+      __defNormalProp(a, prop, b[prop]);
+  if (__getOwnPropSymbols)
+    for (var prop of __getOwnPropSymbols(b)) {
+      if (__propIsEnum.call(b, prop))
+        __defNormalProp(a, prop, b[prop]);
+    }
+  return a;
+};
+var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -19,7 +38,7 @@ var __async = (__this, __arguments, generator) => {
   });
 };
 
-// ../../packages/types/src/preset.ts
+// ../../packages/types/src/commands.ts
 import dedent from "dedent";
 import * as z2 from "zod";
 
@@ -37,22 +56,25 @@ var A11yTargetWithCacheSchema = z.object({
   serializedForm: z.string().optional()
 });
 
-// ../../packages/types/src/preset.ts
-var PresetCommandType = /* @__PURE__ */ ((PresetCommandType2) => {
-  PresetCommandType2["AI_ASSERTION"] = "AI_ASSERTION";
-  PresetCommandType2["CLICK"] = "CLICK";
-  PresetCommandType2["SELECT_OPTION"] = "SELECT_OPTION";
-  PresetCommandType2["TYPE"] = "TYPE";
-  PresetCommandType2["PRESS"] = "PRESS";
-  PresetCommandType2["NAVIGATE"] = "NAVIGATE";
-  PresetCommandType2["SCROLL_UP"] = "SCROLL_UP";
-  PresetCommandType2["SCROLL_DOWN"] = "SCROLL_DOWN";
-  PresetCommandType2["GO_BACK"] = "GO_BACK";
-  PresetCommandType2["GO_FORWARD"] = "GO_FORWARD";
-  PresetCommandType2["WAIT"] = "WAIT";
-  PresetCommandType2["REFRESH"] = "REFRESH";
-  return PresetCommandType2;
-})(PresetCommandType || {});
+// ../../packages/types/src/commands.ts
+var CommandType = /* @__PURE__ */ ((CommandType2) => {
+  CommandType2["AI_ASSERTION"] = "AI_ASSERTION";
+  CommandType2["CLICK"] = "CLICK";
+  CommandType2["SELECT_OPTION"] = "SELECT_OPTION";
+  CommandType2["TYPE"] = "TYPE";
+  CommandType2["PRESS"] = "PRESS";
+  CommandType2["NAVIGATE"] = "NAVIGATE";
+  CommandType2["SCROLL_UP"] = "SCROLL_UP";
+  CommandType2["SCROLL_DOWN"] = "SCROLL_DOWN";
+  CommandType2["GO_BACK"] = "GO_BACK";
+  CommandType2["GO_FORWARD"] = "GO_FORWARD";
+  CommandType2["WAIT"] = "WAIT";
+  CommandType2["REFRESH"] = "REFRESH";
+  CommandType2["TAB"] = "TAB";
+  CommandType2["COOKIE"] = "COOKIE";
+  CommandType2["SUCCESS"] = "SUCCESS";
+  return CommandType2;
+})(CommandType || {});
 var ElementDescriptorSchema = z2.object({
   // natural language passed to LLM
   elementDescriptor: z2.string(),
@@ -155,35 +177,120 @@ var PressCommandSchema = CommonCommandSchema.merge(
 ).describe(
   `PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.`
 );
-var PresetCommandSchema = z2.discriminatedUnion("type", [
+var TabCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("TAB" /* TAB */),
+    url: z2.string()
+  })
+);
+var CookieCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("COOKIE" /* COOKIE */),
+    value: z2.string()
+  })
+);
+var SuccessCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("SUCCESS" /* SUCCESS */),
+    condition: AIAssertionCommandSchema.optional()
+  })
+).describe("SUCCESS - the user goal has been successfully achieved");
+var UserEditableAICommandSchema = z2.discriminatedUnion("type", [
   ClickCommandSchema,
-  GoBackCommandSchema,
-  GoForwardCommandSchema,
-  NavigateCommandSchema,
+  TypeCommandSchema,
   PressCommandSchema,
-  RefreshCommandSchema,
+  SelectOptionCommandSchema,
+  NavigateCommandSchema,
   ScrollDownCommandSchema,
   ScrollUpCommandSchema,
-  SelectOptionCommandSchema,
-  TypeCommandSchema,
-  AIAssertionCommandSchema,
-  WaitCommandSchema
+  SuccessCommandSchema
 ]);
-var AISuggestiblePresetCommandSchema = z2.discriminatedUnion("type", [
-  ClickCommandSchema,
-  TypeCommandSchema,
-  PressCommandSchema,
-  SelectOptionCommandSchema,
-  NavigateCommandSchema,
-  ScrollDownCommandSchema,
-  ScrollUpCommandSchema
+var UserEditablePresetCommandSchema = z2.discriminatedUnion("type", [
+  GoBackCommandSchema,
+  GoForwardCommandSchema,
+  RefreshCommandSchema,
+  AIAssertionCommandSchema,
+  WaitCommandSchema,
+  TabCommandSchema,
+  CookieCommandSchema
+]);
+var CommandSchema = z2.discriminatedUnion("type", [
+  // Commands that can be either specified manually or auto-created by AI in an AI step
+  ...UserEditableAICommandSchema.options,
+  // Commands that can only be specified manually ("preset commands")
+  ...UserEditablePresetCommandSchema.options
+]);
+var FailureCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("FAILURE")
+  })
+).describe(
+  "FAILURE - there are no commands to suggest that could make progress that have not already been tried before"
+);
+var AICommandSchema = z2.discriminatedUnion("type", [
+  ...UserEditableAICommandSchema.options,
+  FailureCommandSchema
 ]);
 
 // ../../packages/types/src/steps.ts
-import * as z4 from "zod";
-
-// ../../packages/types/src/ai-commands.ts
 import * as z3 from "zod";
+var StepType = /* @__PURE__ */ ((StepType2) => {
+  StepType2["AI_ACTION"] = "AI_ACTION";
+  StepType2["PRESET_ACTION"] = "PRESET_ACTION";
+  StepType2["MODULE"] = "MODULE";
+  return StepType2;
+})(StepType || {});
+var AIActionSchema = z3.object({
+  type: z3.literal("AI_ACTION" /* AI_ACTION */),
+  text: z3.string(),
+  // Cached commands for this step
+  commands: z3.array(UserEditableAICommandSchema).optional()
+});
+var PresetActionSchema = z3.object({
+  type: z3.literal("PRESET_ACTION" /* PRESET_ACTION */),
+  command: CommandSchema
+});
+var ModuleStepSchema = z3.object({
+  type: z3.literal("MODULE" /* MODULE */),
+  moduleId: z3.string().uuid()
+});
+var AllowedModuleStepSchema = z3.union([
+  AIActionSchema,
+  PresetActionSchema
+]);
+var ResolvedModuleStepSchema = z3.object({
+  type: z3.literal("RESOLVED_MODULE"),
+  moduleId: z3.string().uuid(),
+  name: z3.string(),
+  steps: AllowedModuleStepSchema.array()
+});
+var StepSchema = z3.union([
+  AIActionSchema,
+  PresetActionSchema,
+  ModuleStepSchema
+]);
+var ResolvedStepSchema = z3.union([
+  AIActionSchema,
+  PresetActionSchema,
+  ResolvedModuleStepSchema
+]);
+
+// ../../packages/web-agent/src/browsers/chrome.ts
+import {
+  chromium,
+  devices
+} from "playwright";
+
+// ../../packages/types/src/assertions.ts
+import { z as z4 } from "zod";
+var AIAssertionResultSchema = z4.object({
+  thoughts: z4.string(),
+  result: z4.boolean(),
+  relevantElements: z4.array(z4.number()).optional()
+});
+
+// ../../packages/types/src/ai-command-generation.ts
+import { z as z5 } from "zod";
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -199,98 +306,12 @@ var EmptyA11yTreeError = class extends Error {
   }
 };
 
-// ../../packages/types/src/ai-commands.ts
-var SuccessCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SUCCESS" /* SUCCESS */)
-  })
-).describe("SUCCESS - the user goal has been successfully achieved");
-var FailureCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("FAILURE" /* FAILURE */)
-  })
-).describe(
-  "FAILURE - there are no commands to suggest that could make progress that have not already been tried before"
-);
-var ControlFlowCommandSchema = z3.discriminatedUnion("type", [
-  SuccessCommandSchema,
-  FailureCommandSchema
-]);
-var AICommandSchema = z3.discriminatedUnion("type", [
-  ...ControlFlowCommandSchema.options,
-  // We allow all preset actions here because users
-  // can edit AI commands to be any preset.
-  // However, the AI can only suggest items in AISuggestiblePresetCommandSchema
-  ...AISuggestiblePresetCommandSchema.options
-]);
-var LLMOutputSchema = z3.object({
-  command: z3.string(),
-  thoughts: z3.string()
+// ../../packages/types/src/ai-command-generation.ts
+var LLMOutputSchema = z5.object({
+  command: z5.string(),
+  thoughts: z5.string()
 });
-var NumericStringSchema = z3.string().pipe(z3.coerce.number());
-
-// ../../packages/types/src/steps.ts
-var StepType = /* @__PURE__ */ ((StepType2) => {
-  StepType2["AI_ACTION"] = "AI_ACTION";
-  StepType2["PRESET_ACTION"] = "PRESET_ACTION";
-  StepType2["MODULE"] = "MODULE";
-  return StepType2;
-})(StepType || {});
-var AIActionSchema = z4.object({
-  type: z4.literal("AI_ACTION" /* AI_ACTION */),
-  text: z4.string(),
-  // Cached commands for this step
-  commands: z4.array(AICommandSchema).optional()
-});
-var PresetActionSchema = z4.object({
-  type: z4.literal("PRESET_ACTION" /* PRESET_ACTION */),
-  command: PresetCommandSchema
-});
-var ModuleStepSchema = z4.object({
-  type: z4.literal("MODULE" /* MODULE */),
-  moduleId: z4.string().uuid()
-});
-var AllowedModuleStepSchema = z4.union([
-  AIActionSchema,
-  PresetActionSchema
-]);
-var ResolvedModuleStepSchema = z4.object({
-  type: z4.literal("RESOLVED_MODULE"),
-  moduleId: z4.string().uuid(),
-  name: z4.string(),
-  steps: AllowedModuleStepSchema.array()
-});
-var StepSchema = z4.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ModuleStepSchema
-]);
-var ResolvedStepSchema = z4.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ResolvedModuleStepSchema
-]);
-
-// ../../packages/web-agent/src/browsers/chrome.ts
-import {
-  chromium,
-  devices
-} from "playwright";
-
-// ../../packages/web-agent/src/utils/url.ts
-var urlChanged = (url1, url2) => {
-  const { hostname, pathname } = new URL(url1);
-  const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
-  return hostname !== hostname2 || pathname !== pathname2;
-};
-
-// ../../packages/types/src/assertions.ts
-import { z as z5 } from "zod";
-var LLMAssertionEvalSchema = z5.object({
-  thoughts: z5.string(),
-  result: z5.boolean(),
-  relevantElements: z5.array(z5.number()).optional()
-});
+var NumericStringSchema = z5.string().pipe(z5.coerce.number());
 
 // ../../packages/types/src/command-results.ts
 import * as z6 from "zod";
@@ -309,9 +330,12 @@ var CommandStatus = /* @__PURE__ */ ((CommandStatus2) => {
 })(CommandStatus || {});
 var CommandMetadataSchema = z6.object({
   beforeUrl: z6.string(),
-  beforeScreenshot: z6.string(),
+  // FIXME: this should be a discriminated union of string | Buffer
+  // but to avoid too much schema wranging we leave this for now
+  // https://github.com/colinhacks/zod/issues/153
+  beforeScreenshot: z6.string().or(z6.instanceof(Buffer)),
   afterUrl: z6.string().optional(),
-  afterScreenshot: z6.string().optional(),
+  afterScreenshot: z6.string().or(z6.instanceof(Buffer)).optional(),
   startedAt: z6.coerce.date(),
   finishedAt: z6.coerce.date(),
   viewport: z6.object({
@@ -319,17 +343,16 @@ var CommandMetadataSchema = z6.object({
     width: z6.number()
   }),
   status: z6.nativeEnum(CommandStatus),
-  error: z6.string().optional(),
+  // used for error message and thoughts
+  message: z6.string().optional(),
   elementInteracted: z6.string().optional()
 });
-var CommandResultSchema = z6.object({
-  command: AICommandSchema
-}).merge(CommandMetadataSchema);
 var StepResultMetadataSchema = z6.object({
   startedAt: z6.coerce.date(),
   finishedAt: z6.coerce.date(),
   status: z6.nativeEnum(ResultStatus),
-  error: z6.string().optional(),
+  // used for error message and thoughts
+  message: z6.string().optional(),
   // browser info
   userAgent: z6.string().optional()
 });
@@ -337,18 +360,14 @@ var PresetActionResultSchema = PresetActionSchema.merge(
   StepResultMetadataSchema
 ).merge(
   z6.object({
-    // commandresult is saved by actions like AI assertions that have a "return" value
-    // commandmetadata is saved by actions like preset click that doesn't have a return value
-    // Array just for consistency with other elements, should only ever be one
-    results: z6.union([CommandResultSchema, CommandMetadataSchema]).array()
+    // Array just for consistency with other result types, should only ever be one for preset.
+    results: CommandMetadataSchema.array()
   })
 );
 var AIActionResultSchema = AIActionSchema.merge(
   StepResultMetadataSchema
 ).merge(
   z6.object({
-    // commandresult is saved by actions like AI assertions that have a "return" value
-    // commandmetadata is saved by actions like preset click that doesn't have a return value
     results: PresetActionResultSchema.array()
   })
 );
@@ -366,22 +385,50 @@ var ResultSchema = z6.discriminatedUnion("type", [
   ModuleResultSchema
 ]);
 
+// ../../packages/types/src/cookies.ts
+import { parseString } from "set-cookie-parser";
+function parseCookieString(cookie) {
+  const parsedCookie = parseString(cookie);
+  if (!parsedCookie.name) {
+    throw new Error("Name missing from cookie");
+  }
+  if (!parsedCookie.value) {
+    throw new Error("Value missing from cookie");
+  }
+  let sameSite;
+  if (parsedCookie.sameSite) {
+    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
+    if (sameSiteSetting === "strict") {
+      sameSite = "Strict";
+    } else if (sameSiteSetting === "lax") {
+      sameSite = "Lax";
+    } else if (sameSiteSetting === "none") {
+      sameSite = "None";
+    } else {
+      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
+    }
+  }
+  if (!parsedCookie.path && parsedCookie.domain) {
+    parsedCookie.path = "/";
+  }
+  const result = __spreadProps(__spreadValues({}, parsedCookie), {
+    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
+    sameSite
+  });
+  return result;
+}
+
 // ../../packages/types/src/execute-results.ts
 import * as z7 from "zod";
 var ExecuteCommandHistoryEntrySchema = z7.object({
   // type of command executed
   type: z7.nativeEnum(StepType),
   // if AI step type, what command was executed
-  generatedStep: AICommandSchema.optional(),
+  generatedStep: UserEditableAICommandSchema.optional(),
   // human readable descriptor for action taken, including element interacted with
   serializedCommand: z7.string().optional(),
   // human readable descriptor for element interacted with
   elementInteracted: z7.string().optional()
-});
-var ExecuteAssertionResultSchema = z7.object({
-  type: z7.literal("assertion" /* ASSERTION */),
-  command: z7.union([SuccessCommandSchema, FailureCommandSchema]),
-  relevantElements: z7.array(z7.number()).optional()
 });
 
 // ../../packages/types/src/goal-splitter.ts
@@ -463,32 +510,14 @@ function clampText(text, length) {
   }
   return text.slice(0, length - 3) + "[...]";
 }
-var AI_COMMAND_DISPLAY_NAMES = {
-  ["CLICK" /* CLICK */]: "Click",
-  ["TYPE" /* TYPE */]: "Type",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up"
-};
-function serializeAICommand(cmd) {
-  let humanSummary = "";
-  switch (cmd.type) {
-    case "SUCCESS" /* SUCCESS */:
-      humanSummary = `Step complete: ${cmd.thoughts}`;
-      break;
-    case "FAILURE" /* FAILURE */:
-      humanSummary = `Step failed: ${cmd.thoughts}`;
-      break;
-    default:
-      return serializePresetCommand(cmd);
-  }
-  return humanSummary;
-}
-function serializePresetCommand(command) {
-  var _a;
+function serializeCommand(command) {
+  var _a, _b;
   switch (command.type) {
+    case "SUCCESS" /* SUCCESS */:
+      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
+        return `Check success condition: ${command.condition.assertion}`;
+      }
+      return `All commands completed`;
     case "NAVIGATE" /* NAVIGATE */:
       return `Go to URL: ${clampText(command.url, 30)}`;
     case "GO_BACK" /* GO_BACK */:
@@ -507,7 +536,7 @@ function serializePresetCommand(command) {
       return `Click on '${command.target.elementDescriptor}'`;
     case "TYPE" /* TYPE */:
       let serializedTarget = "";
-      if ((_a = command.target.a11yData) == null ? void 0 : _a.serializedForm) {
+      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
         serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
       } else if (command.target.elementDescriptor.length > 0) {
         serializedTarget = ` in element ${command.target.elementDescriptor}`;
@@ -517,8 +546,12 @@ function serializePresetCommand(command) {
       return `Press '${command.value}'`;
     case "SELECT_OPTION" /* SELECT_OPTION */:
       return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
+    case "TAB" /* TAB */:
+      return `Switch to tab: ${command.url}`;
+    case "COOKIE" /* COOKIE */:
+      return `Set cookie: ${command.value}`;
     case "AI_ASSERTION" /* AI_ASSERTION */:
-      return `${command.useVision ? "Visual assertion" : "Assertion"} successful: '${command.assertion}'`;
+      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
     default:
       const assertUnreachable = (_x) => {
         throw "If Typescript complains about the line below, you missed a case or break in the switch above";
@@ -526,6 +559,49 @@ function serializePresetCommand(command) {
       return assertUnreachable(command);
   }
 }
+
+// ../../packages/types/src/card-display.ts
+var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
+  Object.values(CommandType)
+);
+var CARD_DISPLAY_NAMES = {
+  ["AI_ACTION" /* AI_ACTION */]: "AI action",
+  ["MODULE" /* MODULE */]: "Module",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
+  ["CLICK" /* CLICK */]: "Click",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
+  ["TYPE" /* TYPE */]: "Type",
+  ["PRESS" /* PRESS */]: "Press",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
+  ["GO_BACK" /* GO_BACK */]: "Go back",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
+  ["WAIT" /* WAIT */]: "Wait",
+  ["REFRESH" /* REFRESH */]: "Refresh",
+  ["TAB" /* TAB */]: "Switch tab",
+  ["COOKIE" /* COOKIE */]: "Set cookie",
+  ["SUCCESS" /* SUCCESS */]: "Done"
+};
+var CARD_DESCRIPTIONS = {
+  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
+  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
+  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
+  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
+  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
+  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
+  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
+  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
+  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
+  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
+  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
+};
 
 // ../../packages/types/src/test.ts
 import { z as z13 } from "zod";
@@ -601,6 +677,7 @@ var GeneratorOptionsSchema = z15.object({
 var GetNextCommandBodySchema = DynamicContextSchema.merge(
   GeneratorOptionsSchema
 );
+var GetNextCommandResponseSchema = AICommandSchema;
 var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
   DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
     z15.object({
@@ -618,15 +695,42 @@ var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
     })
   )
 ]);
+var GetAssertionResponseSchema = AIAssertionResultSchema;
 var LocateBodySchema = DynamicContextSchema.pick({
   browserState: true,
   goal: true
 }).merge(GeneratorOptionsSchema);
+var LocateResponseSchema = AILocatorSchema;
 var SplitGoalBodySchema = DynamicContextSchema.pick({
   goal: true,
   url: true
 }).merge(GeneratorOptionsSchema);
 var SplitGoalResponseSchema = z15.string().array();
+var QueueBodySchema = z15.object({
+  testIds: z15.string().array()
+});
+var CreateRunBodySchema = z15.object({
+  testId: z15.string()
+});
+var UpdateRunBodySchema = z15.object({
+  finishedAt: z15.coerce.date(),
+  results: ResultSchema.array(),
+  status: z15.nativeEnum(RunStatusEnum)
+}).partial();
+var CreateScreenshotBodySchema = z15.object({
+  // base64 string
+  screenshot: z15.string()
+});
+var CreateScreenshotResponseSchema = z15.object({
+  key: z15.string()
+});
+
+// ../../packages/web-agent/src/utils/url.ts
+var urlChanged = (url1, url2) => {
+  const { hostname, pathname } = new URL(url1);
+  const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
+  return hostname !== hostname2 || pathname !== pathname2;
+};
 
 // ../../packages/web-agent/src/browsers/a11y.ts
 var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
@@ -905,7 +1009,7 @@ var CHECK_INTERVAL_MS = 250;
 var A11Y_LOAD_TIMEOUT_MS = 1e3;
 var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
 var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
-var BROWSER_ACTION_TIMEOUT_MS = 3e3;
+var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var HIGHLIGHT_DURATION_MS = 3e3;
 var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
@@ -1008,6 +1112,13 @@ function isRequestRelevantForPageLoad(request, currentURL) {
 }
 
 // ../../packages/web-agent/src/browsers/chrome.ts
+function initCDPSession(cdpClient) {
+  return __async(this, null, function* () {
+    yield cdpClient.send("Accessibility.enable");
+    yield cdpClient.send("DOM.enable");
+    yield cdpClient.send("Overlay.enable");
+  });
+}
 var _ChromeBrowser = class _ChromeBrowser {
   constructor({
     browser,
@@ -1059,9 +1170,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       const navigateAndInitCDP = () => __async(this, null, function* () {
         try {
           yield chrome.navigate(baseURL, false);
-          yield cdpClient.send("Accessibility.enable");
-          yield cdpClient.send("DOM.enable");
-          yield cdpClient.send("Overlay.enable");
+          yield initCDPSession(cdpClient);
         } catch (err) {
           logger.error({ err }, "Failed to initialize chrome browser");
         } finally {
@@ -1708,9 +1817,44 @@ var _ChromeBrowser = class _ChromeBrowser {
       yield this.pageSetup();
     });
   }
+  switchToPage(urlSubstring) {
+    return __async(this, null, function* () {
+      const allPages = yield this.context.pages();
+      for (let i = 0; i < allPages.length; i++) {
+        const page = allPages[i];
+        if (page.url().includes(urlSubstring)) {
+          this.page = page;
+          yield page.waitForLoadState("load", {
+            timeout: MAX_LOAD_TIMEOUT_MS
+          });
+          yield this.pageSetup();
+          this.cdpClient = yield this.context.newCDPSession(page);
+          yield initCDPSession(this.cdpClient);
+          this.logger.info(`Switching to tab ${i} with url ${page.url()}`);
+          return;
+        }
+      }
+      throw new Error(`Could not find page with url containing ${urlSubstring}`);
+    });
+  }
+  setCookie(cookie) {
+    return __async(this, null, function* () {
+      const cookieSettings = parseCookieString(cookie);
+      yield this.context.addCookies([cookieSettings]);
+    });
+  }
 };
 _ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
+
+// ../../packages/web-agent/src/configs/controller.ts
+var A11Y_CONTROLLER_CONFIG = {
+  type: "a11y",
+  version: "1.0.0",
+  useHistory: "diff",
+  useGoalSplitter: true
+};
+var DEFAULT_CONTROLLER_CONFIG = A11Y_CONTROLLER_CONFIG;
 
 // ../../packages/web-agent/src/controller.ts
 import dedent2 from "dedent";
@@ -1848,7 +1992,7 @@ var AgentController = class {
         }
       } else if (
         // on failure, we don't continue to execute
-        proposedCommand.type === "FAILURE" /* FAILURE */
+        proposedCommand.type === "FAILURE"
       ) {
         this.logger.info(
           {
@@ -1946,7 +2090,10 @@ var AgentController = class {
       let result;
       try {
         const executionStart = Date.now();
-        result = yield this.sendCommandToBrowser(command, disableCache);
+        result = yield this.executePresetStep(
+          command,
+          disableCache
+        );
         this.logger.info(
           { result, duration: Date.now() - executionStart },
           "Got execution result"
@@ -1971,67 +2118,87 @@ var AgentController = class {
         }
       }
       if (result.elementInteracted && "target" in command && !command.target.elementDescriptor) {
-        command.target.elementDescriptor = result.elementInteracted;
+        command.target.elementDescriptor = result.elementInteracted.trim();
       }
       if (!stateless) {
         pendingHistory.generatedStep = command;
-        pendingHistory.serializedCommand = serializeAICommand(command);
+        pendingHistory.serializedCommand = serializeCommand(command);
         pendingHistory.state = "DONE";
       }
       return result;
+    });
+  }
+  executeAssertion(urlBeforeCommand, command) {
+    return __async(this, null, function* () {
+      let params;
+      if (command.useVision) {
+        params = {
+          goal: command.assertion,
+          url: urlBeforeCommand,
+          // used for vision only
+          screenshot: yield this.browser.screenshot(),
+          // unused for visual assertion
+          browserState: "",
+          history: "",
+          numPrevious: -1,
+          lastCommand: null
+        };
+      } else {
+        const browserState = yield this.getBrowserState();
+        const history = this.getSerializedHistory(urlBeforeCommand, browserState);
+        params = {
+          goal: command.assertion,
+          url: urlBeforeCommand,
+          // used for text only
+          browserState,
+          history,
+          lastCommand: this.lastExecutedCommand,
+          numPrevious: this.commandHistory.length
+        };
+      }
+      const assertionEval = yield this.generator.getAssertionResult(
+        params,
+        command.useVision,
+        command.disableCache
+      );
+      if (assertionEval.relevantElements) {
+        void Promise.all(
+          assertionEval.relevantElements.map(
+            (id) => this.browser.highlight({ id })
+          )
+        );
+      }
+      if (!assertionEval.result) {
+        throw new Error(assertionEval.thoughts);
+      }
+      return {
+        succeedImmediately: false,
+        thoughts: assertionEval.thoughts,
+        urlAfterCommand: urlBeforeCommand
+      };
     });
   }
   /**
    * Executes a preset command.
    * For most cases, the execution result contains metadata about the command executed.
    * For assertions, an AssertionResult with thoughts is returned.
+   * Throws on failure.
    */
   executePresetStep(command, disableCache) {
     return __async(this, null, function* () {
-      var _a, _b;
+      var _a, _b, _c;
       const urlBeforeCommand = this.browser.url;
       switch (command.type) {
+        case "SUCCESS" /* SUCCESS */:
+          if ((_a = command.condition) == null ? void 0 : _a.assertion.trim()) {
+            return this.executeAssertion(urlBeforeCommand, command.condition);
+          }
+          return {
+            succeedImmediately: false,
+            urlAfterCommand: this.browser.url
+          };
         case "AI_ASSERTION" /* AI_ASSERTION */: {
-          let params;
-          if (command.useVision) {
-            params = {
-              goal: command.assertion,
-              url: urlBeforeCommand,
-              // used for vision only
-              screenshot: yield this.browser.screenshot(),
-              // unused for visual assertion
-              browserState: "",
-              history: "",
-              numPrevious: -1,
-              lastCommand: null
-            };
-          } else {
-            const browserState = yield this.getBrowserState();
-            const history = this.getSerializedHistory(
-              urlBeforeCommand,
-              browserState
-            );
-            params = {
-              goal: command.assertion,
-              url: urlBeforeCommand,
-              // used for text only
-              browserState,
-              history,
-              lastCommand: this.lastExecutedCommand,
-              numPrevious: this.commandHistory.length
-            };
-          }
-          const result2 = yield this.generator.getAssertionResult(
-            params,
-            command.useVision,
-            command.disableCache
-          );
-          if (result2.relevantElements) {
-            void Promise.all(
-              result2.relevantElements.map((id) => this.browser.highlight({ id }))
-            );
-          }
-          return result2;
+          return this.executeAssertion(urlBeforeCommand, command);
         }
         case "NAVIGATE" /* NAVIGATE */:
           yield this.browser.navigate(command.url);
@@ -2057,7 +2224,7 @@ var AgentController = class {
         case "CLICK" /* CLICK */: {
           let id;
           if (command.target.a11yData) {
-            id = (_a = command.target.a11yData) == null ? void 0 : _a.id;
+            id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
           } else {
             const locator = yield this.locateElement(
               command.target.elementDescriptor,
@@ -2075,7 +2242,6 @@ var AgentController = class {
             }
           );
           const result2 = {
-            type: "command" /* COMMAND */,
             urlAfterCommand: this.browser.url,
             succeedImmediately: false,
             elementInteracted
@@ -2089,7 +2255,7 @@ var AgentController = class {
         case "SELECT_OPTION" /* SELECT_OPTION */: {
           let id;
           if (command.target.a11yData) {
-            id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
+            id = (_c = command.target.a11yData) == null ? void 0 : _c.id;
           } else {
             const locator = yield this.locateElement(
               command.target.elementDescriptor,
@@ -2104,12 +2270,17 @@ var AgentController = class {
             command.option
           );
           return {
-            type: "command" /* COMMAND */,
             succeedImmediately: false,
             urlAfterCommand: this.browser.url,
             elementInteracted
           };
         }
+        case "TAB" /* TAB */:
+          yield this.browser.switchToPage(command.url);
+          break;
+        case "COOKIE" /* COOKIE */:
+          yield this.browser.setCookie(command.value);
+          break;
         case "TYPE" /* TYPE */: {
           let elementInteracted;
           const target = command.target;
@@ -2134,7 +2305,6 @@ var AgentController = class {
             yield this.browser.press("Enter");
           }
           const result2 = {
-            type: "command" /* COMMAND */,
             urlAfterCommand: this.browser.url,
             succeedImmediately: false,
             elementInteracted
@@ -2148,7 +2318,6 @@ var AgentController = class {
         case "PRESS" /* PRESS */:
           yield this.browser.press(command.value);
           const result = {
-            type: "command" /* COMMAND */,
             urlAfterCommand: this.browser.url,
             succeedImmediately: false
           };
@@ -2164,38 +2333,15 @@ var AgentController = class {
           return assertUnreachable(command);
       }
       return {
-        type: "command" /* COMMAND */,
         succeedImmediately: false,
         urlAfterCommand: this.browser.url
       };
-    });
-  }
-  sendCommandToBrowser(command, disableCache) {
-    return __async(this, null, function* () {
-      switch (command.type) {
-        case "SUCCESS" /* SUCCESS */:
-        case "FAILURE" /* FAILURE */:
-          return {
-            type: "command" /* COMMAND */,
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url
-          };
-        default:
-          const result = yield this.executePresetStep(command, disableCache);
-          if (result.type !== "command") {
-            throw new Error(
-              `Unexpected preset result type ${result.type} from executing AI action`
-            );
-          }
-          return result;
-      }
     });
   }
 };
 
 // ../../packages/web-agent/src/generators/api-generator.ts
 import fetchRetry from "fetch-retry";
-import * as z16 from "zod";
 var fetch = fetchRetry(global.fetch);
 var API_VERSION = "v1";
 var APIGenerator = class {
@@ -2213,7 +2359,7 @@ var APIGenerator = class {
           disableCache
         }
       );
-      return AILocatorSchema.parse(result);
+      return LocateResponseSchema.parse(result);
     });
   }
   getAssertionResult(context, useVision, disableCache) {
@@ -2230,7 +2376,7 @@ var APIGenerator = class {
             vision: true
           }
         );
-        return ExecuteAssertionResultSchema.parse(result2);
+        return GetAssertionResponseSchema.parse(result2);
       }
       const result = yield this.sendRequest(
         `/${API_VERSION}/web-agent/assertion`,
@@ -2245,7 +2391,7 @@ var APIGenerator = class {
           vision: false
         }
       );
-      return ExecuteAssertionResultSchema.parse(result);
+      return GetAssertionResponseSchema.parse(result);
     });
   }
   getProposedCommand(context, disableCache) {
@@ -2262,7 +2408,7 @@ var APIGenerator = class {
           disableCache
         }
       );
-      return AICommandSchema.parse(result);
+      return GetNextCommandResponseSchema.parse(result);
     });
   }
   getGranularGoals(context, disableCache) {
@@ -2275,7 +2421,7 @@ var APIGenerator = class {
           disableCache
         }
       );
-      return z16.string().array().parse(result);
+      return SplitGoalResponseSchema.parse(result);
     });
   }
   sendRequest(path, body) {
@@ -2303,6 +2449,7 @@ export {
   APIGenerator,
   AgentController,
   ChromeBrowser,
-  PresetCommandType,
+  CommandType,
+  DEFAULT_CONTROLLER_CONFIG,
   StepType
 };
