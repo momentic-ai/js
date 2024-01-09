@@ -3,7 +3,7 @@
 // src/cli.ts
 import chalk from "chalk";
 import { Command as Command4, Option } from "commander";
-import { execa } from "execa";
+import { $ } from "execa";
 import waitOnFn from "wait-on";
 
 // ../../packages/types/src/commands.ts
@@ -3010,7 +3010,7 @@ program.command("run-tests").addOption(
 ).action(async (options) => {
   const { tests, start, waitOn, waitOnTimeout, apiKey } = options;
   console.log({ tests, start, waitOn, waitOnTimeout, apiKey });
-  void execa(start);
+  void $`${start}`;
   await waitOnFn({
     resources: [waitOn],
     timeout: waitOnTimeout * 1e3
