@@ -1,6 +1,8 @@
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
+var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -17,6 +19,19 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -275,11 +290,15 @@ var ResolvedStepSchema = z3.union([
   ResolvedModuleStepSchema
 ]);
 
-// ../../packages/web-agent/src/browsers/chrome.ts
-import {
-  chromium,
-  devices
-} from "playwright";
+// ../../node_modules/.pnpm/playwright@1.40.1/node_modules/playwright/index.mjs
+var playwright_exports = {};
+__export(playwright_exports, {
+  default: () => playwright_default
+});
+__reExport(playwright_exports, playwright_core_star);
+import * as playwright_core_star from "playwright-core";
+import playwright from "playwright-core";
+var playwright_default = playwright;
 
 // ../../packages/types/src/assertions.ts
 import { z as z4 } from "zod";
@@ -714,6 +733,7 @@ var CreateRunBodySchema = z15.object({
   testId: z15.string()
 });
 var UpdateRunBodySchema = z15.object({
+  startedAt: z15.coerce.date(),
   finishedAt: z15.coerce.date(),
   results: ResultSchema.array(),
   status: z15.nativeEnum(RunStatusEnum)
@@ -1143,7 +1163,7 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield chromium.launch({ headless: true });
+      const browser = yield playwright_exports.chromium.launch({ headless: true });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -1151,7 +1171,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         },
         // comment out the below if you are on Mac OS but you're using a monitor
         deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: devices["Desktop Chrome"].userAgent,
+        userAgent: playwright_exports.devices["Desktop Chrome"].userAgent,
         geolocation: { latitude: 37.7749, longitude: -122.4194 },
         // san francisco
         locale: "en-US",
@@ -1845,7 +1865,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     });
   }
 };
-_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
+_ChromeBrowser.USER_AGENT = playwright_exports.devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/configs/controller.ts
