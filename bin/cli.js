@@ -67,11 +67,24 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // src/cli.ts
+import { Command as Command4, Option } from "commander";
+
+// package.json
+var version = "1.0.0";
+
+// src/install-browsers.ts
+import { registry } from "playwright-core/lib/server";
+function installBrowsers() {
+  return __async(this, null, function* () {
+    const executables = registry.defaultExecutables();
+    yield registry.install(executables, false);
+  });
+}
+
+// src/run-tests-locally.ts
 import exec from "@actions/exec";
 import io from "@actions/io";
 import chalk from "chalk";
-import { Command as Command4, Option } from "commander";
-import { registry } from "playwright-core/lib/server";
 import quote from "quote";
 import parseArgsStringToArgv2 from "string-argv";
 import waitOnFn from "wait-on";
@@ -750,7 +763,7 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   url: true
 }).merge(GeneratorOptionsSchema);
 var SplitGoalResponseSchema = z15.string().array();
-var QueueBodySchema = z15.object({
+var QueueTestsBodySchema = z15.object({
   testIds: z15.string().array()
 });
 var GetTestResponseSchema = ResolvedTestSchema;
@@ -2495,9 +2508,6 @@ var APIGenerator = class {
   }
 };
 
-// package.json
-var version = "1.0.0";
-
 // src/api-client.ts
 var API_VERSION2 = "v1";
 var APIClient = class {
@@ -2536,6 +2546,14 @@ var APIClient = class {
         method: "GET"
       });
       return GetTestResponseSchema.parse(result);
+    });
+  }
+  queueTests(body) {
+    return __async(this, null, function* () {
+      yield this.sendRequest(`/${API_VERSION2}/tests/queue`, {
+        method: "POST",
+        body
+      });
     });
   }
   uploadScreenshot(body) {
@@ -3156,6 +3174,91 @@ function runTest(_0) {
   });
 }
 
+// src/run-tests-locally.ts
+function runTestsLocally(_0) {
+  return __async(this, arguments, function* ({
+    tests,
+    start,
+    waitOn,
+    waitOnTimeout,
+    server,
+    apiKey
+  }) {
+    yield execCommand(start, false);
+    yield waitOnFn({
+      resources: [waitOn],
+      timeout: waitOnTimeout * 1e3
+    });
+    const apiClient = new APIClient({
+      baseURL: server,
+      apiKey
+    });
+    const apiGenerator = new APIGenerator({
+      baseURL: server,
+      apiKey
+    });
+    const promises = tests.map((testId) => __async(this, null, function* () {
+      let failed = true;
+      try {
+        failed = yield runTest({
+          testId,
+          apiClient,
+          generator: apiGenerator,
+          newBaseURL: waitOn
+        });
+      } catch (e) {
+        console.error(e);
+      }
+      return { failed, testId };
+    }));
+    const results = yield Promise.all(promises);
+    const failedResults = results.filter((result) => result.failed);
+    if (failedResults.length > 0) {
+      console.log(
+        chalk.red(
+          `Failed ${failedResults.length} out of ${results.length} tests:`
+        )
+      );
+      failedResults.forEach((result) => {
+        console.log(chalk.red(`- ${result.testId}`));
+      });
+      process.exit(1);
+    }
+    console.log(chalk.green(`All ${results.length} tests passed!`));
+    process.exit(0);
+  });
+}
+function execCommand(fullCommand, waitToFinish = true) {
+  return __async(this, null, function* () {
+    const args = parseArgsStringToArgv2(fullCommand);
+    const toolPath = yield io.which(args[0], true);
+    const toolArguments = args.slice(1);
+    const promise = exec.exec(quote(toolPath), toolArguments);
+    if (waitToFinish) {
+      return promise;
+    }
+  });
+}
+
+// src/run-tests-remotely.ts
+import chalk2 from "chalk";
+function runTestsRemotely(_0) {
+  return __async(this, arguments, function* ({
+    tests,
+    apiKey,
+    server
+  }) {
+    const apiClient = new APIClient({
+      baseURL: server,
+      apiKey
+    });
+    yield apiClient.queueTests({
+      testIds: tests
+    });
+    console.log(chalk2.green(`Successfully queued ${tests.length} tests!`));
+  });
+}
+
 // src/cli.ts
 var program = new Command4();
 program.name("momentic").description("Momentic CLI").version(version);
@@ -3168,76 +3271,55 @@ program.command("run-tests").addOption(
     "specify tests to run"
   ).makeOptionMandatory(true)
 ).addOption(
-  new Option(
-    "--start <command>",
-    "specify start command"
-  ).makeOptionMandatory(true)
+  new Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
 ).addOption(
-  new Option("--wait-on <url>", "specify url to wait on").makeOptionMandatory(
-    true
+  new Option("--server <server>", "Momentic server to use").default(
+    "https://api.momentic.ai"
   )
 ).addOption(
+  new Option("--remote", "run tests remotely").default(true).conflicts(["local", "start, waitOn, waitOnTimeout"])
+).addOption(
+  new Option("--local", "run tests locally").implies({
+    start: "npm run start",
+    waitOn: "http://localhost:3000"
+  })
+).addOption(new Option("--start <command>", "specify start command")).addOption(new Option("--wait-on <url>", "specify URL to wait on")).addOption(
   new Option(
     "--wait-on-timeout <timeout>",
     "specify how long to wait on url"
   ).default(60, "one minute")
-).addOption(
-  new Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
 ).action((options) => __async(void 0, null, function* () {
-  const { tests, start, waitOn, waitOnTimeout, apiKey } = options;
-  yield execCommand(start, false);
-  yield waitOnFn({
-    resources: [waitOn],
-    timeout: waitOnTimeout * 1e3
-  });
-  const apiClient = new APIClient({
-    baseURL: "https://api.momentic.ai",
-    apiKey
-  });
-  const apiGenerator = new APIGenerator({
-    baseURL: "https://api.momentic.ai",
-    apiKey
-  });
-  const promises = tests.map((testId) => __async(void 0, null, function* () {
-    const failed = yield runTest({
-      testId,
-      apiClient,
-      generator: apiGenerator,
-      newBaseURL: waitOn
-    });
-    return { failed, testId };
-  }));
-  const results = yield Promise.all(promises);
-  const failedResults = results.filter((result) => result.failed);
-  if (failedResults.length > 0) {
-    console.log(
-      chalk.red(
-        `Failed ${failedResults.length} out of ${results.length} tests:`
-      )
-    );
-    failedResults.forEach((result) => {
-      console.log(chalk.red(`- ${result.testId}`));
-    });
-    process.exit(1);
+  const {
+    tests,
+    apiKey,
+    server,
+    remote,
+    local,
+    start,
+    waitOn,
+    waitOnTimeout
+  } = options;
+  if (remote) {
+    yield runTestsRemotely({ tests, apiKey, server });
+    return;
   }
-  console.log(chalk.green(`All ${results.length} tests passed!`));
-  process.exit(0);
+  if (local) {
+    try {
+      yield runTestsLocally({
+        tests,
+        start,
+        waitOn,
+        waitOnTimeout,
+        server,
+        apiKey
+      });
+    } catch (e) {
+      console.error(e);
+      process.exit(1);
+    }
+    return;
+  }
 }));
-var execCommand = (fullCommand, waitToFinish = true) => __async(void 0, null, function* () {
-  const args = parseArgsStringToArgv2(fullCommand);
-  const toolPath = yield io.which(args[0], true);
-  const toolArguments = args.slice(1);
-  const promise = exec.exec(quote(toolPath), toolArguments);
-  if (waitToFinish) {
-    return promise;
-  }
-});
-function installBrowsers() {
-  return __async(this, null, function* () {
-    const executables = registry.defaultExecutables();
-    yield registry.install(executables, false);
-  });
-}
 function main() {
   return __async(this, null, function* () {
     yield program.parseAsync(process.argv);
