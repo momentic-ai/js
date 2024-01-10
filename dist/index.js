@@ -727,7 +727,7 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   url: true
 }).merge(GeneratorOptionsSchema);
 var SplitGoalResponseSchema = z15.string().array();
-var QueueBodySchema = z15.object({
+var QueueTestsBodySchema = z15.object({
   testIds: z15.string().array()
 });
 var CreateRunBodySchema = z15.object({
