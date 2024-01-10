@@ -506,10 +506,11 @@ var ModuleSchema = z10.object({
 
 // ../../packages/types/src/runs.ts
 import { z as z11 } from "zod";
-var RunTrigger = {
+var RunTriggerEnum = {
   WEBHOOK: "WEBHOOK",
   CRON: "CRON",
-  MANUAL: "MANUAL"
+  MANUAL: "MANUAL",
+  CLI: "CLI"
 };
 var RunStatusEnum = {
   PENDING: "PENDING",
@@ -529,7 +530,7 @@ var RunMetadataSchema = z11.object({
   finishedAt: DateOrStringSchema.or(z11.null()),
   testId: z11.string().or(z11.null()),
   status: z11.nativeEnum(RunStatusEnum),
-  trigger: z11.nativeEnum(RunTrigger),
+  trigger: z11.nativeEnum(RunTriggerEnum),
   test: z11.object({
     name: z11.string(),
     id: z11.string()
@@ -754,7 +755,8 @@ var QueueBodySchema = z15.object({
 });
 var GetTestResponseSchema = ResolvedTestSchema;
 var CreateRunBodySchema = z15.object({
-  testId: z15.string()
+  testId: z15.string(),
+  trigger: z15.nativeEnum(RunTriggerEnum)
 });
 var CreateRunResponseSchema = RunWithTestSchema;
 var GetRunResponseSchema = RunWithTestSchema;
@@ -3123,7 +3125,8 @@ function runTest(_0) {
       logger: consoleLogger
     });
     const run = yield apiClient.createRun({
-      testId
+      testId,
+      trigger: "CLI"
     });
     let failed = true;
     try {
