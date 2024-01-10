@@ -3277,11 +3277,14 @@ program.command("run-tests").addOption(
     "https://api.momentic.ai"
   )
 ).addOption(
-  new Option("--remote", "run tests remotely").default(true).conflicts(["local", "start, waitOn, waitOnTimeout"])
+  new Option("--remote", "run tests remotely").default(true).conflicts(["start, waitOn, waitOnTimeout"]).implies({
+    local: false
+  })
 ).addOption(
   new Option("--local", "run tests locally").implies({
     start: "npm run start",
-    waitOn: "http://localhost:3000"
+    waitOn: "http://localhost:3000",
+    remote: false
   })
 ).addOption(new Option("--start <command>", "specify start command")).addOption(new Option("--wait-on <url>", "specify URL to wait on")).addOption(
   new Option(
