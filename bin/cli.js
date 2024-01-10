@@ -56,6 +56,7 @@ import exec from "@actions/exec";
 import io from "@actions/io";
 import chalk from "chalk";
 import { Command as Command4, Option } from "commander";
+import { registry } from "playwright-core/lib/server";
 import quote from "quote";
 import parseArgsStringToArgv2 from "string-argv";
 import waitOnFn from "wait-on";
@@ -3135,6 +3136,9 @@ function runTest(_0) {
 // src/cli.ts
 var program = new Command4();
 program.name("momentic").description("Momentic CLI").version(version);
+program.command("install-browsers").action(() => __async(void 0, null, function* () {
+  yield installBrowsers();
+}));
 program.command("run-tests").addOption(
   new Option(
     "--tests <tests...>",
@@ -3204,6 +3208,12 @@ var execCommand = (fullCommand, waitToFinish = true) => __async(void 0, null, fu
     return promise;
   }
 });
+function installBrowsers() {
+  return __async(this, null, function* () {
+    const executables = registry.defaultExecutables();
+    yield registry.install(executables, false);
+  });
+}
 function main() {
   return __async(this, null, function* () {
     yield program.parseAsync(process.argv);
