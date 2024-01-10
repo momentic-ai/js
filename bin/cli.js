@@ -3198,6 +3198,7 @@ program.command("run-tests").addOption(
     process.exit(1);
   }
   console.log(chalk.green(`All ${results.length} tests passed!`));
+  process.exit(0);
 }));
 var execCommand = (fullCommand, waitToFinish = true) => __async(void 0, null, function* () {
   const args = parseArgsStringToArgv2(fullCommand);
