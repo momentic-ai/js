@@ -1,8 +1,6 @@
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -19,19 +17,6 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -87,10 +72,11 @@ var CommandType = /* @__PURE__ */ ((CommandType2) => {
   CommandType2["REFRESH"] = "REFRESH";
   CommandType2["TAB"] = "TAB";
   CommandType2["COOKIE"] = "COOKIE";
+  CommandType2["HOVER"] = "HOVER";
   CommandType2["SUCCESS"] = "SUCCESS";
   return CommandType2;
 })(CommandType || {});
-var ElementDescriptorSchema = z2.object({
+var ElementTargetSchema = z2.object({
   // natural language passed to LLM
   elementDescriptor: z2.string(),
   // Cached A11y target - when a user creates a preset action, this will not exist
@@ -141,7 +127,7 @@ var GoForwardCommandSchema = CommonCommandSchema.merge(
 var ClickCommandSchema = CommonCommandSchema.merge(
   z2.object({
     type: z2.literal("CLICK" /* CLICK */),
-    target: ElementDescriptorSchema,
+    target: ElementTargetSchema,
     doubleClick: z2.boolean().default(false),
     rightClick: z2.boolean().default(false)
   })
@@ -150,12 +136,18 @@ var ClickCommandSchema = CommonCommandSchema.merge(
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
-  `.replace("\n", " ")
+  `.replaceAll("\n", " ")
+);
+var HoverCommandSchema = CommonCommandSchema.merge(
+  z2.object({
+    type: z2.literal("HOVER" /* HOVER */),
+    target: ElementTargetSchema
+  })
 );
 var SelectOptionCommandSchema = CommonCommandSchema.merge(
   z2.object({
     type: z2.literal("SELECT_OPTION" /* SELECT_OPTION */),
-    target: ElementDescriptorSchema,
+    target: ElementTargetSchema,
     option: z2.string()
   })
 ).describe(
@@ -177,7 +169,7 @@ var TypeOptionsSchema = z2.object({
 var TypeCommandSchema = CommonCommandSchema.merge(
   z2.object({
     type: z2.literal("TYPE" /* TYPE */),
-    target: ElementDescriptorSchema,
+    target: ElementTargetSchema,
     value: z2.string(),
     pressEnter: z2.boolean().default(false)
   })
@@ -227,7 +219,8 @@ var UserEditablePresetCommandSchema = z2.discriminatedUnion("type", [
   AIAssertionCommandSchema,
   WaitCommandSchema,
   TabCommandSchema,
-  CookieCommandSchema
+  CookieCommandSchema,
+  HoverCommandSchema
 ]);
 var CommandSchema = z2.discriminatedUnion("type", [
   // Commands that can be either specified manually or auto-created by AI in an AI step
@@ -290,15 +283,14 @@ var ResolvedStepSchema = z3.union([
   ResolvedModuleStepSchema
 ]);
 
-// ../../node_modules/.pnpm/playwright@1.40.1/node_modules/playwright/index.mjs
-var playwright_exports = {};
-__export(playwright_exports, {
-  default: () => playwright_default
-});
-__reExport(playwright_exports, playwright_core_star);
-import * as playwright_core_star from "playwright-core";
-import playwright from "playwright-core";
-var playwright_default = playwright;
+// ../../packages/web-agent/src/browsers/chrome.ts
+import { distance as distance2 } from "fastest-levenshtein";
+import {
+  chromium,
+  devices
+} from "playwright";
+import { addExtra } from "playwright-extra";
+import pluginStealth from "puppeteer-extra-plugin-stealth";
 
 // ../../packages/types/src/assertions.ts
 import { z as z4 } from "zod";
@@ -508,6 +500,7 @@ var RunMetadataSchema = z11.object({
   testId: z11.string().or(z11.null()),
   status: z11.nativeEnum(RunStatusEnum),
   trigger: z11.nativeEnum(RunTriggerEnum),
+  attempts: z11.number(),
   test: z11.object({
     name: z11.string(),
     id: z11.string()
@@ -525,104 +518,8 @@ var RunWithTestSchema = RunMetadataSchema.merge(
 );
 
 // ../../packages/types/src/serialization.ts
-function clampText(text, length) {
-  if (text.length < length) {
-    return text;
-  }
-  return text.slice(0, length - 3) + "[...]";
-}
-function serializeCommand(command) {
-  var _a, _b;
-  switch (command.type) {
-    case "SUCCESS" /* SUCCESS */:
-      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
-        return `Check success condition: ${command.condition.assertion}`;
-      }
-      return `All commands completed`;
-    case "NAVIGATE" /* NAVIGATE */:
-      return `Go to URL: ${clampText(command.url, 30)}`;
-    case "GO_BACK" /* GO_BACK */:
-      return `Go back to the previous page`;
-    case "GO_FORWARD" /* GO_FORWARD */:
-      return `Go forward to the next page`;
-    case "SCROLL_DOWN" /* SCROLL_DOWN */:
-      return `Scroll down one page`;
-    case "SCROLL_UP" /* SCROLL_UP */:
-      return `Scroll up one page`;
-    case "WAIT" /* WAIT */:
-      return `Wait for ${command.delay} seconds`;
-    case "REFRESH" /* REFRESH */:
-      return `Refresh the page`;
-    case "CLICK" /* CLICK */:
-      return `Click on '${command.target.elementDescriptor}'`;
-    case "TYPE" /* TYPE */:
-      let serializedTarget = "";
-      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
-        serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
-      } else if (command.target.elementDescriptor.length > 0) {
-        serializedTarget = ` in element ${command.target.elementDescriptor}`;
-      }
-      return `Type${serializedTarget}: '${command.value}'`;
-    case "PRESS" /* PRESS */:
-      return `Press '${command.value}'`;
-    case "SELECT_OPTION" /* SELECT_OPTION */:
-      return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
-    case "TAB" /* TAB */:
-      return `Switch to tab: ${command.url}`;
-    case "COOKIE" /* COOKIE */:
-      return `Set cookie: ${command.value}`;
-    case "AI_ASSERTION" /* AI_ASSERTION */:
-      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
-    default:
-      const assertUnreachable = (_x) => {
-        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-      };
-      return assertUnreachable(command);
-  }
-}
-
-// ../../packages/types/src/card-display.ts
-var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
-  Object.values(CommandType)
-);
-var CARD_DISPLAY_NAMES = {
-  ["AI_ACTION" /* AI_ACTION */]: "AI action",
-  ["MODULE" /* MODULE */]: "Module",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
-  ["CLICK" /* CLICK */]: "Click",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["TYPE" /* TYPE */]: "Type",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["GO_BACK" /* GO_BACK */]: "Go back",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
-  ["WAIT" /* WAIT */]: "Wait",
-  ["REFRESH" /* REFRESH */]: "Refresh",
-  ["TAB" /* TAB */]: "Switch tab",
-  ["COOKIE" /* COOKIE */]: "Set cookie",
-  ["SUCCESS" /* SUCCESS */]: "Done"
-};
-var CARD_DESCRIPTIONS = {
-  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
-  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
-  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
-  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
-  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
-  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
-  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
-  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
-  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
-  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
-  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
-};
+import { parse, stringify } from "yaml";
+import { z as z14 } from "zod";
 
 // ../../packages/types/src/test.ts
 import { z as z13 } from "zod";
@@ -654,65 +551,219 @@ var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
 var TestSettingsSchema = z12.object({
   name: z12.string().min(1),
   baseUrl: z12.string().url(),
+  retries: z12.coerce.number().min(0).max(10),
   advanced: TestAdvancedSettingsSchema
 });
 
 // ../../packages/types/src/test.ts
-var ResolvedTestSchema = z13.object({
+var BaseTestMetadataSchema = z13.object({
   id: z13.string(),
   name: z13.string(),
   baseUrl: z13.string(),
-  steps: z13.array(ResolvedStepSchema),
-  createdAt: z13.coerce.date(),
-  updatedAt: z13.coerce.date(),
-  createdBy: z13.string(),
-  organizationId: z13.string().or(z13.null()),
   schemaVersion: z13.string(),
   advanced: TestAdvancedSettingsSchema,
+  retries: z13.number()
+});
+var ExtendedTestMetadataSchema = z13.object({
+  createdAt: z13.coerce.date(),
+  updatedAt: z13.coerce.date(),
   schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema
+  webhooks: WebhookSettingsSchema,
+  createdBy: z13.string(),
+  organizationId: z13.string().or(z13.null())
+});
+var ResolvedTestSchema = BaseTestMetadataSchema.merge(
+  ExtendedTestMetadataSchema
+).merge(
+  z13.object({
+    steps: z13.array(ResolvedStepSchema)
+  })
+);
+var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
+  z13.object({
+    steps: z13.array(ResolvedStepSchema)
+  })
+);
+
+// ../../packages/types/src/serialization.ts
+function clampText(text, length) {
+  if (text.length < length) {
+    return text;
+  }
+  return text.slice(0, length - 3) + "[...]";
+}
+function serializeCommand(command) {
+  var _a, _b, _c;
+  switch (command.type) {
+    case "SUCCESS" /* SUCCESS */:
+      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
+        return `Check success condition: ${command.condition.assertion}`;
+      }
+      return `All commands completed`;
+    case "NAVIGATE" /* NAVIGATE */:
+      return `Go to URL: ${clampText(command.url, 30)}`;
+    case "GO_BACK" /* GO_BACK */:
+      return `Go back to the previous page`;
+    case "GO_FORWARD" /* GO_FORWARD */:
+      return `Go forward to the next page`;
+    case "SCROLL_DOWN" /* SCROLL_DOWN */:
+      return `Scroll down one page`;
+    case "SCROLL_UP" /* SCROLL_UP */:
+      return `Scroll up one page`;
+    case "WAIT" /* WAIT */:
+      return `Wait for ${command.delay} seconds`;
+    case "REFRESH" /* REFRESH */:
+      return `Refresh the page`;
+    case "CLICK" /* CLICK */:
+      return `Click on '${command.target.elementDescriptor}'`;
+    case "TYPE" /* TYPE */: {
+      let serializedTarget = "";
+      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
+        serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
+      } else if (command.target.elementDescriptor.length > 0) {
+        serializedTarget = ` in element ${command.target.elementDescriptor}`;
+      }
+      return `Type${serializedTarget}: '${command.value}'`;
+    }
+    case "HOVER" /* HOVER */: {
+      let serializedTarget = "";
+      if ((_c = command.target.a11yData) == null ? void 0 : _c.serializedForm) {
+        serializedTarget = ` over element: ${command.target.a11yData.serializedForm}`;
+      } else if (command.target.elementDescriptor.length > 0) {
+        serializedTarget = ` over element: ${command.target.elementDescriptor}`;
+      }
+      return `Hover${serializedTarget}`;
+    }
+    case "PRESS" /* PRESS */:
+      return `Press '${command.value}'`;
+    case "SELECT_OPTION" /* SELECT_OPTION */:
+      return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
+    case "TAB" /* TAB */:
+      return `Switch to tab: ${command.url}`;
+    case "COOKIE" /* COOKIE */:
+      return `Set cookie: ${command.value}`;
+    case "AI_ASSERTION" /* AI_ASSERTION */:
+      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
+    default:
+      const assertUnreachable = (_x) => {
+        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+      };
+      return assertUnreachable(command);
+  }
+}
+var TestSerializationResultSchema = z14.object({
+  test: z14.string().describe("YAML for the test, including metadata and steps"),
+  modules: z14.record(z14.string(), z14.string()).describe("Map of module name to YAML for the module")
+});
+var SerializedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: StepSchema.array()
+  })
+);
+var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
+  type: true
+}).merge(
+  z14.object({
+    schemaVersion: z14.string()
+  })
+);
+var DeserializedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: z14.array(z14.record(z14.string(), z14.unknown()))
+  })
+);
+var DeserializedModuleSchema = z14.object({
+  moduleId: z14.string().uuid(),
+  name: z14.string(),
+  schemaVersion: z14.string(),
+  steps: z14.array(z14.record(z14.string(), z14.unknown()))
 });
 
+// ../../packages/types/src/card-display.ts
+var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
+  Object.values(CommandType)
+);
+var CARD_DISPLAY_NAMES = {
+  ["AI_ACTION" /* AI_ACTION */]: "AI action",
+  ["MODULE" /* MODULE */]: "Module",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
+  ["CLICK" /* CLICK */]: "Click",
+  ["HOVER" /* HOVER */]: "Hover",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
+  ["TYPE" /* TYPE */]: "Type",
+  ["PRESS" /* PRESS */]: "Press",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
+  ["GO_BACK" /* GO_BACK */]: "Go back",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
+  ["WAIT" /* WAIT */]: "Wait",
+  ["REFRESH" /* REFRESH */]: "Refresh",
+  ["TAB" /* TAB */]: "Switch tab",
+  ["COOKIE" /* COOKIE */]: "Set cookie",
+  ["SUCCESS" /* SUCCESS */]: "Done"
+};
+var CARD_DESCRIPTIONS = {
+  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
+  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
+  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
+  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
+  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
+  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
+  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
+  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
+  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
+  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
+  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
+  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
+};
+
 // ../../packages/types/src/context.ts
-import * as z14 from "zod";
-var DynamicContextSchema = z14.object({
+import * as z15 from "zod";
+var DynamicContextSchema = z15.object({
   // user goal or instruction
-  goal: z14.string(),
+  goal: z15.string(),
   // current url of the browser
-  url: z14.string(),
+  url: z15.string(),
   // serialized page state
-  browserState: z14.string(),
+  browserState: z15.string(),
   // serialized history of previous commands
-  history: z14.string(),
+  history: z15.string(),
   // number of previously executed commands
-  numPrevious: z14.number(),
+  numPrevious: z15.number(),
   // last executed command, if any
-  lastCommand: ExecuteCommandHistoryEntrySchema.or(z14.null())
+  lastCommand: ExecuteCommandHistoryEntrySchema.or(z15.null())
 });
 
 // ../../packages/types/src/public-api.ts
-import * as z15 from "zod";
-var GeneratorOptionsSchema = z15.object({
-  disableCache: z15.boolean()
+import * as z16 from "zod";
+var GeneratorOptionsSchema = z16.object({
+  disableCache: z16.boolean()
 });
 var GetNextCommandBodySchema = DynamicContextSchema.merge(
   GeneratorOptionsSchema
 );
 var GetNextCommandResponseSchema = AICommandSchema;
-var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
+var GetAssertionResultBodySchema = z16.discriminatedUnion("vision", [
   DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
-    z15.object({
-      vision: z15.literal(false)
+    z16.object({
+      vision: z16.literal(false)
     })
   ),
   DynamicContextSchema.pick({
     goal: true,
     url: true
   }).merge(GeneratorOptionsSchema).merge(
-    z15.object({
+    z16.object({
       // base64 encoded image
-      screenshot: z15.string(),
-      vision: z15.literal(true)
+      screenshot: z16.string(),
+      vision: z16.literal(true)
     })
   )
 ]);
@@ -726,26 +777,42 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   goal: true,
   url: true
 }).merge(GeneratorOptionsSchema);
-var SplitGoalResponseSchema = z15.string().array();
-var QueueTestsBodySchema = z15.object({
-  testIds: z15.string().array()
-});
-var CreateRunBodySchema = z15.object({
-  testId: z15.string(),
-  trigger: z15.nativeEnum(RunTriggerEnum)
-});
-var UpdateRunBodySchema = z15.object({
-  startedAt: z15.coerce.date(),
-  finishedAt: z15.coerce.date(),
-  results: ResultSchema.array(),
-  status: z15.nativeEnum(RunStatusEnum)
+var SplitGoalResponseSchema = z16.string().array();
+var QueueTestsBodySchema = z16.object({
+  testPaths: z16.string().array(),
+  testIds: z16.string().array()
 }).partial();
-var CreateScreenshotBodySchema = z15.object({
-  // base64 string
-  screenshot: z15.string()
+var ExportTestBodySchema = z16.object({
+  path: z16.string()
 });
-var CreateScreenshotResponseSchema = z15.object({
-  key: z15.string()
+var TestWithModulesYAMLSchema = z16.object({
+  test: z16.string().describe("test YAML"),
+  modules: z16.record(
+    z16.string().describe("moduleId"),
+    z16.string().describe("module YAML")
+  )
+});
+var UpdateTestsBodySchema = TestWithModulesYAMLSchema.array();
+var CreateRunBodySchema = z16.object({
+  testPath: z16.string(),
+  testId: z16.string()
+}).partial().merge(
+  z16.object({
+    trigger: z16.nativeEnum(RunTriggerEnum)
+  })
+);
+var UpdateRunBodySchema = z16.object({
+  startedAt: z16.coerce.date(),
+  finishedAt: z16.coerce.date(),
+  results: ResultSchema.array(),
+  status: z16.nativeEnum(RunStatusEnum)
+}).partial();
+var CreateScreenshotBodySchema = z16.object({
+  // base64 string
+  screenshot: z16.string()
+});
+var CreateScreenshotResponseSchema = z16.object({
+  key: z16.string()
 });
 
 // ../../packages/web-agent/src/utils/url.ts
@@ -754,6 +821,29 @@ var urlChanged = (url1, url2) => {
   const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
   return hostname !== hostname2 || pathname !== pathname2;
 };
+
+// ../../packages/web-agent/src/browsers/a11y.ts
+import { distance } from "fastest-levenshtein";
+
+// ../../packages/web-agent/src/browsers/constants.ts
+var RETINA_WINDOW_SCALE_FACTOR = 2;
+var MAX_LOAD_TIMEOUT_MS = 8e3;
+var NETWORK_STABLE_DURATION_MS = 1250;
+var NETWORK_IDLE_TIMEOUT_MS = 3e3;
+var CHECK_INTERVAL_MS = 250;
+var A11Y_LOAD_TIMEOUT_MS = 1e3;
+var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
+var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
+var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
+var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
+var HIGHLIGHT_DURATION_MS = 3e3;
+var MAX_LEVENSHTEIN_DISTANCE = 300;
+var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.25;
+var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
+  "about:blank",
+  "chrome-error://chromewebdata/"
+]);
+var MAX_BROWSER_ACTION_ATTEMPTS = 2;
 
 // ../../packages/web-agent/src/browsers/a11y.ts
 var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
@@ -768,7 +858,8 @@ var defaultA11yNodeSerializeParams = {
   indentLevel: 0,
   noID: false,
   noChildren: false,
-  noProperties: false
+  noProperties: false,
+  maxLevel: void 0
 };
 var ProcessedA11yNode = class {
   constructor(params) {
@@ -839,14 +930,15 @@ var ProcessedA11yNode = class {
         }
       });
     }
-    if (this.children.length === 0 || noChildren) {
+    const maxLevelExceeded = opts.maxLevel !== void 0 && indentLevel / 2 >= opts.maxLevel;
+    if (this.children.length === 0 || noChildren || maxLevelExceeded) {
       s += " />\n";
       return s;
     } else {
       s += ">\n";
     }
     for (const child of this.children) {
-      s += child.serialize({ indentLevel: indentLevel + 2 });
+      s += child.serialize(__spreadProps(__spreadValues({}, opts), { indentLevel: indentLevel + 2 }));
     }
     s += `${indent}</${this.role}>
 `;
@@ -1004,6 +1096,30 @@ function processA11yTree(graph) {
   }
   return new ProcessedA11yTree(processedRoot[0], outputNodeMap);
 }
+var saveNodeDetailsToCache = (node, target) => {
+  target.id = parseInt(node.id);
+  target.content = node.content;
+  target.name = node.name;
+  target.role = node.role;
+  target.serializedForm = node.serialize({ noID: true, maxLevel: 1 });
+};
+var getNodeComparisonScore = (node, target) => {
+  var _a;
+  let score = 0;
+  if (node.role === target.role) {
+    score++;
+  }
+  const attrs = ["name", "content"];
+  for (const attr of attrs) {
+    if (!((_a = node[attr]) == null ? void 0 : _a.trim())) {
+      continue;
+    }
+    if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_CHANGE_RATIO) {
+      score++;
+    }
+  }
+  return score;
+};
 
 // ../../packages/web-agent/src/browsers/cdp.ts
 var GREEN = { r: 147, g: 196, b: 125, a: 0.55 };
@@ -1022,24 +1138,6 @@ var NODE_HIGHLIGHT_CONFIG = {
   shapeColor: GREEN,
   shapeMarginColor: GREEN
 };
-
-// ../../packages/web-agent/src/browsers/constants.ts
-var RETINA_WINDOW_SCALE_FACTOR = 2;
-var MAX_LOAD_TIMEOUT_MS = 8e3;
-var NETWORK_STABLE_DURATION_MS = 1250;
-var NETWORK_IDLE_TIMEOUT_MS = 3e3;
-var CHECK_INTERVAL_MS = 250;
-var A11Y_LOAD_TIMEOUT_MS = 1e3;
-var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
-var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
-var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var HIGHLIGHT_DURATION_MS = 3e3;
-var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
-  "about:blank",
-  "chrome-error://chromewebdata/"
-]);
-var MAX_BROWSER_ACTION_ATTEMPTS = 2;
 
 // ../../packages/web-agent/src/browsers/utils/time.ts
 var sleep = (ms = 1e3) => {
@@ -1135,6 +1233,8 @@ function isRequestRelevantForPageLoad(request, currentURL) {
 }
 
 // ../../packages/web-agent/src/browsers/chrome.ts
+var chromiumWithExtra = addExtra(chromium);
+chromiumWithExtra.use(pluginStealth());
 function initCDPSession(cdpClient) {
   return __async(this, null, function* () {
     yield cdpClient.send("Accessibility.enable");
@@ -1165,7 +1265,7 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield playwright_exports.chromium.launch({ headless: true });
+      const browser = yield chromiumWithExtra.launch({ headless: true });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -1173,7 +1273,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         },
         // comment out the below if you are on Mac OS but you're using a monitor
         deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: playwright_exports.devices["Desktop Chrome"].userAgent,
+        userAgent: devices["Desktop Chrome"].userAgent,
         geolocation: { latitude: 37.7749, longitude: -122.4194 },
         // san francisco
         locale: "en-US",
@@ -1328,7 +1428,11 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, arguments, function* (text, options = {}) {
       const { clearContent = true, pressKeysSequentially = false } = options;
       if (clearContent) {
-        yield this.page.keyboard.press("Meta+A");
+        if (process.platform === "darwin") {
+          yield this.page.keyboard.press("Meta+A");
+        } else {
+          yield this.page.keyboard.press("Control+A");
+        }
         yield this.page.keyboard.press("Backspace");
       }
       if (pressKeysSequentially) {
@@ -1342,7 +1446,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, arguments, function* (index, options = {}) {
       const node = this.nodeMap.get(`${index}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(`Could not find DOM node during click: ${index}`);
       }
       const nodeClicked = yield this.clickUsingCDP(node, options);
       yield this.highlightNode(nodeClicked);
@@ -1353,7 +1457,9 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, null, function* () {
       const node = this.nodeMap.get(`${index}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(
+          `Could not find DOM node while selecting option: ${index}`
+        );
       }
       if (!node.backendNodeID) {
         throw new Error(
@@ -1368,27 +1474,41 @@ var _ChromeBrowser = class _ChromeBrowser {
       return node.serialize({ noChildren: true, noProperties: true, noID: true });
     });
   }
-  highlight(target) {
+  scrollIntoView(target) {
     return __async(this, null, function* () {
-      try {
-        yield this.highlightByA11yID(target.id);
-      } catch (err) {
-        this.logger.warn({ err, target }, "Failed to highlight target");
-      }
-    });
-  }
-  highlightByA11yID(index) {
-    return __async(this, null, function* () {
-      const node = this.nodeMap.get(`${index}`);
+      const id = yield this.resolveCachedTargetToID(target);
+      const node = this.nodeMap.get(`${id}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(`Could not find node in DOM with a11y id: ${id}`);
       }
       if (!node.backendNodeID) {
         throw new Error(
-          `Select target missing backend node id: ${node.getLogForm()}`
+          `Focus target missing backend node id: ${node.getLogForm()}`
         );
       }
-      yield this.highlightNode(node);
+      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
+      yield locator.scrollIntoViewIfNeeded({
+        timeout: BROWSER_ACTION_TIMEOUT_MS
+      });
+    });
+  }
+  highlight(target) {
+    return __async(this, null, function* () {
+      try {
+        const id = yield this.resolveCachedTargetToID(target);
+        const node = this.nodeMap.get(`${id}`);
+        if (!node) {
+          throw new Error(`Could not find DOM node during highlight: ${id}`);
+        }
+        if (!node.backendNodeID) {
+          throw new Error(
+            `Select target missing backend node id: ${node.getLogForm()}`
+          );
+        }
+        yield this.highlightNode(node);
+      } catch (err) {
+        this.logger.warn({ err, target }, "Failed to highlight target");
+      }
     });
   }
   highlightNode(node) {
@@ -1511,33 +1631,134 @@ var _ChromeBrowser = class _ChromeBrowser {
       }
       if (!rejected && urlChanged(this.url, startURL)) {
         this.logger.debug(
+          { startURL, newURL: this.url },
           `Detected url change in wrapPossibleNavigation, waiting for load state`
         );
-        try {
-          yield this.page.waitForLoadState("load", {
-            timeout: timeoutMS - (Date.now() - startTime)
-          });
-        } catch (e) {
-          this.logger.warn(
-            { url: this.url },
-            "Timeout elapsed waiting for load state to fire, continuing anyways..."
-          );
+        const remainingTimeout = Math.max(
+          timeoutMS - (Date.now() - startTime),
+          0
+        );
+        if (remainingTimeout > 0) {
+          try {
+            yield this.page.waitForLoadState("load", {
+              timeout: remainingTimeout
+            });
+          } catch (e) {
+            this.logger.warn(
+              { url: this.url },
+              "Timeout elapsed waiting for load state to fire, continuing anyways..."
+            );
+          }
         }
       }
       return unwrapAndThrowError(retPromise);
     });
   }
+  /**
+   * Given a potentially cached a11y ID, resolve it to an actual ID, checking that it is still valid.
+   * If the ID is no longer valid, try to auto-heal with heuristics.
+   * Throws if no auto-healing is possible.
+   */
+  resolveCachedTargetToID(target) {
+    return __async(this, null, function* () {
+      if (!target.name && !target.role && !target.content) {
+        const node = this.nodeMap.get(`${target.id}`);
+        if (!node) {
+          throw new Error(
+            `Resolving target failed, fresh value did not exist in node map: ${target.id}`
+          );
+        }
+        saveNodeDetailsToCache(node, target);
+        return target.id;
+      }
+      yield this.getA11yTree();
+      const proposedNode = this.nodeMap.get(`${target.id}`);
+      if (proposedNode) {
+        if (getNodeComparisonScore(proposedNode, target) >= 2) {
+          this.logger.info(
+            "Resolved cached a11y target to node with exact same id"
+          );
+          saveNodeDetailsToCache(proposedNode, target);
+          return target.id;
+        }
+      }
+      let closestLevenshteinDistance = Infinity;
+      let closestNode;
+      for (const node of this.nodeMap.values()) {
+        if (getNodeComparisonScore(node, target) >= 2) {
+          this.logger.info(
+            { newNode: node.getLogForm(), target },
+            "Resolved cached a11y target to new node with field comparison"
+          );
+          saveNodeDetailsToCache(node, target);
+          return parseInt(node.id);
+        }
+        if (target.serializedForm) {
+          const serializedNode = node.serialize({
+            noID: true,
+            maxLevel: 1
+          });
+          if (Math.abs(serializedNode.length - target.serializedForm.length) > MAX_LEVENSHTEIN_DISTANCE) {
+            continue;
+          }
+          const levenshteinDistance = distance2(
+            target.serializedForm,
+            serializedNode
+          );
+          if (levenshteinDistance < closestLevenshteinDistance && levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length) < MAX_LEVENSHTEIN_CHANGE_RATIO) {
+            closestLevenshteinDistance = levenshteinDistance;
+            closestNode = node;
+          }
+        }
+      }
+      if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
+        this.logger.info(
+          { newNode: closestNode.getLogForm(), target },
+          "Resolved cached a11y target to new node with pure levenshtein distance"
+        );
+        saveNodeDetailsToCache(closestNode, target);
+        return parseInt(closestNode.id);
+      }
+      throw new Error(
+        `Could not find any relevant node given cached target: ${JSON.stringify(
+          target
+        )}`
+      );
+    });
+  }
   click(_0) {
     return __async(this, arguments, function* (target, options = {}) {
+      const id = yield this.resolveCachedTargetToID(target);
       const elementInteracted = yield this.wrapPossibleNavigation(
-        () => this.clickByA11yID(target.id, options)
+        () => this.clickByA11yID(id, options)
       );
       return elementInteracted;
     });
   }
+  hover(target) {
+    return __async(this, null, function* () {
+      const nodeId = yield this.resolveCachedTargetToID(target);
+      const node = this.nodeMap.get(`${nodeId}`);
+      if (!node) {
+        throw new Error(`Could not find DOM node for hover: ${nodeId}`);
+      }
+      if (!node.backendNodeID) {
+        throw new Error(
+          `Hover target missing backend node id: ${node.getLogForm()}`
+        );
+      }
+      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
+      yield locator.hover({
+        timeout: BROWSER_ACTION_TIMEOUT_MS
+      });
+      yield this.highlightNode(node);
+      return node.serialize({ noChildren: true, noProperties: true, noID: true });
+    });
+  }
   selectOption(target, option) {
     return __async(this, null, function* () {
-      return this.selectOptionByA11yID(target.id, option);
+      const id = yield this.resolveCachedTargetToID(target);
+      return this.selectOptionByA11yID(id, option);
     });
   }
   press(key) {
@@ -1605,7 +1826,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       let timeoutTriggered = true;
       while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
         yield sleep(CHECK_INTERVAL_MS);
-        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
+        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS && process.env.NODE_ENV !== "production") {
           this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
           continue;
         }
@@ -1867,7 +2088,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     });
   }
 };
-_ChromeBrowser.USER_AGENT = playwright_exports.devices["Desktop Chrome"].userAgent;
+_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/configs/controller.ts
@@ -2030,6 +2251,9 @@ var AgentController = class {
   }
   locateElement(description, disableCache) {
     return __async(this, null, function* () {
+      if (!description) {
+        throw new Error("Cannot locate element with empty description");
+      }
       const locator = yield this.generator.getElementLocation(
         { browserState: yield this.getBrowserState(), goal: description },
         disableCache
@@ -2201,6 +2425,41 @@ var AgentController = class {
       };
     });
   }
+  wrapElementTargetingCommand(target, disableCache, action, newlyGenerated = false) {
+    return __async(this, null, function* () {
+      if (!target.a11yData) {
+        target.a11yData = A11yTargetWithCacheSchema.parse(
+          yield this.locateElement(target.elementDescriptor, disableCache)
+        );
+        newlyGenerated = true;
+      }
+      try {
+        const result = yield action(target.a11yData);
+        return result;
+      } catch (err) {
+        if (!newlyGenerated) {
+          this.logger.warn(
+            { err, target },
+            "Failed to execute action with cached target, retrying with AI"
+          );
+          target.a11yData = void 0;
+          return this.wrapElementTargetingCommand(
+            target,
+            disableCache,
+            action,
+            true
+          );
+        }
+        this.logger.error(
+          { err, target },
+          "Failed to target element even after all auto-healing"
+        );
+        throw new Error(
+          `Failed to find element with description: ${target.elementDescriptor}. Has your website changed significantly?`
+        );
+      }
+    });
+  }
   /**
    * Executes a preset command.
    * For most cases, the execution result contains metadata about the command executed.
@@ -2209,7 +2468,7 @@ var AgentController = class {
    */
   executePresetStep(command, disableCache) {
     return __async(this, null, function* () {
-      var _a, _b, _c;
+      var _a;
       const urlBeforeCommand = this.browser.url;
       switch (command.type) {
         case "SUCCESS" /* SUCCESS */:
@@ -2245,24 +2504,13 @@ var AgentController = class {
           yield this.browser.refresh();
           break;
         case "CLICK" /* CLICK */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.click(
-            {
-              id
-            },
-            {
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.click(target, {
               doubleClick: command.doubleClick,
               rightClick: command.rightClick
-            }
+            })
           );
           const result2 = {
             urlAfterCommand: this.browser.url,
@@ -2276,21 +2524,10 @@ var AgentController = class {
           return result2;
         }
         case "SELECT_OPTION" /* SELECT_OPTION */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_c = command.target.a11yData) == null ? void 0 : _c.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.selectOption(
-            {
-              id
-            },
-            command.option
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (targetWithA11yData) => this.browser.selectOption(targetWithA11yData, command.option)
           );
           return {
             succeedImmediately: false,
@@ -2305,21 +2542,11 @@ var AgentController = class {
           yield this.browser.setCookie(command.value);
           break;
         case "TYPE" /* TYPE */: {
-          let elementInteracted;
-          const target = command.target;
-          if (target.a11yData) {
-            elementInteracted = yield this.browser.click({
-              id: target.a11yData.id
-            });
-          } else if (target.elementDescriptor.length > 0) {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            elementInteracted = yield this.browser.click({
-              id: locator.id
-            });
-          }
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.click(target)
+          );
           yield this.browser.type(command.value, {
             clearContent: command.clearContent,
             pressKeysSequentially: command.pressKeysSequentially
@@ -2337,6 +2564,18 @@ var AgentController = class {
             result2.succeedImmediatelyReason = "URL changed";
           }
           return result2;
+        }
+        case "HOVER" /* HOVER */: {
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.hover(target)
+          );
+          return {
+            succeedImmediately: false,
+            urlAfterCommand: this.browser.url,
+            elementInteracted
+          };
         }
         case "PRESS" /* PRESS */:
           yield this.browser.press(command.value);
