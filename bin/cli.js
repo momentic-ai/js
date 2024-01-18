@@ -1,9 +1,7 @@
 #!/usr/bin/env node
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
@@ -32,19 +30,6 @@ var __objRest = (source, exclude) => {
     }
   return target;
 };
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __reExport = (target, mod, secondTarget) => (__copyProps(target, mod, "default"), secondTarget && __copyProps(secondTarget, mod, "default"));
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -67,31 +52,10 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // src/cli.ts
-import { Command as Command4, Option } from "commander";
+import { Command as Command3, Option as Option2 } from "commander";
 
 // package.json
 var version = "1.0.0";
-
-// src/install-browsers.ts
-import { registry } from "playwright-core/lib/server";
-function installBrowsers() {
-  return __async(this, null, function* () {
-    const executables = registry.defaultExecutables();
-    yield registry.install(executables, false);
-  });
-}
-
-// src/run-tests-locally.ts
-import exec from "@actions/exec";
-import io from "@actions/io";
-import chalk from "chalk";
-import quote from "quote";
-import parseArgsStringToArgv2 from "string-argv";
-import waitOnFn from "wait-on";
-
-// ../../packages/types/src/commands.ts
-import dedent from "dedent";
-import * as z2 from "zod";
 
 // ../../packages/types/src/a11y-targets.ts
 import * as z from "zod";
@@ -107,7 +71,21 @@ var A11yTargetWithCacheSchema = z.object({
   serializedForm: z.string().optional()
 });
 
+// ../../packages/types/src/assertions.ts
+import { z as z2 } from "zod";
+var AIAssertionResultSchema = z2.object({
+  thoughts: z2.string(),
+  result: z2.boolean(),
+  relevantElements: z2.array(z2.number()).optional()
+});
+
+// ../../packages/types/src/ai-command-generation.ts
+import parseArgsStringToArgv from "string-argv";
+import { z as z4 } from "zod";
+
 // ../../packages/types/src/commands.ts
+import dedent from "dedent";
+import * as z3 from "zod";
 var CommandType = /* @__PURE__ */ ((CommandType2) => {
   CommandType2["AI_ASSERTION"] = "AI_ASSERTION";
   CommandType2["CLICK"] = "CLICK";
@@ -123,130 +101,137 @@ var CommandType = /* @__PURE__ */ ((CommandType2) => {
   CommandType2["REFRESH"] = "REFRESH";
   CommandType2["TAB"] = "TAB";
   CommandType2["COOKIE"] = "COOKIE";
+  CommandType2["HOVER"] = "HOVER";
   CommandType2["SUCCESS"] = "SUCCESS";
   return CommandType2;
 })(CommandType || {});
-var ElementDescriptorSchema = z2.object({
+var ElementTargetSchema = z3.object({
   // natural language passed to LLM
-  elementDescriptor: z2.string(),
+  elementDescriptor: z3.string(),
   // Cached A11y target - when a user creates a preset action, this will not exist
   a11yData: A11yTargetWithCacheSchema.optional()
 });
-var CommonCommandSchema = z2.object({
+var CommonCommandSchema = z3.object({
   // If the command is suggested by AI, why it did so
-  thoughts: z2.string().optional()
+  thoughts: z3.string().optional()
 });
 var NavigateCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("NAVIGATE" /* NAVIGATE */),
-    url: z2.string()
+  z3.object({
+    type: z3.literal("NAVIGATE" /* NAVIGATE */),
+    url: z3.string()
   })
 ).describe("NAVIGATE <url> - Go to the specified url");
 var ScrollUpCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("SCROLL_UP" /* SCROLL_UP */)
+  z3.object({
+    type: z3.literal("SCROLL_UP" /* SCROLL_UP */)
   })
 ).describe("SCROLL_UP - Scroll up one page");
 var ScrollDownCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("SCROLL_DOWN" /* SCROLL_DOWN */)
+  z3.object({
+    type: z3.literal("SCROLL_DOWN" /* SCROLL_DOWN */)
   })
 ).describe("SCROLL_DOWN - Scroll down one page");
 var WaitCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("WAIT" /* WAIT */),
-    delay: z2.number()
+  z3.object({
+    type: z3.literal("WAIT" /* WAIT */),
+    delay: z3.number()
     // seconds
   })
 );
 var RefreshCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("REFRESH" /* REFRESH */)
+  z3.object({
+    type: z3.literal("REFRESH" /* REFRESH */)
   })
 );
 var GoBackCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("GO_BACK" /* GO_BACK */)
+  z3.object({
+    type: z3.literal("GO_BACK" /* GO_BACK */)
   })
 );
 var GoForwardCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("GO_FORWARD" /* GO_FORWARD */)
+  z3.object({
+    type: z3.literal("GO_FORWARD" /* GO_FORWARD */)
   })
 );
 var ClickCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("CLICK" /* CLICK */),
-    target: ElementDescriptorSchema,
-    doubleClick: z2.boolean().default(false),
-    rightClick: z2.boolean().default(false)
+  z3.object({
+    type: z3.literal("CLICK" /* CLICK */),
+    target: ElementTargetSchema,
+    doubleClick: z3.boolean().default(false),
+    rightClick: z3.boolean().default(false)
   })
 ).describe(
   dedent`CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
-  `.replace("\n", " ")
+  `.replaceAll("\n", " ")
+);
+var HoverCommandSchema = CommonCommandSchema.merge(
+  z3.object({
+    type: z3.literal("HOVER" /* HOVER */),
+    target: ElementTargetSchema
+  })
 );
 var SelectOptionCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("SELECT_OPTION" /* SELECT_OPTION */),
-    target: ElementDescriptorSchema,
-    option: z2.string()
+  z3.object({
+    type: z3.literal("SELECT_OPTION" /* SELECT_OPTION */),
+    target: ElementTargetSchema,
+    option: z3.string()
   })
 ).describe(
   // TODO: if we move to a non-mutative way of selecting elements (e.g. by selector), we should update this description
   `SELECT_OPTION <id> "<option>" - select the specified item from the select with the specified id. The item should exist on the page. Use the name of the item instead of the id. Make sure to include quotes around the option.`
 );
 var AIAssertionCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("AI_ASSERTION" /* AI_ASSERTION */),
-    assertion: z2.string(),
-    useVision: z2.boolean().default(false),
-    disableCache: z2.boolean().default(false)
+  z3.object({
+    type: z3.literal("AI_ASSERTION" /* AI_ASSERTION */),
+    assertion: z3.string(),
+    useVision: z3.boolean().default(false),
+    disableCache: z3.boolean().default(false)
   })
 );
-var TypeOptionsSchema = z2.object({
-  clearContent: z2.boolean().default(true),
-  pressKeysSequentially: z2.boolean().default(false)
+var TypeOptionsSchema = z3.object({
+  clearContent: z3.boolean().default(true),
+  pressKeysSequentially: z3.boolean().default(false)
 });
 var TypeCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("TYPE" /* TYPE */),
-    target: ElementDescriptorSchema,
-    value: z2.string(),
-    pressEnter: z2.boolean().default(false)
+  z3.object({
+    type: z3.literal("TYPE" /* TYPE */),
+    target: ElementTargetSchema,
+    value: z3.string(),
+    pressEnter: z3.boolean().default(false)
   })
 ).merge(TypeOptionsSchema).describe(
   `TYPE <id> "<text>" - type the specified text into the input with the specified id. The text should be specified by the user - do not use text from the EXAMPLES or generate text yourself. Make sure to include quotes around the text.`
 );
 var PressCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("PRESS" /* PRESS */),
-    value: z2.string()
+  z3.object({
+    type: z3.literal("PRESS" /* PRESS */),
+    value: z3.string()
   })
 ).describe(
   `PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.`
 );
 var TabCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("TAB" /* TAB */),
-    url: z2.string()
+  z3.object({
+    type: z3.literal("TAB" /* TAB */),
+    url: z3.string()
   })
 );
 var CookieCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("COOKIE" /* COOKIE */),
-    value: z2.string()
+  z3.object({
+    type: z3.literal("COOKIE" /* COOKIE */),
+    value: z3.string()
   })
 );
 var SuccessCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("SUCCESS" /* SUCCESS */),
+  z3.object({
+    type: z3.literal("SUCCESS" /* SUCCESS */),
     condition: AIAssertionCommandSchema.optional()
   })
 ).describe("SUCCESS - the user goal has been successfully achieved");
-var UserEditableAICommandSchema = z2.discriminatedUnion("type", [
+var UserEditableAICommandSchema = z3.discriminatedUnion("type", [
   ClickCommandSchema,
   TypeCommandSchema,
   PressCommandSchema,
@@ -256,97 +241,33 @@ var UserEditableAICommandSchema = z2.discriminatedUnion("type", [
   ScrollUpCommandSchema,
   SuccessCommandSchema
 ]);
-var UserEditablePresetCommandSchema = z2.discriminatedUnion("type", [
+var UserEditablePresetCommandSchema = z3.discriminatedUnion("type", [
   GoBackCommandSchema,
   GoForwardCommandSchema,
   RefreshCommandSchema,
   AIAssertionCommandSchema,
   WaitCommandSchema,
   TabCommandSchema,
-  CookieCommandSchema
+  CookieCommandSchema,
+  HoverCommandSchema
 ]);
-var CommandSchema = z2.discriminatedUnion("type", [
+var CommandSchema = z3.discriminatedUnion("type", [
   // Commands that can be either specified manually or auto-created by AI in an AI step
   ...UserEditableAICommandSchema.options,
   // Commands that can only be specified manually ("preset commands")
   ...UserEditablePresetCommandSchema.options
 ]);
 var FailureCommandSchema = CommonCommandSchema.merge(
-  z2.object({
-    type: z2.literal("FAILURE")
+  z3.object({
+    type: z3.literal("FAILURE")
   })
 ).describe(
   "FAILURE - there are no commands to suggest that could make progress that have not already been tried before"
 );
-var AICommandSchema = z2.discriminatedUnion("type", [
+var AICommandSchema = z3.discriminatedUnion("type", [
   ...UserEditableAICommandSchema.options,
   FailureCommandSchema
 ]);
-
-// ../../packages/types/src/steps.ts
-import * as z3 from "zod";
-var StepType = /* @__PURE__ */ ((StepType2) => {
-  StepType2["AI_ACTION"] = "AI_ACTION";
-  StepType2["PRESET_ACTION"] = "PRESET_ACTION";
-  StepType2["MODULE"] = "MODULE";
-  return StepType2;
-})(StepType || {});
-var AIActionSchema = z3.object({
-  type: z3.literal("AI_ACTION" /* AI_ACTION */),
-  text: z3.string(),
-  // Cached commands for this step
-  commands: z3.array(UserEditableAICommandSchema).optional()
-});
-var PresetActionSchema = z3.object({
-  type: z3.literal("PRESET_ACTION" /* PRESET_ACTION */),
-  command: CommandSchema
-});
-var ModuleStepSchema = z3.object({
-  type: z3.literal("MODULE" /* MODULE */),
-  moduleId: z3.string().uuid()
-});
-var AllowedModuleStepSchema = z3.union([
-  AIActionSchema,
-  PresetActionSchema
-]);
-var ResolvedModuleStepSchema = z3.object({
-  type: z3.literal("RESOLVED_MODULE"),
-  moduleId: z3.string().uuid(),
-  name: z3.string(),
-  steps: AllowedModuleStepSchema.array()
-});
-var StepSchema = z3.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ModuleStepSchema
-]);
-var ResolvedStepSchema = z3.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ResolvedModuleStepSchema
-]);
-
-// ../../node_modules/.pnpm/playwright@1.40.1/node_modules/playwright/index.mjs
-var playwright_exports = {};
-__export(playwright_exports, {
-  default: () => playwright_default
-});
-__reExport(playwright_exports, playwright_core_star);
-import * as playwright_core_star from "playwright-core";
-import playwright from "playwright-core";
-var playwright_default = playwright;
-
-// ../../packages/types/src/assertions.ts
-import { z as z4 } from "zod";
-var AIAssertionResultSchema = z4.object({
-  thoughts: z4.string(),
-  result: z4.boolean(),
-  relevantElements: z4.array(z4.number()).optional()
-});
-
-// ../../packages/types/src/ai-command-generation.ts
-import parseArgsStringToArgv from "string-argv";
-import { z as z5 } from "zod";
 
 // ../../packages/types/src/errors.ts
 var BrowserExecutionError = class extends Error {
@@ -363,14 +284,60 @@ var EmptyA11yTreeError = class extends Error {
 };
 
 // ../../packages/types/src/ai-command-generation.ts
-var LLMOutputSchema = z5.object({
-  command: z5.string(),
-  thoughts: z5.string()
+var LLMOutputSchema = z4.object({
+  command: z4.string(),
+  thoughts: z4.string()
 });
-var NumericStringSchema = z5.string().pipe(z5.coerce.number());
+var NumericStringSchema = z4.string().pipe(z4.coerce.number());
 
 // ../../packages/types/src/command-results.ts
 import * as z6 from "zod";
+
+// ../../packages/types/src/steps.ts
+import * as z5 from "zod";
+var LATEST_VERSION = "1.0.6";
+var StepType = /* @__PURE__ */ ((StepType2) => {
+  StepType2["AI_ACTION"] = "AI_ACTION";
+  StepType2["PRESET_ACTION"] = "PRESET_ACTION";
+  StepType2["MODULE"] = "MODULE";
+  return StepType2;
+})(StepType || {});
+var AIActionSchema = z5.object({
+  type: z5.literal("AI_ACTION" /* AI_ACTION */),
+  text: z5.string(),
+  // Cached commands for this step
+  commands: z5.array(UserEditableAICommandSchema).optional()
+});
+var PresetActionSchema = z5.object({
+  type: z5.literal("PRESET_ACTION" /* PRESET_ACTION */),
+  command: CommandSchema
+});
+var ModuleStepSchema = z5.object({
+  type: z5.literal("MODULE" /* MODULE */),
+  moduleId: z5.string().uuid()
+});
+var AllowedModuleStepSchema = z5.union([
+  AIActionSchema,
+  PresetActionSchema
+]);
+var ResolvedModuleStepSchema = z5.object({
+  type: z5.literal("RESOLVED_MODULE"),
+  moduleId: z5.string().uuid(),
+  name: z5.string(),
+  steps: AllowedModuleStepSchema.array()
+});
+var StepSchema = z5.union([
+  AIActionSchema,
+  PresetActionSchema,
+  ModuleStepSchema
+]);
+var ResolvedStepSchema = z5.union([
+  AIActionSchema,
+  PresetActionSchema,
+  ResolvedModuleStepSchema
+]);
+
+// ../../packages/types/src/command-results.ts
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
   ResultStatus2["SUCCESS"] = "SUCCESS";
   ResultStatus2["FAILED"] = "FAILED";
@@ -501,6 +468,18 @@ var AILocatorSchema = z9.object({
   options: z9.array(z9.string()).optional()
 });
 
+// ../../packages/types/src/logger.ts
+var consoleLogger = {
+  info: console.log,
+  error: console.error,
+  debug: console.debug,
+  warn: console.warn,
+  child: () => consoleLogger,
+  flush: () => {
+  },
+  bindings: () => ({})
+};
+
 // ../../packages/types/src/modules.ts
 import { z as z10 } from "zod";
 var ModuleMetadataSchema = z10.object({
@@ -544,6 +523,7 @@ var RunMetadataSchema = z11.object({
   testId: z11.string().or(z11.null()),
   status: z11.nativeEnum(RunStatusEnum),
   trigger: z11.nativeEnum(RunTriggerEnum),
+  attempts: z11.number(),
   test: z11.object({
     name: z11.string(),
     id: z11.string()
@@ -561,104 +541,8 @@ var RunWithTestSchema = RunMetadataSchema.merge(
 );
 
 // ../../packages/types/src/serialization.ts
-function clampText(text, length) {
-  if (text.length < length) {
-    return text;
-  }
-  return text.slice(0, length - 3) + "[...]";
-}
-function serializeCommand(command) {
-  var _a, _b;
-  switch (command.type) {
-    case "SUCCESS" /* SUCCESS */:
-      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
-        return `Check success condition: ${command.condition.assertion}`;
-      }
-      return `All commands completed`;
-    case "NAVIGATE" /* NAVIGATE */:
-      return `Go to URL: ${clampText(command.url, 30)}`;
-    case "GO_BACK" /* GO_BACK */:
-      return `Go back to the previous page`;
-    case "GO_FORWARD" /* GO_FORWARD */:
-      return `Go forward to the next page`;
-    case "SCROLL_DOWN" /* SCROLL_DOWN */:
-      return `Scroll down one page`;
-    case "SCROLL_UP" /* SCROLL_UP */:
-      return `Scroll up one page`;
-    case "WAIT" /* WAIT */:
-      return `Wait for ${command.delay} seconds`;
-    case "REFRESH" /* REFRESH */:
-      return `Refresh the page`;
-    case "CLICK" /* CLICK */:
-      return `Click on '${command.target.elementDescriptor}'`;
-    case "TYPE" /* TYPE */:
-      let serializedTarget = "";
-      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
-        serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
-      } else if (command.target.elementDescriptor.length > 0) {
-        serializedTarget = ` in element ${command.target.elementDescriptor}`;
-      }
-      return `Type${serializedTarget}: '${command.value}'`;
-    case "PRESS" /* PRESS */:
-      return `Press '${command.value}'`;
-    case "SELECT_OPTION" /* SELECT_OPTION */:
-      return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
-    case "TAB" /* TAB */:
-      return `Switch to tab: ${command.url}`;
-    case "COOKIE" /* COOKIE */:
-      return `Set cookie: ${command.value}`;
-    case "AI_ASSERTION" /* AI_ASSERTION */:
-      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
-    default:
-      const assertUnreachable = (_x) => {
-        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-      };
-      return assertUnreachable(command);
-  }
-}
-
-// ../../packages/types/src/card-display.ts
-var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
-  Object.values(CommandType)
-);
-var CARD_DISPLAY_NAMES = {
-  ["AI_ACTION" /* AI_ACTION */]: "AI action",
-  ["MODULE" /* MODULE */]: "Module",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
-  ["CLICK" /* CLICK */]: "Click",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["TYPE" /* TYPE */]: "Type",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["GO_BACK" /* GO_BACK */]: "Go back",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
-  ["WAIT" /* WAIT */]: "Wait",
-  ["REFRESH" /* REFRESH */]: "Refresh",
-  ["TAB" /* TAB */]: "Switch tab",
-  ["COOKIE" /* COOKIE */]: "Set cookie",
-  ["SUCCESS" /* SUCCESS */]: "Done"
-};
-var CARD_DESCRIPTIONS = {
-  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
-  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
-  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
-  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
-  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
-  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
-  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
-  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
-  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
-  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
-  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
-};
+import { parse, stringify } from "yaml";
+import { z as z14 } from "zod";
 
 // ../../packages/types/src/test.ts
 import { z as z13 } from "zod";
@@ -690,65 +574,219 @@ var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
 var TestSettingsSchema = z12.object({
   name: z12.string().min(1),
   baseUrl: z12.string().url(),
+  retries: z12.coerce.number().min(0).max(10),
   advanced: TestAdvancedSettingsSchema
 });
 
 // ../../packages/types/src/test.ts
-var ResolvedTestSchema = z13.object({
+var BaseTestMetadataSchema = z13.object({
   id: z13.string(),
   name: z13.string(),
   baseUrl: z13.string(),
-  steps: z13.array(ResolvedStepSchema),
-  createdAt: z13.coerce.date(),
-  updatedAt: z13.coerce.date(),
-  createdBy: z13.string(),
-  organizationId: z13.string().or(z13.null()),
   schemaVersion: z13.string(),
   advanced: TestAdvancedSettingsSchema,
+  retries: z13.number()
+});
+var ExtendedTestMetadataSchema = z13.object({
+  createdAt: z13.coerce.date(),
+  updatedAt: z13.coerce.date(),
   schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema
+  webhooks: WebhookSettingsSchema,
+  createdBy: z13.string(),
+  organizationId: z13.string().or(z13.null())
+});
+var ResolvedTestSchema = BaseTestMetadataSchema.merge(
+  ExtendedTestMetadataSchema
+).merge(
+  z13.object({
+    steps: z13.array(ResolvedStepSchema)
+  })
+);
+var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
+  z13.object({
+    steps: z13.array(ResolvedStepSchema)
+  })
+);
+
+// ../../packages/types/src/serialization.ts
+function clampText(text, length) {
+  if (text.length < length) {
+    return text;
+  }
+  return text.slice(0, length - 3) + "[...]";
+}
+function serializeCommand(command) {
+  var _a, _b, _c;
+  switch (command.type) {
+    case "SUCCESS" /* SUCCESS */:
+      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
+        return `Check success condition: ${command.condition.assertion}`;
+      }
+      return `All commands completed`;
+    case "NAVIGATE" /* NAVIGATE */:
+      return `Go to URL: ${clampText(command.url, 30)}`;
+    case "GO_BACK" /* GO_BACK */:
+      return `Go back to the previous page`;
+    case "GO_FORWARD" /* GO_FORWARD */:
+      return `Go forward to the next page`;
+    case "SCROLL_DOWN" /* SCROLL_DOWN */:
+      return `Scroll down one page`;
+    case "SCROLL_UP" /* SCROLL_UP */:
+      return `Scroll up one page`;
+    case "WAIT" /* WAIT */:
+      return `Wait for ${command.delay} seconds`;
+    case "REFRESH" /* REFRESH */:
+      return `Refresh the page`;
+    case "CLICK" /* CLICK */:
+      return `Click on '${command.target.elementDescriptor}'`;
+    case "TYPE" /* TYPE */: {
+      let serializedTarget = "";
+      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
+        serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
+      } else if (command.target.elementDescriptor.length > 0) {
+        serializedTarget = ` in element ${command.target.elementDescriptor}`;
+      }
+      return `Type${serializedTarget}: '${command.value}'`;
+    }
+    case "HOVER" /* HOVER */: {
+      let serializedTarget = "";
+      if ((_c = command.target.a11yData) == null ? void 0 : _c.serializedForm) {
+        serializedTarget = ` over element: ${command.target.a11yData.serializedForm}`;
+      } else if (command.target.elementDescriptor.length > 0) {
+        serializedTarget = ` over element: ${command.target.elementDescriptor}`;
+      }
+      return `Hover${serializedTarget}`;
+    }
+    case "PRESS" /* PRESS */:
+      return `Press '${command.value}'`;
+    case "SELECT_OPTION" /* SELECT_OPTION */:
+      return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
+    case "TAB" /* TAB */:
+      return `Switch to tab: ${command.url}`;
+    case "COOKIE" /* COOKIE */:
+      return `Set cookie: ${command.value}`;
+    case "AI_ASSERTION" /* AI_ASSERTION */:
+      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
+    default:
+      const assertUnreachable = (_x) => {
+        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
+      };
+      return assertUnreachable(command);
+  }
+}
+var TestSerializationResultSchema = z14.object({
+  test: z14.string().describe("YAML for the test, including metadata and steps"),
+  modules: z14.record(z14.string(), z14.string()).describe("Map of module name to YAML for the module")
+});
+var SerializedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: StepSchema.array()
+  })
+);
+var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
+  type: true
+}).merge(
+  z14.object({
+    schemaVersion: z14.string()
+  })
+);
+var DeserializedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: z14.array(z14.record(z14.string(), z14.unknown()))
+  })
+);
+var DeserializedModuleSchema = z14.object({
+  moduleId: z14.string().uuid(),
+  name: z14.string(),
+  schemaVersion: z14.string(),
+  steps: z14.array(z14.record(z14.string(), z14.unknown()))
 });
 
+// ../../packages/types/src/card-display.ts
+var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
+  Object.values(CommandType)
+);
+var CARD_DISPLAY_NAMES = {
+  ["AI_ACTION" /* AI_ACTION */]: "AI action",
+  ["MODULE" /* MODULE */]: "Module",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
+  ["CLICK" /* CLICK */]: "Click",
+  ["HOVER" /* HOVER */]: "Hover",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
+  ["TYPE" /* TYPE */]: "Type",
+  ["PRESS" /* PRESS */]: "Press",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
+  ["GO_BACK" /* GO_BACK */]: "Go back",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
+  ["WAIT" /* WAIT */]: "Wait",
+  ["REFRESH" /* REFRESH */]: "Refresh",
+  ["TAB" /* TAB */]: "Switch tab",
+  ["COOKIE" /* COOKIE */]: "Set cookie",
+  ["SUCCESS" /* SUCCESS */]: "Done"
+};
+var CARD_DESCRIPTIONS = {
+  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
+  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
+  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
+  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
+  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
+  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
+  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
+  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
+  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
+  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
+  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
+  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
+};
+
 // ../../packages/types/src/context.ts
-import * as z14 from "zod";
-var DynamicContextSchema = z14.object({
+import * as z15 from "zod";
+var DynamicContextSchema = z15.object({
   // user goal or instruction
-  goal: z14.string(),
+  goal: z15.string(),
   // current url of the browser
-  url: z14.string(),
+  url: z15.string(),
   // serialized page state
-  browserState: z14.string(),
+  browserState: z15.string(),
   // serialized history of previous commands
-  history: z14.string(),
+  history: z15.string(),
   // number of previously executed commands
-  numPrevious: z14.number(),
+  numPrevious: z15.number(),
   // last executed command, if any
-  lastCommand: ExecuteCommandHistoryEntrySchema.or(z14.null())
+  lastCommand: ExecuteCommandHistoryEntrySchema.or(z15.null())
 });
 
 // ../../packages/types/src/public-api.ts
-import * as z15 from "zod";
-var GeneratorOptionsSchema = z15.object({
-  disableCache: z15.boolean()
+import * as z16 from "zod";
+var GeneratorOptionsSchema = z16.object({
+  disableCache: z16.boolean()
 });
 var GetNextCommandBodySchema = DynamicContextSchema.merge(
   GeneratorOptionsSchema
 );
 var GetNextCommandResponseSchema = AICommandSchema;
-var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
+var GetAssertionResultBodySchema = z16.discriminatedUnion("vision", [
   DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
-    z15.object({
-      vision: z15.literal(false)
+    z16.object({
+      vision: z16.literal(false)
     })
   ),
   DynamicContextSchema.pick({
     goal: true,
     url: true
   }).merge(GeneratorOptionsSchema).merge(
-    z15.object({
+    z16.object({
       // base64 encoded image
-      screenshot: z15.string(),
-      vision: z15.literal(true)
+      screenshot: z16.string(),
+      vision: z16.literal(true)
     })
   )
 ]);
@@ -762,30 +800,387 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   goal: true,
   url: true
 }).merge(GeneratorOptionsSchema);
-var SplitGoalResponseSchema = z15.string().array();
-var QueueTestsBodySchema = z15.object({
-  testIds: z15.string().array()
-});
+var SplitGoalResponseSchema = z16.string().array();
+var QueueTestsBodySchema = z16.object({
+  testPaths: z16.string().array(),
+  testIds: z16.string().array()
+}).partial();
 var GetTestResponseSchema = ResolvedTestSchema;
-var CreateRunBodySchema = z15.object({
-  testId: z15.string(),
-  trigger: z15.nativeEnum(RunTriggerEnum)
+var ExportTestBodySchema = z16.object({
+  path: z16.string()
 });
+var ExportTestResponseSchema = TestSerializationResultSchema;
+var TestWithModulesYAMLSchema = z16.object({
+  test: z16.string().describe("test YAML"),
+  modules: z16.record(
+    z16.string().describe("moduleId"),
+    z16.string().describe("module YAML")
+  )
+});
+var UpdateTestsBodySchema = TestWithModulesYAMLSchema.array();
+var CreateRunBodySchema = z16.object({
+  testPath: z16.string(),
+  testId: z16.string()
+}).partial().merge(
+  z16.object({
+    trigger: z16.nativeEnum(RunTriggerEnum)
+  })
+);
 var CreateRunResponseSchema = RunWithTestSchema;
 var GetRunResponseSchema = RunWithTestSchema;
-var UpdateRunBodySchema = z15.object({
-  startedAt: z15.coerce.date(),
-  finishedAt: z15.coerce.date(),
+var UpdateRunBodySchema = z16.object({
+  startedAt: z16.coerce.date(),
+  finishedAt: z16.coerce.date(),
   results: ResultSchema.array(),
-  status: z15.nativeEnum(RunStatusEnum)
+  status: z16.nativeEnum(RunStatusEnum)
 }).partial();
-var CreateScreenshotBodySchema = z15.object({
+var CreateScreenshotBodySchema = z16.object({
   // base64 string
-  screenshot: z15.string()
+  screenshot: z16.string()
 });
-var CreateScreenshotResponseSchema = z15.object({
-  key: z15.string()
+var CreateScreenshotResponseSchema = z16.object({
+  key: z16.string()
 });
+
+// src/api-client.ts
+var API_VERSION = "v1";
+var APIClient = class {
+  constructor(params) {
+    this.baseURL = params.baseURL;
+    this.apiKey = params.apiKey;
+  }
+  getRun(runId) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/runs/${runId}`, {
+        method: "GET"
+      });
+      return GetRunResponseSchema.parse(result);
+    });
+  }
+  createRun(body) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/runs`, {
+        method: "POST",
+        body
+      });
+      return CreateRunResponseSchema.parse(result);
+    });
+  }
+  updateRun(runId, body) {
+    return __async(this, null, function* () {
+      yield this.sendRequest(`/${API_VERSION}/runs/${runId}`, {
+        method: "PATCH",
+        body
+      });
+    });
+  }
+  getTest(testPath) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/tests/${testPath}`, {
+        method: "GET"
+      });
+      return GetTestResponseSchema.parse(result);
+    });
+  }
+  getTestYAMLExport(body) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/tests/export`, {
+        method: "POST",
+        body
+      });
+      return ExportTestResponseSchema.parse(result);
+    });
+  }
+  updateTestWithYAML(body) {
+    return __async(this, null, function* () {
+      yield this.sendRequest(`/${API_VERSION}/tests/update`, {
+        method: "POST",
+        body
+      });
+    });
+  }
+  queueTests(body) {
+    return __async(this, null, function* () {
+      yield this.sendRequest(`/${API_VERSION}/tests/queue`, {
+        method: "POST",
+        body
+      });
+    });
+  }
+  uploadScreenshot(body) {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/screenshots`, {
+        method: "POST",
+        body
+      });
+      return CreateScreenshotResponseSchema.parse(result);
+    });
+  }
+  sendRequest(path2, options) {
+    return __async(this, null, function* () {
+      const response = yield fetch(`${this.baseURL}${path2}`, {
+        method: options.method,
+        body: options.body ? JSON.stringify(options.body) : void 0,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${this.apiKey}`
+        }
+      });
+      if (!response.ok) {
+        let body;
+        try {
+          body = yield response.json();
+        } catch (err) {
+          body = yield response.text();
+        }
+        throw new Error(
+          `Request to ${path2} failed with status ${response.status}: ${JSON.stringify(body)}`
+        );
+      }
+      if (response.status === 204) {
+        return response.text();
+      }
+      return response.json();
+    });
+  }
+};
+
+// src/install-browsers.ts
+import { registry } from "playwright-core/lib/server";
+function installBrowsers() {
+  return __async(this, null, function* () {
+    const executables = registry.defaultExecutables();
+    yield registry.install(executables, false);
+  });
+}
+
+// src/options.ts
+import { Argument, Option } from "commander";
+var apiKeyOption = new Option(
+  "--api-key <key>",
+  "API key for authentication. If not supplied, attempts to read the MOMENTIC_API_KEY env var."
+).env("MOMENTIC_API_KEY").makeOptionMandatory(true);
+var serverAddressOption = new Option(
+  "--server <server>",
+  "Momentic server to use. Leave unchanged unless using Momentic on-premise."
+).default("https://api.momentic.ai");
+var yesOption = new Option("-y, --yes", "Skip confirmation prompts.");
+var testNameArgument = new Argument(
+  "<test>",
+  "Name of a test (case insensitive). Spaces may be replaced with dashes, such as `hello-world`."
+).argRequired();
+var testsVariadicArgument = new Argument(
+  "<tests...>",
+  "Names of tests (case insensitive). Spaces may be replaced with dashes, such as `hello-world`. If using --local, you may also specify paths to Momentic YAML files locally."
+).argRequired();
+var pathsVariadicArgument = new Argument(
+  "<paths...>",
+  "File paths pointing to one or more YAML files containing Momentic tests, or a directory of Momentic YAML files."
+);
+
+// src/prompt.ts
+import chalk from "chalk";
+import readline from "readline/promises";
+function promptForConfirmation(question, yellow) {
+  return __async(this, null, function* () {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    });
+    question = `${question} (y/N) `;
+    const questionContent = yellow ? chalk.yellow(question) : question;
+    const answer = yield rl.question(questionContent);
+    rl.close();
+    if (answer.toLowerCase() === "y") {
+      return true;
+    } else {
+      return false;
+    }
+  });
+}
+
+// src/pull-test.ts
+import chalk2 from "chalk";
+import { existsSync, mkdirSync, writeFileSync } from "fs";
+import { join } from "path";
+
+// src/constants.ts
+var MODULES_FOLDER_NAME = "modules";
+
+// src/pull-test.ts
+function fetchAndSaveTestToDisk(_0) {
+  return __async(this, arguments, function* ({
+    name,
+    client
+  }) {
+    if (name.endsWith(".yaml")) {
+      name = name.slice(0, -5);
+    }
+    const testPath = nameToYAMLFileName(name);
+    const { test, modules } = yield client.getTestYAMLExport({ path: name });
+    if (!(yield checkAndPromptForOverwrite(testPath))) {
+      console.log(chalk2.red("Pull cancelled"));
+      return;
+    }
+    writeFileSync(testPath, test, "utf-8");
+    console.log(
+      // escape spaces in name when printing
+      chalk2.green(`Wrote '${testPath}'`)
+    );
+    const numModules = Object.keys(modules).length;
+    if (numModules > 0) {
+      if (!existsSync(MODULES_FOLDER_NAME)) {
+        mkdirSync(MODULES_FOLDER_NAME);
+      }
+    }
+    for (const [moduleName, moduleYAML] of Object.entries(modules)) {
+      const modulePath = join("modules", nameToYAMLFileName(moduleName));
+      if (!(yield checkAndPromptForOverwrite(modulePath))) {
+        console.log(chalk2.red("Pull cancelled"));
+        return;
+      }
+      writeFileSync(modulePath, moduleYAML, "utf-8");
+      console.log(chalk2.green(`Wrote '${modulePath}'`));
+    }
+    console.log(
+      chalk2.green(
+        `Pulled 1 test${numModules ? ` and ${numModules} modules` : ""}!`
+      )
+    );
+  });
+}
+function checkAndPromptForOverwrite(path2) {
+  return __async(this, null, function* () {
+    if (!existsSync(path2)) {
+      return true;
+    }
+    return promptForConfirmation(
+      `File '${path2.replace(/(\s+)/g, "\\$1")}' already exists. Overwrite?`,
+      true
+    );
+  });
+}
+function nameToYAMLFileName(name) {
+  return `${name.toLowerCase().replaceAll(" ", "-")}`;
+}
+
+// src/push-test.ts
+import chalk3 from "chalk";
+import { existsSync as existsSync2, readFileSync, readdirSync, statSync } from "fs";
+import path from "path";
+function saveTestToServer(params) {
+  return __async(this, null, function* () {
+    const rootTestPaths = /* @__PURE__ */ new Set();
+    for (const testPathOrDir of params.paths) {
+      const fullPath = path.resolve(testPathOrDir);
+      if (fullPath && existsSync2(fullPath) && statSync(fullPath).isDirectory()) {
+        const files = readdirSync(fullPath);
+        for (const file of files) {
+          if (file.endsWith(".yaml")) {
+            rootTestPaths.add(path.join(fullPath, file));
+          }
+        }
+      }
+      if (fullPath.endsWith(".yaml")) {
+        if (!existsSync2(fullPath) || !statSync(fullPath).isFile()) {
+          throw new Error(`File not found or unreadable: ${fullPath}`);
+        }
+        rootTestPaths.add(fullPath);
+      }
+    }
+    console.log(`Found ${rootTestPaths.size} test(s) to push:`);
+    rootTestPaths.forEach((testPath) => console.log(`  - ${testPath}`));
+    console.log(`Loading file contents and resolving dependent modules`);
+    const testUpdates = Array.from(rootTestPaths).map(readTestWithModules);
+    const moduleIds = new Set(
+      testUpdates.flatMap((update) => Object.keys(update.modules))
+    );
+    console.log(
+      `Pushing ${rootTestPaths.size} test(s) and ${moduleIds.size} module(s)`
+    );
+    if (!params.yes) {
+      const warning = "Pushing tests overwrites tests on production and will instantly affect scheduled runs. Continue?";
+      if (!(yield promptForConfirmation(warning, true))) {
+        console.log(chalk3.red("Push cancelled"));
+        return;
+      }
+    }
+    yield params.client.updateTestWithYAML(testUpdates);
+    console.log(chalk3.green("Update successful!"));
+  });
+}
+function readTestWithModules(testFilePath) {
+  let testContent;
+  try {
+    testContent = readFileSync(testFilePath, "utf8");
+    testContent = testContent.replace(/\r\n|\r/g, "\n");
+  } catch (err) {
+    throw new Error(`Could not read test file ${testFilePath}: ${err}`);
+  }
+  const moduleIds = /* @__PURE__ */ new Set();
+  const moduleIdRegex = /moduleId: (.*)/g;
+  let moduleIdMatch;
+  while ((moduleIdMatch = moduleIdRegex.exec(testContent)) !== null) {
+    moduleIds.add(moduleIdMatch[1].trim());
+  }
+  const modules = {};
+  if (moduleIds.size > 0) {
+    const modulesDir = findModulesDir(testFilePath);
+    moduleIds.forEach((moduleId) => {
+      if (!modules[moduleId]) {
+        modules[moduleId] = getModuleFile(modulesDir, moduleId);
+      }
+    });
+  }
+  return {
+    test: testContent,
+    modules
+  };
+}
+function findModulesDir(startDir) {
+  let currentDir = startDir;
+  while (currentDir !== "/") {
+    const modulesDir = path.join(currentDir, MODULES_FOLDER_NAME);
+    if (existsSync2(modulesDir)) {
+      return modulesDir;
+    } else {
+      currentDir = path.dirname(currentDir);
+    }
+  }
+  throw new Error(
+    `No '${MODULES_FOLDER_NAME}' directory found in the path ${startDir} or any of its parents`
+  );
+}
+function getModuleFile(dir, moduleId) {
+  const files = readdirSync(dir);
+  for (const file of files) {
+    const filePath = path.join(dir, file);
+    const fileContent = readFileSync(filePath, "utf8");
+    if (fileContent.includes(moduleId)) {
+      return fileContent;
+    }
+  }
+  throw new Error(
+    `Could not find module file for module ${moduleId} in ${dir}`
+  );
+}
+
+// src/run-tests-locally.ts
+import exec from "@actions/exec";
+import io from "@actions/io";
+import chalk5 from "chalk";
+import quote from "quote";
+import parseArgsStringToArgv2 from "string-argv";
+import waitOnFn from "wait-on";
+
+// ../../packages/web-agent/src/browsers/chrome.ts
+import { distance as distance2 } from "fastest-levenshtein";
+import {
+  chromium,
+  devices
+} from "playwright";
+import { addExtra } from "playwright-extra";
+import pluginStealth from "puppeteer-extra-plugin-stealth";
 
 // ../../packages/web-agent/src/utils/url.ts
 var urlChanged = (url1, url2) => {
@@ -793,6 +1188,29 @@ var urlChanged = (url1, url2) => {
   const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
   return hostname !== hostname2 || pathname !== pathname2;
 };
+
+// ../../packages/web-agent/src/browsers/a11y.ts
+import { distance } from "fastest-levenshtein";
+
+// ../../packages/web-agent/src/browsers/constants.ts
+var RETINA_WINDOW_SCALE_FACTOR = 2;
+var MAX_LOAD_TIMEOUT_MS = 8e3;
+var NETWORK_STABLE_DURATION_MS = 1250;
+var NETWORK_IDLE_TIMEOUT_MS = 3e3;
+var CHECK_INTERVAL_MS = 250;
+var A11Y_LOAD_TIMEOUT_MS = 1e3;
+var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
+var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
+var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
+var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
+var HIGHLIGHT_DURATION_MS = 3e3;
+var MAX_LEVENSHTEIN_DISTANCE = 300;
+var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.25;
+var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
+  "about:blank",
+  "chrome-error://chromewebdata/"
+]);
+var MAX_BROWSER_ACTION_ATTEMPTS = 2;
 
 // ../../packages/web-agent/src/browsers/a11y.ts
 var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
@@ -807,7 +1225,8 @@ var defaultA11yNodeSerializeParams = {
   indentLevel: 0,
   noID: false,
   noChildren: false,
-  noProperties: false
+  noProperties: false,
+  maxLevel: void 0
 };
 var ProcessedA11yNode = class {
   constructor(params) {
@@ -878,14 +1297,15 @@ var ProcessedA11yNode = class {
         }
       });
     }
-    if (this.children.length === 0 || noChildren) {
+    const maxLevelExceeded = opts.maxLevel !== void 0 && indentLevel / 2 >= opts.maxLevel;
+    if (this.children.length === 0 || noChildren || maxLevelExceeded) {
       s += " />\n";
       return s;
     } else {
       s += ">\n";
     }
     for (const child of this.children) {
-      s += child.serialize({ indentLevel: indentLevel + 2 });
+      s += child.serialize(__spreadProps(__spreadValues({}, opts), { indentLevel: indentLevel + 2 }));
     }
     s += `${indent}</${this.role}>
 `;
@@ -1043,6 +1463,30 @@ function processA11yTree(graph) {
   }
   return new ProcessedA11yTree(processedRoot[0], outputNodeMap);
 }
+var saveNodeDetailsToCache = (node, target) => {
+  target.id = parseInt(node.id);
+  target.content = node.content;
+  target.name = node.name;
+  target.role = node.role;
+  target.serializedForm = node.serialize({ noID: true, maxLevel: 1 });
+};
+var getNodeComparisonScore = (node, target) => {
+  var _a;
+  let score = 0;
+  if (node.role === target.role) {
+    score++;
+  }
+  const attrs = ["name", "content"];
+  for (const attr of attrs) {
+    if (!((_a = node[attr]) == null ? void 0 : _a.trim())) {
+      continue;
+    }
+    if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_CHANGE_RATIO) {
+      score++;
+    }
+  }
+  return score;
+};
 
 // ../../packages/web-agent/src/browsers/cdp.ts
 var GREEN = { r: 147, g: 196, b: 125, a: 0.55 };
@@ -1061,24 +1505,6 @@ var NODE_HIGHLIGHT_CONFIG = {
   shapeColor: GREEN,
   shapeMarginColor: GREEN
 };
-
-// ../../packages/web-agent/src/browsers/constants.ts
-var RETINA_WINDOW_SCALE_FACTOR = 2;
-var MAX_LOAD_TIMEOUT_MS = 8e3;
-var NETWORK_STABLE_DURATION_MS = 1250;
-var NETWORK_IDLE_TIMEOUT_MS = 3e3;
-var CHECK_INTERVAL_MS = 250;
-var A11Y_LOAD_TIMEOUT_MS = 1e3;
-var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
-var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
-var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var HIGHLIGHT_DURATION_MS = 3e3;
-var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
-  "about:blank",
-  "chrome-error://chromewebdata/"
-]);
-var MAX_BROWSER_ACTION_ATTEMPTS = 2;
 
 // ../../packages/web-agent/src/browsers/utils/time.ts
 var sleep = (ms = 1e3) => {
@@ -1174,6 +1600,8 @@ function isRequestRelevantForPageLoad(request, currentURL) {
 }
 
 // ../../packages/web-agent/src/browsers/chrome.ts
+var chromiumWithExtra = addExtra(chromium);
+chromiumWithExtra.use(pluginStealth());
 function initCDPSession(cdpClient) {
   return __async(this, null, function* () {
     yield cdpClient.send("Accessibility.enable");
@@ -1204,7 +1632,7 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield playwright_exports.chromium.launch({ headless: true });
+      const browser = yield chromiumWithExtra.launch({ headless: true });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -1212,7 +1640,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         },
         // comment out the below if you are on Mac OS but you're using a monitor
         deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: playwright_exports.devices["Desktop Chrome"].userAgent,
+        userAgent: devices["Desktop Chrome"].userAgent,
         geolocation: { latitude: 37.7749, longitude: -122.4194 },
         // san francisco
         locale: "en-US",
@@ -1367,7 +1795,11 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, arguments, function* (text, options = {}) {
       const { clearContent = true, pressKeysSequentially = false } = options;
       if (clearContent) {
-        yield this.page.keyboard.press("Meta+A");
+        if (process.platform === "darwin") {
+          yield this.page.keyboard.press("Meta+A");
+        } else {
+          yield this.page.keyboard.press("Control+A");
+        }
         yield this.page.keyboard.press("Backspace");
       }
       if (pressKeysSequentially) {
@@ -1381,7 +1813,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, arguments, function* (index, options = {}) {
       const node = this.nodeMap.get(`${index}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(`Could not find DOM node during click: ${index}`);
       }
       const nodeClicked = yield this.clickUsingCDP(node, options);
       yield this.highlightNode(nodeClicked);
@@ -1392,7 +1824,9 @@ var _ChromeBrowser = class _ChromeBrowser {
     return __async(this, null, function* () {
       const node = this.nodeMap.get(`${index}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(
+          `Could not find DOM node while selecting option: ${index}`
+        );
       }
       if (!node.backendNodeID) {
         throw new Error(
@@ -1407,27 +1841,41 @@ var _ChromeBrowser = class _ChromeBrowser {
       return node.serialize({ noChildren: true, noProperties: true, noID: true });
     });
   }
-  highlight(target) {
+  scrollIntoView(target) {
     return __async(this, null, function* () {
-      try {
-        yield this.highlightByA11yID(target.id);
-      } catch (err) {
-        this.logger.warn({ err, target }, "Failed to highlight target");
-      }
-    });
-  }
-  highlightByA11yID(index) {
-    return __async(this, null, function* () {
-      const node = this.nodeMap.get(`${index}`);
+      const id = yield this.resolveCachedTargetToID(target);
+      const node = this.nodeMap.get(`${id}`);
       if (!node) {
-        throw new Error(`Could not find node in DOM with index: ${index}`);
+        throw new Error(`Could not find node in DOM with a11y id: ${id}`);
       }
       if (!node.backendNodeID) {
         throw new Error(
-          `Select target missing backend node id: ${node.getLogForm()}`
+          `Focus target missing backend node id: ${node.getLogForm()}`
         );
       }
-      yield this.highlightNode(node);
+      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
+      yield locator.scrollIntoViewIfNeeded({
+        timeout: BROWSER_ACTION_TIMEOUT_MS
+      });
+    });
+  }
+  highlight(target) {
+    return __async(this, null, function* () {
+      try {
+        const id = yield this.resolveCachedTargetToID(target);
+        const node = this.nodeMap.get(`${id}`);
+        if (!node) {
+          throw new Error(`Could not find DOM node during highlight: ${id}`);
+        }
+        if (!node.backendNodeID) {
+          throw new Error(
+            `Select target missing backend node id: ${node.getLogForm()}`
+          );
+        }
+        yield this.highlightNode(node);
+      } catch (err) {
+        this.logger.warn({ err, target }, "Failed to highlight target");
+      }
     });
   }
   highlightNode(node) {
@@ -1550,33 +1998,134 @@ var _ChromeBrowser = class _ChromeBrowser {
       }
       if (!rejected && urlChanged(this.url, startURL)) {
         this.logger.debug(
+          { startURL, newURL: this.url },
           `Detected url change in wrapPossibleNavigation, waiting for load state`
         );
-        try {
-          yield this.page.waitForLoadState("load", {
-            timeout: timeoutMS - (Date.now() - startTime)
-          });
-        } catch (e) {
-          this.logger.warn(
-            { url: this.url },
-            "Timeout elapsed waiting for load state to fire, continuing anyways..."
-          );
+        const remainingTimeout = Math.max(
+          timeoutMS - (Date.now() - startTime),
+          0
+        );
+        if (remainingTimeout > 0) {
+          try {
+            yield this.page.waitForLoadState("load", {
+              timeout: remainingTimeout
+            });
+          } catch (e) {
+            this.logger.warn(
+              { url: this.url },
+              "Timeout elapsed waiting for load state to fire, continuing anyways..."
+            );
+          }
         }
       }
       return unwrapAndThrowError(retPromise);
     });
   }
+  /**
+   * Given a potentially cached a11y ID, resolve it to an actual ID, checking that it is still valid.
+   * If the ID is no longer valid, try to auto-heal with heuristics.
+   * Throws if no auto-healing is possible.
+   */
+  resolveCachedTargetToID(target) {
+    return __async(this, null, function* () {
+      if (!target.name && !target.role && !target.content) {
+        const node = this.nodeMap.get(`${target.id}`);
+        if (!node) {
+          throw new Error(
+            `Resolving target failed, fresh value did not exist in node map: ${target.id}`
+          );
+        }
+        saveNodeDetailsToCache(node, target);
+        return target.id;
+      }
+      yield this.getA11yTree();
+      const proposedNode = this.nodeMap.get(`${target.id}`);
+      if (proposedNode) {
+        if (getNodeComparisonScore(proposedNode, target) >= 2) {
+          this.logger.info(
+            "Resolved cached a11y target to node with exact same id"
+          );
+          saveNodeDetailsToCache(proposedNode, target);
+          return target.id;
+        }
+      }
+      let closestLevenshteinDistance = Infinity;
+      let closestNode;
+      for (const node of this.nodeMap.values()) {
+        if (getNodeComparisonScore(node, target) >= 2) {
+          this.logger.info(
+            { newNode: node.getLogForm(), target },
+            "Resolved cached a11y target to new node with field comparison"
+          );
+          saveNodeDetailsToCache(node, target);
+          return parseInt(node.id);
+        }
+        if (target.serializedForm) {
+          const serializedNode = node.serialize({
+            noID: true,
+            maxLevel: 1
+          });
+          if (Math.abs(serializedNode.length - target.serializedForm.length) > MAX_LEVENSHTEIN_DISTANCE) {
+            continue;
+          }
+          const levenshteinDistance = distance2(
+            target.serializedForm,
+            serializedNode
+          );
+          if (levenshteinDistance < closestLevenshteinDistance && levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length) < MAX_LEVENSHTEIN_CHANGE_RATIO) {
+            closestLevenshteinDistance = levenshteinDistance;
+            closestNode = node;
+          }
+        }
+      }
+      if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
+        this.logger.info(
+          { newNode: closestNode.getLogForm(), target },
+          "Resolved cached a11y target to new node with pure levenshtein distance"
+        );
+        saveNodeDetailsToCache(closestNode, target);
+        return parseInt(closestNode.id);
+      }
+      throw new Error(
+        `Could not find any relevant node given cached target: ${JSON.stringify(
+          target
+        )}`
+      );
+    });
+  }
   click(_0) {
     return __async(this, arguments, function* (target, options = {}) {
+      const id = yield this.resolveCachedTargetToID(target);
       const elementInteracted = yield this.wrapPossibleNavigation(
-        () => this.clickByA11yID(target.id, options)
+        () => this.clickByA11yID(id, options)
       );
       return elementInteracted;
     });
   }
+  hover(target) {
+    return __async(this, null, function* () {
+      const nodeId = yield this.resolveCachedTargetToID(target);
+      const node = this.nodeMap.get(`${nodeId}`);
+      if (!node) {
+        throw new Error(`Could not find DOM node for hover: ${nodeId}`);
+      }
+      if (!node.backendNodeID) {
+        throw new Error(
+          `Hover target missing backend node id: ${node.getLogForm()}`
+        );
+      }
+      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
+      yield locator.hover({
+        timeout: BROWSER_ACTION_TIMEOUT_MS
+      });
+      yield this.highlightNode(node);
+      return node.serialize({ noChildren: true, noProperties: true, noID: true });
+    });
+  }
   selectOption(target, option) {
     return __async(this, null, function* () {
-      return this.selectOptionByA11yID(target.id, option);
+      const id = yield this.resolveCachedTargetToID(target);
+      return this.selectOptionByA11yID(id, option);
     });
   }
   press(key) {
@@ -1644,7 +2193,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       let timeoutTriggered = true;
       while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
         yield sleep(CHECK_INTERVAL_MS);
-        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS) {
+        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS && process.env.NODE_ENV !== "production") {
           this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
           continue;
         }
@@ -1906,7 +2455,7 @@ var _ChromeBrowser = class _ChromeBrowser {
     });
   }
 };
-_ChromeBrowser.USER_AGENT = playwright_exports.devices["Desktop Chrome"].userAgent;
+_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
 var ChromeBrowser = _ChromeBrowser;
 
 // ../../packages/web-agent/src/configs/controller.ts
@@ -2069,6 +2618,9 @@ var AgentController = class {
   }
   locateElement(description, disableCache) {
     return __async(this, null, function* () {
+      if (!description) {
+        throw new Error("Cannot locate element with empty description");
+      }
       const locator = yield this.generator.getElementLocation(
         { browserState: yield this.getBrowserState(), goal: description },
         disableCache
@@ -2240,6 +2792,41 @@ var AgentController = class {
       };
     });
   }
+  wrapElementTargetingCommand(target, disableCache, action, newlyGenerated = false) {
+    return __async(this, null, function* () {
+      if (!target.a11yData) {
+        target.a11yData = A11yTargetWithCacheSchema.parse(
+          yield this.locateElement(target.elementDescriptor, disableCache)
+        );
+        newlyGenerated = true;
+      }
+      try {
+        const result = yield action(target.a11yData);
+        return result;
+      } catch (err) {
+        if (!newlyGenerated) {
+          this.logger.warn(
+            { err, target },
+            "Failed to execute action with cached target, retrying with AI"
+          );
+          target.a11yData = void 0;
+          return this.wrapElementTargetingCommand(
+            target,
+            disableCache,
+            action,
+            true
+          );
+        }
+        this.logger.error(
+          { err, target },
+          "Failed to target element even after all auto-healing"
+        );
+        throw new Error(
+          `Failed to find element with description: ${target.elementDescriptor}. Has your website changed significantly?`
+        );
+      }
+    });
+  }
   /**
    * Executes a preset command.
    * For most cases, the execution result contains metadata about the command executed.
@@ -2248,7 +2835,7 @@ var AgentController = class {
    */
   executePresetStep(command, disableCache) {
     return __async(this, null, function* () {
-      var _a, _b, _c;
+      var _a;
       const urlBeforeCommand = this.browser.url;
       switch (command.type) {
         case "SUCCESS" /* SUCCESS */:
@@ -2284,24 +2871,13 @@ var AgentController = class {
           yield this.browser.refresh();
           break;
         case "CLICK" /* CLICK */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_b = command.target.a11yData) == null ? void 0 : _b.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.click(
-            {
-              id
-            },
-            {
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.click(target, {
               doubleClick: command.doubleClick,
               rightClick: command.rightClick
-            }
+            })
           );
           const result2 = {
             urlAfterCommand: this.browser.url,
@@ -2315,21 +2891,10 @@ var AgentController = class {
           return result2;
         }
         case "SELECT_OPTION" /* SELECT_OPTION */: {
-          let id;
-          if (command.target.a11yData) {
-            id = (_c = command.target.a11yData) == null ? void 0 : _c.id;
-          } else {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            id = locator.id;
-          }
-          const elementInteracted = yield this.browser.selectOption(
-            {
-              id
-            },
-            command.option
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (targetWithA11yData) => this.browser.selectOption(targetWithA11yData, command.option)
           );
           return {
             succeedImmediately: false,
@@ -2344,21 +2909,11 @@ var AgentController = class {
           yield this.browser.setCookie(command.value);
           break;
         case "TYPE" /* TYPE */: {
-          let elementInteracted;
-          const target = command.target;
-          if (target.a11yData) {
-            elementInteracted = yield this.browser.click({
-              id: target.a11yData.id
-            });
-          } else if (target.elementDescriptor.length > 0) {
-            const locator = yield this.locateElement(
-              command.target.elementDescriptor,
-              disableCache
-            );
-            elementInteracted = yield this.browser.click({
-              id: locator.id
-            });
-          }
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.click(target)
+          );
           yield this.browser.type(command.value, {
             clearContent: command.clearContent,
             pressKeysSequentially: command.pressKeysSequentially
@@ -2376,6 +2931,18 @@ var AgentController = class {
             result2.succeedImmediatelyReason = "URL changed";
           }
           return result2;
+        }
+        case "HOVER" /* HOVER */: {
+          const elementInteracted = yield this.wrapElementTargetingCommand(
+            command.target,
+            disableCache,
+            (target) => this.browser.hover(target)
+          );
+          return {
+            succeedImmediately: false,
+            urlAfterCommand: this.browser.url,
+            elementInteracted
+          };
         }
         case "PRESS" /* PRESS */:
           yield this.browser.press(command.value);
@@ -2405,7 +2972,7 @@ var AgentController = class {
 // ../../packages/web-agent/src/generators/api-generator.ts
 import fetchRetry from "fetch-retry";
 var fetch2 = fetchRetry(global.fetch);
-var API_VERSION = "v1";
+var API_VERSION2 = "v1";
 var APIGenerator = class {
   constructor(params) {
     this.baseURL = params.baseURL;
@@ -2414,7 +2981,7 @@ var APIGenerator = class {
   getElementLocation(context, disableCache) {
     return __async(this, null, function* () {
       const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/locate-element`,
+        `/${API_VERSION2}/web-agent/locate-element`,
         {
           browserState: context.browserState,
           goal: context.goal,
@@ -2429,7 +2996,7 @@ var APIGenerator = class {
       var _a;
       if (useVision) {
         const result2 = yield this.sendRequest(
-          `/${API_VERSION}/web-agent/assertion`,
+          `/${API_VERSION2}/web-agent/assertion`,
           {
             url: context.url,
             goal: context.goal,
@@ -2441,7 +3008,7 @@ var APIGenerator = class {
         return GetAssertionResponseSchema.parse(result2);
       }
       const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/assertion`,
+        `/${API_VERSION2}/web-agent/assertion`,
         {
           url: context.url,
           browserState: context.browserState,
@@ -2459,7 +3026,7 @@ var APIGenerator = class {
   getProposedCommand(context, disableCache) {
     return __async(this, null, function* () {
       const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/next-command`,
+        `/${API_VERSION2}/web-agent/next-command`,
         {
           url: context.url,
           browserState: context.browserState,
@@ -2476,7 +3043,7 @@ var APIGenerator = class {
   getGranularGoals(context, disableCache) {
     return __async(this, null, function* () {
       const result = yield this.sendRequest(
-        `/${API_VERSION}/web-agent/split-goal`,
+        `/${API_VERSION2}/web-agent/split-goal`,
         {
           url: context.url,
           goal: context.goal,
@@ -2486,9 +3053,9 @@ var APIGenerator = class {
       return SplitGoalResponseSchema.parse(result);
     });
   }
-  sendRequest(path, body) {
+  sendRequest(path2, body) {
     return __async(this, null, function* () {
-      const response = yield fetch2(`${this.baseURL}${path}`, {
+      const response = yield fetch2(`${this.baseURL}${path2}`, {
         retries: 3,
         retryDelay: 1e3,
         method: "POST",
@@ -2500,7 +3067,7 @@ var APIGenerator = class {
       });
       if (!response.ok) {
         throw new Error(
-          `Request to ${path} failed with status ${response.status}: ${yield response.text()}`
+          `Request to ${path2} failed with status ${response.status}: ${yield response.text()}`
         );
       }
       return response.json();
@@ -2508,85 +3075,8 @@ var APIGenerator = class {
   }
 };
 
-// src/api-client.ts
-var API_VERSION2 = "v1";
-var APIClient = class {
-  constructor(params) {
-    this.baseURL = params.baseURL;
-    this.apiKey = params.apiKey;
-  }
-  getRun(runId) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
-        method: "GET"
-      });
-      return GetRunResponseSchema.parse(result);
-    });
-  }
-  createRun(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/runs`, {
-        method: "POST",
-        body
-      });
-      return CreateRunResponseSchema.parse(result);
-    });
-  }
-  updateRun(runId, body) {
-    return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION2}/runs/${runId}`, {
-        method: "PATCH",
-        body
-      });
-    });
-  }
-  getTest(testId) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/tests/${testId}`, {
-        method: "GET"
-      });
-      return GetTestResponseSchema.parse(result);
-    });
-  }
-  queueTests(body) {
-    return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION2}/tests/queue`, {
-        method: "POST",
-        body
-      });
-    });
-  }
-  uploadScreenshot(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION2}/screenshots`, {
-        method: "POST",
-        body
-      });
-      return CreateScreenshotResponseSchema.parse(result);
-    });
-  }
-  sendRequest(path, options) {
-    return __async(this, null, function* () {
-      const response = yield fetch(`${this.baseURL}${path}`, {
-        method: options.method,
-        body: options.body ? JSON.stringify(options.body) : void 0,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Request to ${path} failed with status ${response.status}: ${yield response.text()}`
-        );
-      }
-      if (response.status === 204) {
-        return response.text();
-      }
-      return response.json();
-    });
-  }
-};
+// src/run-test.ts
+import chalk4 from "chalk";
 
 // ../../packages/execute/src/constants.ts
 var MAX_COMMANDS_PER_STEP = 20;
@@ -2822,7 +3312,8 @@ var executePresetStep = (_a) => __async(void 0, null, function* () {
     (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
       message,
       startedAt: startedAt.getTime(),
-      durationMs: finishedAt.getTime() - startedAt.getTime()
+      durationMs: finishedAt.getTime() - startedAt.getTime(),
+      command: step.command
     });
     return result;
   } catch (err) {
@@ -3107,31 +3598,40 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
   return failed;
 });
 
-// src/logger.ts
-var consoleLogger = {
-  info: console.log,
-  error: console.error,
-  debug: console.debug,
-  warn: console.warn,
-  child: () => consoleLogger,
-  flush: () => {
-  }
-};
-
 // src/run-test.ts
+import { runStepMigrations } from "test-migrations";
+import { parse as parse2 } from "yaml";
 function runTest(_0) {
   return __async(this, arguments, function* ({
-    testId,
+    path: path2,
     apiClient,
     generator,
     newBaseURL
   }) {
-    const test = yield apiClient.getTest(testId);
+    console.log("Collecting tests...");
+    let test;
+    if (path2.endsWith(".yaml")) {
+      console.log(`Reading ${path2} from local filesystem`);
+      test = yield resolveLocalTest(path2);
+      path2 = path2.slice(0, -5);
+    } else {
+      console.log(`Fetching ${path2} from Momentic server (${apiClient.baseURL})`);
+      test = yield apiClient.getTest(path2);
+    }
+    if (test.schemaVersion > LATEST_VERSION) {
+      console.log(
+        chalk4.yellow(
+          `Test ${path2} has schema version ${test.schemaVersion}, which is greater than what is currently supported by this SDK. Please update your momentic package version to avoid unexpected behavior.`
+        )
+      );
+    }
     const originalURL = new URL(test.baseUrl);
-    const newURL = new URL(newBaseURL);
-    originalURL.hostname = newURL.hostname;
-    originalURL.protocol = newURL.protocol;
-    originalURL.port = newURL.port;
+    if (newBaseURL) {
+      const newURL = new URL(newBaseURL);
+      originalURL.hostname = newURL.hostname;
+      originalURL.protocol = newURL.protocol;
+      originalURL.port = newURL.port;
+    }
     const browser = yield ChromeBrowser.init(
       originalURL.toString(),
       consoleLogger
@@ -3143,7 +3643,7 @@ function runTest(_0) {
       logger: consoleLogger
     });
     const run = yield apiClient.createRun({
-      testId,
+      testPath: path2,
       trigger: "CLI"
     });
     let failed = true;
@@ -3173,6 +3673,87 @@ function runTest(_0) {
     return failed;
   });
 }
+function resolveLocalTest(filePath) {
+  return __async(this, null, function* () {
+    const { test, modules: unmigratedModules } = readTestWithModules(filePath);
+    const unmigratedTest = parse2(test);
+    if (!unmigratedTest.steps || !Array.isArray(unmigratedTest.steps)) {
+      throw new Error(`Test ${filePath} is missing steps`);
+    }
+    if (!unmigratedTest.schemaVersion || !unmigratedTest.id) {
+      throw new Error(`Test ${filePath} is missing an ID or schema version`);
+    }
+    let steps;
+    if (unmigratedTest.schemaVersion < LATEST_VERSION) {
+      console.log(
+        chalk4.yellow(
+          `Test ${filePath} has schema version ${unmigratedTest.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your test will be migrated to the latest version before execution.`
+        )
+      );
+      const { steps: migratedSteps } = yield runStepMigrations({
+        metadata: unmigratedTest,
+        steps: unmigratedTest.steps,
+        logger: consoleLogger
+      });
+      steps = StepSchema.array().parse(migratedSteps);
+    } else {
+      steps = StepSchema.array().parse(unmigratedTest.steps);
+    }
+    const migratedModules = {};
+    for (const [moduleId, unmigratedModuleYAML] of Object.entries(
+      unmigratedModules
+    )) {
+      const unmigratedModule = parse2(unmigratedModuleYAML);
+      if (!unmigratedModule.schemaVersion || !unmigratedModule.moduleId) {
+        throw new Error(`Module ${moduleId} is missing an ID or schema version`);
+      }
+      if (!unmigratedModule.steps || !Array.isArray(unmigratedModule.steps)) {
+        throw new Error(`Module ${moduleId} is missing steps`);
+      }
+      if (unmigratedModule.schemaVersion < LATEST_VERSION) {
+        console.log(
+          chalk4.yellow(
+            `Module ${moduleId} has schema version ${unmigratedModule.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your module will be migrated to the latest version before execution.`
+          )
+        );
+        const { steps: migratedSteps } = yield runStepMigrations({
+          metadata: {
+            id: unmigratedModule.moduleId,
+            schemaVersion: unmigratedModule.schemaVersion
+          },
+          steps: unmigratedModule.steps,
+          logger: consoleLogger
+        });
+        migratedModules[moduleId] = __spreadProps(__spreadValues({}, unmigratedModule), {
+          steps: AllowedModuleStepSchema.array().parse(migratedSteps)
+        });
+      } else {
+        migratedModules[moduleId] = unmigratedModule;
+      }
+    }
+    const resolvedTestSteps = steps.map((step) => {
+      if (step.type !== "MODULE" /* MODULE */) {
+        return step;
+      }
+      const resolvedModule = migratedModules[step.moduleId];
+      if (!resolvedModule) {
+        throw new Error(
+          `Could not resolve module ${step.moduleId} required in test ${filePath}`
+        );
+      }
+      const moduleStep = {
+        type: "RESOLVED_MODULE",
+        moduleId: step.moduleId,
+        name: resolvedModule.name,
+        steps: resolvedModule.steps
+      };
+      return moduleStep;
+    });
+    return MinimalRunnableResolvedTestSchema.parse(__spreadProps(__spreadValues({}, unmigratedTest), {
+      steps: resolvedTestSteps
+    }));
+  });
+}
 
 // src/run-tests-locally.ts
 function runTestsLocally(_0) {
@@ -3181,50 +3762,53 @@ function runTestsLocally(_0) {
     start,
     waitOn,
     waitOnTimeout,
-    server,
-    apiKey
+    client
   }) {
-    yield execCommand(start, false);
-    yield waitOnFn({
-      resources: [waitOn],
-      timeout: waitOnTimeout * 1e3
-    });
-    const apiClient = new APIClient({
-      baseURL: server,
-      apiKey
-    });
+    if (start) {
+      console.log(`Running start command: ${start}`);
+      yield execCommand(start, false);
+    }
+    if (waitOn) {
+      console.log(
+        `Waiting for ${waitOn} to be accessible (timeout: ${waitOnTimeout}s)`
+      );
+      yield waitOnFn({
+        resources: [waitOn],
+        timeout: waitOnTimeout * 1e3
+      });
+    }
     const apiGenerator = new APIGenerator({
-      baseURL: server,
-      apiKey
+      baseURL: client.baseURL,
+      apiKey: client.apiKey
     });
-    const promises = tests.map((testId) => __async(this, null, function* () {
+    const promises = tests.map((path2) => __async(this, null, function* () {
       let failed = true;
       try {
         failed = yield runTest({
-          testId,
-          apiClient,
+          path: path2,
+          apiClient: client,
           generator: apiGenerator,
           newBaseURL: waitOn
         });
       } catch (e) {
         console.error(e);
       }
-      return { failed, testId };
+      return { failed, path: path2 };
     }));
     const results = yield Promise.all(promises);
     const failedResults = results.filter((result) => result.failed);
     if (failedResults.length > 0) {
       console.log(
-        chalk.red(
+        chalk5.red(
           `Failed ${failedResults.length} out of ${results.length} tests:`
         )
       );
       failedResults.forEach((result) => {
-        console.log(chalk.red(`- ${result.testId}`));
+        console.log(chalk5.red(`- ${result.path}`));
       });
       process.exit(1);
     }
-    console.log(chalk.green(`All ${results.length} tests passed!`));
+    console.log(chalk5.green(`All ${results.length} tests passed!`));
     process.exit(0);
   });
 }
@@ -3241,87 +3825,110 @@ function execCommand(fullCommand, waitToFinish = true) {
 }
 
 // src/run-tests-remotely.ts
-import chalk2 from "chalk";
+import chalk6 from "chalk";
 function runTestsRemotely(_0) {
   return __async(this, arguments, function* ({
     tests,
-    apiKey,
-    server
+    client
   }) {
-    const apiClient = new APIClient({
-      baseURL: server,
-      apiKey
+    yield client.queueTests({
+      testPaths: tests
     });
-    yield apiClient.queueTests({
-      testIds: tests
-    });
-    console.log(chalk2.green(`Successfully queued ${tests.length} tests!`));
+    console.log(chalk6.green(`Successfully queued ${tests.length} tests!`));
   });
 }
 
 // src/cli.ts
-var program = new Command4();
+var program = new Command3();
 program.name("momentic").description("Momentic CLI").version(version);
 program.command("install-browsers").action(() => __async(void 0, null, function* () {
   yield installBrowsers();
 }));
-program.command("run-tests").addOption(
-  new Option(
-    "--tests <tests...>",
-    "specify tests to run"
-  ).makeOptionMandatory(true)
-).addOption(
-  new Option("--api-key <key>", "API key for authenticating").env("MOMENTIC_API_KEY").makeOptionMandatory(true)
-).addOption(
-  new Option("--server <server>", "Momentic server to use").default(
-    "https://api.momentic.ai"
-  )
-).addOption(
-  new Option("--remote", "run tests remotely").default(true).conflicts(["start, waitOn, waitOnTimeout"]).implies({
+program.command("run").alias("run-tests").addArgument(testsVariadicArgument).addOption(apiKeyOption).addOption(serverAddressOption).addOption(
+  new Option2(
+    "-r, --remote",
+    "Run tests remotely. The production version of this test will be queued for execution."
+  ).default(true).conflicts(["start, waitOn, waitOnTimeout, local"]).implies({
     local: false
   })
 ).addOption(
-  new Option("--local", "run tests locally").implies({
-    start: "npm run start",
-    waitOn: "http://localhost:3000",
+  new Option2(
+    "-l, --local",
+    "Run tests locally. Useful for accessing apps on localhost."
+  ).implies({
     remote: false
   })
-).addOption(new Option("--start <command>", "specify start command")).addOption(new Option("--wait-on <url>", "specify URL to wait on")).addOption(
-  new Option(
+).addOption(
+  new Option2(
+    "--start <command>",
+    "Arbitrary setup command that will run before Momentic steps begin."
+  )
+).addOption(
+  new Option2(
+    "--wait-on <url>",
+    "URL to wait to become accessible before Momentic tests begin."
+  )
+).addOption(
+  new Option2(
     "--wait-on-timeout <timeout>",
-    "specify how long to wait on url"
+    "Max time to wait for the --wait-on URL to become accessible."
   ).default(60, "one minute")
-).action((options) => __async(void 0, null, function* () {
-  const {
-    tests,
-    apiKey,
-    server,
-    remote,
-    local,
-    start,
-    waitOn,
-    waitOnTimeout
-  } = options;
+).action((tests, options) => __async(void 0, null, function* () {
+  const { apiKey, server, remote, local } = options;
+  const client = new APIClient({
+    baseURL: server,
+    apiKey
+  });
   if (remote) {
-    yield runTestsRemotely({ tests, apiKey, server });
+    if (tests.some((test) => test.endsWith(".yaml"))) {
+      const prompt = "A local test file was provided without the --local flag. The production version of this test will be queued remotely. Continue?";
+      if (!(yield promptForConfirmation(prompt, true))) {
+        console.log("Run cancelled");
+        process.exit(1);
+      }
+      tests = tests.map((test) => {
+        if (test.endsWith(".yaml")) {
+          return test.slice(0, -5);
+        }
+        return test;
+      });
+    }
+    yield runTestsRemotely({ tests, client });
     return;
   }
   if (local) {
     try {
-      yield runTestsLocally({
+      yield runTestsLocally(__spreadValues({
         tests,
-        start,
-        waitOn,
-        waitOnTimeout,
-        server,
-        apiKey
-      });
+        client
+      }, options));
     } catch (e) {
       console.error(e);
       process.exit(1);
     }
     return;
   }
+  throw new Error("One of remote or local must be specified");
+}));
+program.command("pull").description(
+  "Fetch a test from your organization and save it in YAML format onto local disk."
+).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
+  const { apiKey, server } = options;
+  const client = new APIClient({
+    baseURL: server,
+    apiKey
+  });
+  yield fetchAndSaveTestToDisk({ name: test, client });
+}));
+program.command("push").description(
+  "Save a local YAML file containing a test to your cloud workspace."
+).addOption(yesOption).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(pathsVariadicArgument).action((paths, options) => __async(void 0, null, function* () {
+  const { apiKey, server, yes } = options;
+  const client = new APIClient({
+    baseURL: server,
+    apiKey
+  });
+  yield saveTestToServer({ paths, client, yes });
 }));
 function main() {
   return __async(this, null, function* () {
