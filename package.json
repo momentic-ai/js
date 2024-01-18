@@ -16,7 +16,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://momentic.ai",
+  "homepage": "https://momentic.ai/docs",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/momentic-ai/sdk.git"
