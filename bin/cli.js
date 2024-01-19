@@ -993,6 +993,8 @@ import chalk from "chalk";
 import readline from "readline/promises";
 function promptForConfirmation(question, yellow) {
   return __async(this, null, function* () {
+    if (process.env.CI)
+      return true;
     const rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout
