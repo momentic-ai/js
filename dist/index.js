@@ -850,6 +850,7 @@ var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
 var alwaysInterestingRoles = /* @__PURE__ */ new Set([
   "textbox",
   "checkbox",
+  "combobox",
   "button",
   "link",
   "combobox"
@@ -1266,7 +1267,10 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield chromiumWithExtra.launch({ headless: true });
+      const browser = yield chromiumWithExtra.launch({
+        headless: true,
+        handleSIGTERM: false
+      });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
