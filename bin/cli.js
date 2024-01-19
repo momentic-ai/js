@@ -1218,9 +1218,10 @@ var alwaysInterestingRoles = /* @__PURE__ */ new Set([
   "textbox",
   "checkbox",
   "button",
-  "link"
+  "link",
+  "combobox"
 ]);
-var rolesToOmitID = /* @__PURE__ */ new Set(["paragraph", "menuitem", "option"]);
+var rolesToOmitID = /* @__PURE__ */ new Set(["paragraph", "option"]);
 var defaultA11yNodeSerializeParams = {
   indentLevel: 0,
   noID: false,
@@ -2802,6 +2803,7 @@ var AgentController = class {
       }
       try {
         const result = yield action(target.a11yData);
+        this.logger.debug("Successfully used cached target to perform action");
         return result;
       } catch (err) {
         if (!newlyGenerated) {
