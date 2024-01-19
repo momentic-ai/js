@@ -56,6 +56,9 @@ dependencies:
   wait-on:
     specifier: ^7.2.0
     version: 7.2.0
+  yaml:
+    specifier: 2.3.4
+    version: 2.3.4
   zod:
     specifier: ^3.22.4
     version: 3.22.4
@@ -609,6 +612,11 @@ packages:
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+    dev: false
+
+  /yaml@2.3.4:
+    resolution: {integrity: sha512-8aAvwVUSHpfEqTQ4w/KMlf3HcRdt50E5ODIQJBw1fQ5RL34xabzxtUlzTXVqc4rkZsPbvrXKWnABCD7kWSmocA==}
+    engines: {node: '>= 14'}
     dev: false
 
   /zod@3.22.4:
