@@ -3600,8 +3600,334 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
   return failed;
 });
 
+// ../../packages/test-migrations/src/index.ts
+import diffLines2 from "diff-lines";
+import semver from "semver";
+
+// ../../packages/test-migrations/src/2023-12-28-1.0.5-migrate-to-ai-step-v2.ts
+var migrateToAIStepV2 = {
+  name: "Migrate to ai step v2",
+  fromVersion: "1.0.4",
+  toVersion: "1.0.5",
+  recursiveKeys: /* @__PURE__ */ new Set(["results", "commands"]),
+  stopOnFailure: true,
+  execute: (steps) => __async(void 0, null, function* () {
+    steps = steps.filter(
+      (step) => !(step.status !== void 0 && step.type === "AI_ACTION")
+    );
+    steps = steps.map((step) => {
+      var _a, _b;
+      if (step.status === void 0) {
+        return step;
+      }
+      if (step.type === "PRESET_ACTION") {
+        step.results = (_b = (_a = step.commands) != null ? _a : step.results) != null ? _b : [];
+      }
+      return step;
+    });
+    return steps;
+  })
+};
+
+// ../../packages/test-migrations/src/2024-01-05-1.0.6-ensure-ai-step-has-done.ts
+var ensureAIStepHasDone = {
+  name: "Make sure ai step v2 has done command",
+  fromVersion: "1.0.5",
+  toVersion: "1.0.6",
+  recursiveKeys: /* @__PURE__ */ new Set(["results", "commands"]),
+  stopOnFailure: true,
+  execute: (steps) => __async(void 0, null, function* () {
+    return steps.map((step) => {
+      if (step.type !== "AI_ACTION") {
+        return step;
+      }
+      if (step.status !== void 0) {
+        return step;
+      }
+      if (!step.commands || !step.commands.length) {
+        return step;
+      }
+      const commands = step.commands;
+      const lastCommand = commands[commands.length - 1];
+      if (lastCommand && lastCommand["type"] !== "SUCCESS") {
+        commands.push({
+          type: "SUCCESS"
+        });
+      }
+      return step;
+    });
+  })
+};
+
+// ../../packages/test-migrations/src/migrate-assertions-to-preset.ts
+var migrateAssertionsToPresetActions = {
+  name: "Migrate AI assertions to preset actions",
+  fromVersion: "1.0.0",
+  toVersion: "1.0.1",
+  recursiveKeys: /* @__PURE__ */ new Set(),
+  execute: (steps) => __async(void 0, null, function* () {
+    return steps.map((record2) => {
+      if (record2["type"] !== "AI_ASSERTION") {
+        return record2;
+      }
+      const assertion = record2["text"];
+      const newPresetStep = {
+        type: "PRESET_ACTION",
+        command: {
+          type: "AI_ASSERTION",
+          assertion,
+          useVision: false,
+          disableCache: true
+        }
+      };
+      const migratedStep = __spreadValues(__spreadValues({}, record2), newPresetStep);
+      delete migratedStep["text"];
+      return migratedStep;
+    });
+  }),
+  stopOnFailure: true
+};
+
+// ../../packages/test-migrations/src/migrate-element-descriptor-to-target.ts
+var targetRequiredCommands = /* @__PURE__ */ new Set([
+  "CLICK",
+  "TYPE",
+  "SELECT_OPTION"
+]);
+var migrateElementDescriptorToTarget = {
+  name: "Migrate element descriptor to live in a target object",
+  fromVersion: "1.0.3",
+  toVersion: "1.0.4",
+  recursiveKeys: /* @__PURE__ */ new Set(),
+  execute: (steps) => __async(void 0, null, function* () {
+    return steps.map((step) => {
+      const command = step["command"];
+      const commandType = command == null ? void 0 : command["type"];
+      const elementDescriptor = command == null ? void 0 : command["elementDescriptor"];
+      if (elementDescriptor !== void 0 || targetRequiredCommands.has(commandType)) {
+        command["target"] = {
+          elementDescriptor: elementDescriptor != null ? elementDescriptor : ""
+        };
+      }
+      if (step["commands"] && Array.isArray(step["commands"])) {
+        const commands = step["commands"];
+        commands.forEach((command2) => {
+          const elementDescriptor2 = command2 == null ? void 0 : command2["elementDescriptor"];
+          const commandType2 = command2 == null ? void 0 : command2["type"];
+          if (elementDescriptor2 !== void 0 || targetRequiredCommands.has(commandType2)) {
+            command2["target"] = {
+              elementDescriptor: elementDescriptor2 != null ? elementDescriptor2 : ""
+            };
+          }
+        });
+      }
+      if (step["results"] && Array.isArray(step["results"])) {
+        const commandResults = step["results"];
+        commandResults.forEach((commandResult) => {
+          const command2 = commandResult["command"];
+          const elementDescriptor2 = command2 == null ? void 0 : command2["elementDescriptor"];
+          const commandType2 = command2 == null ? void 0 : command2["type"];
+          if (elementDescriptor2 !== void 0 || targetRequiredCommands.has(commandType2)) {
+            command2["target"] = {
+              elementDescriptor: elementDescriptor2 != null ? elementDescriptor2 : ""
+            };
+          }
+          if (commandResult["commands"] && Array.isArray(commandResult["commands"])) {
+            const commands = commandResult["commands"];
+            commands.forEach((command3) => {
+              const elementDescriptor3 = command3 == null ? void 0 : command3["elementDescriptor"];
+              const commandType3 = command3 == null ? void 0 : command3["type"];
+              if (elementDescriptor3 !== void 0 || targetRequiredCommands.has(commandType3)) {
+                command3["target"] = {
+                  elementDescriptor: elementDescriptor3 != null ? elementDescriptor3 : ""
+                };
+              }
+            });
+          }
+        });
+      }
+      return step;
+    });
+  }),
+  stopOnFailure: true
+};
+
+// ../../packages/test-migrations/src/migrate-failure-to-failed.ts
+var migrateFailureToFailed = {
+  name: "Migrate FAILURE status to FAILED",
+  fromVersion: "1.0.1",
+  toVersion: "1.0.2",
+  recursiveKeys: /* @__PURE__ */ new Set(),
+  execute: (steps) => __async(void 0, null, function* () {
+    return steps.map((step) => {
+      const record2 = step;
+      if (record2["status"] === "FAILURE") {
+        record2["status"] = "FAILED";
+      }
+      if (typeof record2.commands === "object" && Array.isArray(record2.commands)) {
+        record2.commands.forEach((command) => {
+          if (command && typeof command === "object") {
+            const commandObject = command;
+            if ((commandObject == null ? void 0 : commandObject.status) === "FAILURE") {
+              commandObject.status = "FAILED";
+            }
+          }
+        });
+      }
+      return record2;
+    });
+  }),
+  stopOnFailure: true
+};
+
+// ../../packages/test-migrations/src/migrate-preset-step-type.ts
+var migratePresetStepTypeToDropPrefix = {
+  name: "Migrate preset step types to use the same",
+  fromVersion: "1.0.2",
+  toVersion: "1.0.3",
+  recursiveKeys: /* @__PURE__ */ new Set(),
+  execute: (steps) => __async(void 0, null, function* () {
+    return steps.map((step) => {
+      const command = step["command"];
+      const commandType = command == null ? void 0 : command["type"];
+      if (commandType == null ? void 0 : commandType.startsWith("PRESET_")) {
+        command["type"] = commandType.slice(7);
+      }
+      if (step["commands"] && Array.isArray(step["commands"])) {
+        const commands = step["commands"];
+        commands.forEach((command2) => {
+          const commandType2 = command2["type"];
+          if (commandType2 == null ? void 0 : commandType2.startsWith("PRESET_")) {
+            command2["type"] = commandType2.slice(7);
+          }
+        });
+      }
+      if (step["results"] && Array.isArray(step["results"])) {
+        const commandResults = step["results"];
+        commandResults.forEach((commandResult) => {
+          const command2 = commandResult["command"];
+          const commandType2 = command2 == null ? void 0 : command2["type"];
+          if (commandType2 == null ? void 0 : commandType2.startsWith("PRESET_")) {
+            command2["type"] = commandType2.slice(7);
+          }
+          if (commandResult["commands"] && Array.isArray(commandResult["commands"])) {
+            const commands = commandResult["commands"];
+            commands.forEach((command3) => {
+              const commandType3 = command3["type"];
+              if (commandType3 == null ? void 0 : commandType3.startsWith("PRESET_")) {
+                command3["type"] = commandType3.slice(7);
+              }
+            });
+          }
+        });
+      }
+      return step;
+    });
+  }),
+  stopOnFailure: true
+};
+
+// ../../packages/test-migrations/src/index.ts
+var testMigrations = [
+  migrateAssertionsToPresetActions,
+  migrateFailureToFailed,
+  migratePresetStepTypeToDropPrefix,
+  migrateElementDescriptorToTarget,
+  migrateToAIStepV2,
+  ensureAIStepHasDone
+  // add new migrations here!
+];
+if (LATEST_VERSION !== testMigrations[testMigrations.length - 1].toVersion) {
+  throw new Error(
+    `Please bump LATEST_VERSION in types package after adding a migration`
+  );
+}
+testMigrations.forEach((migration, index) => {
+  if (!semver.valid(migration.toVersion) || !semver.valid(migration.fromVersion)) {
+    throw new Error(`Migration '${migration.name}' has invalid version`);
+  }
+  if (!semver.gt(migration.toVersion, migration.fromVersion)) {
+    throw new Error(
+      `Migration '${migration.name}' has toVersion <= fromVersion`
+    );
+  }
+  if (index === 0)
+    return;
+  const previousMigration = testMigrations[index - 1];
+  if (previousMigration.toVersion !== migration.fromVersion) {
+    throw new Error(
+      `Migration '${migration.name}' at index ${index} is not contiguous with previous migration`
+    );
+  }
+});
+function isArrayOfStepObjects(val) {
+  return val.every((v) => v && typeof v === "object" && !Array.isArray(v));
+}
+var runStepMigrations = (_0) => __async(void 0, [_0], function* ({
+  metadata,
+  steps: inputSteps,
+  logger
+}) {
+  let steps = inputSteps;
+  const { schemaVersion: currentVersion, id } = metadata;
+  const migrationIndex = testMigrations.findIndex(
+    (migration) => semver.gt(migration.toVersion, currentVersion)
+  );
+  if (migrationIndex === -1) {
+    logger.debug({ id }, "Step migrations up to date");
+    return { steps, newVersion: currentVersion };
+  }
+  let newVersion = currentVersion;
+  for (let i = migrationIndex; i < testMigrations.length; i++) {
+    const migration = testMigrations[i];
+    const logIdentifiers = {
+      id,
+      migration: migration.name,
+      toVersion: migration.toVersion
+    };
+    logger.debug(logIdentifiers, "Starting migration");
+    try {
+      steps = yield migrateStepLikeArrayRecursively(steps, migration);
+      newVersion = migration.toVersion;
+    } catch (err) {
+      logger.error(__spreadValues({ err }, logIdentifiers), "Migration failed");
+      throw new Error(`Step migration ${migration.name} failed: ${err}`);
+    }
+  }
+  const diffs = diffLines2(
+    JSON.stringify(inputSteps, void 0, 2),
+    JSON.stringify(steps, void 0, 2),
+    { n_surrounding: 1 }
+  );
+  logger.debug({ diffs, id }, "Migration diffs");
+  return {
+    newVersion,
+    steps
+  };
+});
+function migrateStepLikeArrayRecursively(inputSteps, migration) {
+  return __async(this, null, function* () {
+    const steps = yield migration.execute(inputSteps);
+    for (const step of steps) {
+      for (const key of Object.keys(step)) {
+        if (!migration.recursiveKeys.has(key)) {
+          continue;
+        }
+        const val = step[key];
+        if (!val || !Array.isArray(val)) {
+          continue;
+        }
+        if (!isArrayOfStepObjects(val)) {
+          continue;
+        }
+        step[key] = yield migrateStepLikeArrayRecursively(val, migration);
+      }
+    }
+    return steps;
+  });
+}
+
 // src/run-test.ts
-import { runStepMigrations } from "test-migrations";
 import { parse as parse2 } from "yaml";
 function runTest(_0) {
   return __async(this, arguments, function* ({
