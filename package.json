@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.17-rc.0",
+  "version": "0.0.17-rc.1",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -54,6 +54,7 @@
     "set-cookie-parser": "^2.6.0",
     "string-argv": "^0.3.2",
     "wait-on": "^7.2.0",
+    "yaml": "2.3.4",
     "zod": "^3.22.4"
   }
 }
