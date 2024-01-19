@@ -956,6 +956,12 @@ function installBrowsers() {
 
 // src/options.ts
 import { Argument, Option } from "commander";
+
+// src/constants.ts
+var DEFAULT_FOLDER_PATH = "momentic";
+var MODULES_FOLDER_NAME = "modules";
+
+// src/options.ts
 var apiKeyOption = new Option(
   "--api-key <key>",
   "API key for authentication. If not supplied, attempts to read the MOMENTIC_API_KEY env var."
@@ -977,6 +983,10 @@ var pathsVariadicArgument = new Argument(
   "<paths...>",
   "File paths pointing to one or more YAML files containing Momentic tests, or a directory of Momentic YAML files."
 );
+var outDirOption = new Option(
+  "-o --out-dir <outDir>",
+  "Root directory to write output files to. Can be absolute or relative to the current directory. Defaults to `momentic`."
+).default(DEFAULT_FOLDER_PATH);
 
 // src/prompt.ts
 import chalk from "chalk";
@@ -1003,38 +1013,37 @@ function promptForConfirmation(question, yellow) {
 import chalk2 from "chalk";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
-
-// src/constants.ts
-var MODULES_FOLDER_NAME = "modules";
-
-// src/pull-test.ts
 function fetchAndSaveTestToDisk(_0) {
   return __async(this, arguments, function* ({
     name,
-    client
+    client,
+    outDir
   }) {
     if (name.endsWith(".yaml")) {
       name = name.slice(0, -5);
     }
-    const testPath = nameToYAMLFileName(name);
+    const rootDir = outDir != null ? outDir : DEFAULT_FOLDER_PATH;
+    if (!existsSync(rootDir)) {
+      mkdirSync(rootDir, { recursive: true });
+    }
+    const rootModuleDir = join(rootDir, MODULES_FOLDER_NAME);
+    if (!existsSync(rootModuleDir)) {
+      mkdirSync(rootModuleDir, { recursive: true });
+    }
+    const testFilePath = join(rootDir, nameToYAMLFileName(name));
     const { test, modules } = yield client.getTestYAMLExport({ path: name });
-    if (!(yield checkAndPromptForOverwrite(testPath))) {
+    if (!(yield checkAndPromptForOverwrite(testFilePath))) {
       console.log(chalk2.red("Pull cancelled"));
       return;
     }
-    writeFileSync(testPath, test, "utf-8");
+    writeFileSync(testFilePath, test, "utf-8");
     console.log(
       // escape spaces in name when printing
-      chalk2.green(`Wrote '${testPath}'`)
+      chalk2.green(`Wrote '${testFilePath}'`)
     );
     const numModules = Object.keys(modules).length;
-    if (numModules > 0) {
-      if (!existsSync(MODULES_FOLDER_NAME)) {
-        mkdirSync(MODULES_FOLDER_NAME);
-      }
-    }
     for (const [moduleName, moduleYAML] of Object.entries(modules)) {
-      const modulePath = join("modules", nameToYAMLFileName(moduleName));
+      const modulePath = join(rootModuleDir, nameToYAMLFileName(moduleName));
       if (!(yield checkAndPromptForOverwrite(modulePath))) {
         console.log(chalk2.red("Pull cancelled"));
         return;
@@ -1061,7 +1070,7 @@ function checkAndPromptForOverwrite(path2) {
   });
 }
 function nameToYAMLFileName(name) {
-  return `${name.toLowerCase().replaceAll(" ", "-")}`;
+  return `${name.toLowerCase().replaceAll(" ", "-")}.yaml`;
 }
 
 // src/push-test.ts
@@ -1096,7 +1105,7 @@ function saveTestToServer(params) {
       testUpdates.flatMap((update) => Object.keys(update.modules))
     );
     console.log(
-      `Pushing ${rootTestPaths.size} test(s) and ${moduleIds.size} module(s)`
+      `Resolved ${rootTestPaths.size} test(s) and ${moduleIds.size} module(s)`
     );
     if (!params.yes) {
       const warning = "Pushing tests overwrites tests on production and will instantly affect scheduled runs. Continue?";
@@ -1217,6 +1226,7 @@ var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
 var alwaysInterestingRoles = /* @__PURE__ */ new Set([
   "textbox",
   "checkbox",
+  "combobox",
   "button",
   "link",
   "combobox"
@@ -1633,7 +1643,10 @@ var _ChromeBrowser = class _ChromeBrowser {
    */
   static init(_0, _1, _2) {
     return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield chromiumWithExtra.launch({ headless: true });
+      const browser = yield chromiumWithExtra.launch({
+        headless: true,
+        handleSIGTERM: false
+      });
       const context = yield browser.newContext({
         viewport: {
           width: 1920,
@@ -4240,13 +4253,13 @@ program.command("run").alias("run-tests").addArgument(testsVariadicArgument).add
 }));
 program.command("pull").description(
   "Fetch a test from your organization and save it in YAML format onto local disk."
-).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
-  const { apiKey, server } = options;
+).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
+  const { apiKey, server, outDir } = options;
   const client = new APIClient({
     baseURL: server,
     apiKey
   });
-  yield fetchAndSaveTestToDisk({ name: test, client });
+  yield fetchAndSaveTestToDisk({ name: test, client, outDir });
 }));
 program.command("push").description(
   "Save a local YAML file containing a test to your cloud workspace."
