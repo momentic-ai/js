@@ -3956,7 +3956,6 @@ function runTest(_0) {
     if (path2.endsWith(".yaml")) {
       console.log(`Reading ${path2} from local filesystem`);
       test = yield resolveLocalTest(path2);
-      path2 = path2.slice(0, -5);
     } else {
       console.log(`Fetching ${path2} from Momentic server (${apiClient.baseURL})`);
       test = yield apiClient.getTest(path2);
@@ -3986,7 +3985,7 @@ function runTest(_0) {
       logger: consoleLogger
     });
     const run = yield apiClient.createRun({
-      testPath: path2,
+      testId: test.id,
       trigger: "CLI"
     });
     let failed = true;
