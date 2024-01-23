@@ -53,9 +53,7 @@ var __async = (__this, __arguments, generator) => {
 
 // src/cli.ts
 import { Command as Command3, Option as Option2 } from "commander";
-
-// package.json
-var version = "1.0.0";
+import { existsSync as existsSync4 } from "fs";
 
 // ../../packages/types/src/a11y-targets.ts
 import * as z from "zod";
@@ -290,9 +288,6 @@ var LLMOutputSchema = z4.object({
 });
 var NumericStringSchema = z4.string().pipe(z4.coerce.number());
 
-// ../../packages/types/src/command-results.ts
-import * as z6 from "zod";
-
 // ../../packages/types/src/steps.ts
 import * as z5 from "zod";
 var LATEST_VERSION = "1.0.6";
@@ -337,7 +332,53 @@ var ResolvedStepSchema = z5.union([
   ResolvedModuleStepSchema
 ]);
 
+// ../../packages/types/src/card-display.ts
+var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
+  Object.values(CommandType)
+);
+var CARD_DISPLAY_NAMES = {
+  ["AI_ACTION" /* AI_ACTION */]: "AI action",
+  ["MODULE" /* MODULE */]: "Module",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
+  ["CLICK" /* CLICK */]: "Click",
+  ["HOVER" /* HOVER */]: "Hover",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
+  ["TYPE" /* TYPE */]: "Type",
+  ["PRESS" /* PRESS */]: "Press",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
+  ["GO_BACK" /* GO_BACK */]: "Go back",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
+  ["WAIT" /* WAIT */]: "Wait",
+  ["REFRESH" /* REFRESH */]: "Refresh",
+  ["TAB" /* TAB */]: "Switch tab",
+  ["COOKIE" /* COOKIE */]: "Set cookie",
+  ["SUCCESS" /* SUCCESS */]: "Done"
+};
+var CARD_DESCRIPTIONS = {
+  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
+  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
+  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
+  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
+  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
+  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
+  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
+  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
+  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
+  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
+  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
+  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
+};
+
 // ../../packages/types/src/command-results.ts
+import * as z6 from "zod";
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
   ResultStatus2["SUCCESS"] = "SUCCESS";
   ResultStatus2["FAILED"] = "FAILED";
@@ -408,207 +449,7 @@ var ResultSchema = z6.discriminatedUnion("type", [
   ModuleResultSchema
 ]);
 
-// ../../packages/types/src/cookies.ts
-import { parseString } from "set-cookie-parser";
-function parseCookieString(cookie) {
-  const parsedCookie = parseString(cookie);
-  if (!parsedCookie.name) {
-    throw new Error("Name missing from cookie");
-  }
-  if (!parsedCookie.value) {
-    throw new Error("Value missing from cookie");
-  }
-  let sameSite;
-  if (parsedCookie.sameSite) {
-    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
-    if (sameSiteSetting === "strict") {
-      sameSite = "Strict";
-    } else if (sameSiteSetting === "lax") {
-      sameSite = "Lax";
-    } else if (sameSiteSetting === "none") {
-      sameSite = "None";
-    } else {
-      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
-    }
-  }
-  if (!parsedCookie.path && parsedCookie.domain) {
-    parsedCookie.path = "/";
-  }
-  const result = __spreadProps(__spreadValues({}, parsedCookie), {
-    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
-    sameSite
-  });
-  return result;
-}
-
-// ../../packages/types/src/execute-results.ts
-import * as z7 from "zod";
-var ExecuteCommandHistoryEntrySchema = z7.object({
-  // type of command executed
-  type: z7.nativeEnum(StepType),
-  // if AI step type, what command was executed
-  generatedStep: UserEditableAICommandSchema.optional(),
-  // human readable descriptor for action taken, including element interacted with
-  serializedCommand: z7.string().optional(),
-  // human readable descriptor for element interacted with
-  elementInteracted: z7.string().optional()
-});
-
-// ../../packages/types/src/goal-splitter.ts
-import { z as z8 } from "zod";
-var InstructionsSchema = z8.string().array();
-
-// ../../packages/types/src/locator.ts
-import * as z9 from "zod";
-var AILocatorSchema = z9.object({
-  thoughts: z9.string(),
-  // a11y id
-  id: z9.number().int(),
-  // dropdowns should have options
-  options: z9.array(z9.string()).optional()
-});
-
-// ../../packages/types/src/logger.ts
-var consoleLogger = {
-  info: console.log,
-  error: console.error,
-  debug: console.debug,
-  warn: console.warn,
-  child: () => consoleLogger,
-  flush: () => {
-  },
-  bindings: () => ({})
-};
-
-// ../../packages/types/src/modules.ts
-import { z as z10 } from "zod";
-var ModuleMetadataSchema = z10.object({
-  id: z10.string(),
-  createdAt: z10.coerce.date(),
-  createdBy: z10.string(),
-  organizationId: z10.string().or(z10.null()),
-  name: z10.string(),
-  schemaVersion: z10.string(),
-  // this is only used in the client and is not stored in the db
-  numSteps: z10.number()
-});
-var ModuleSchema = z10.object({
-  steps: AllowedModuleStepSchema.array()
-}).merge(ModuleMetadataSchema.omit({ numSteps: true }));
-
-// ../../packages/types/src/runs.ts
-import { z as z11 } from "zod";
-var RunTriggerEnum = {
-  WEBHOOK: "WEBHOOK",
-  CRON: "CRON",
-  MANUAL: "MANUAL",
-  CLI: "CLI"
-};
-var RunStatusEnum = {
-  PENDING: "PENDING",
-  RUNNING: "RUNNING",
-  PASSED: "PASSED",
-  FAILED: "FAILED",
-  CANCELLED: "CANCELLED"
-};
-var DateOrStringSchema = z11.string().pipe(z11.coerce.date()).or(z11.date());
-var RunMetadataSchema = z11.object({
-  id: z11.string(),
-  createdAt: DateOrStringSchema,
-  createdBy: z11.string(),
-  organizationId: z11.string().or(z11.null()),
-  scheduledAt: DateOrStringSchema.or(z11.null()),
-  startedAt: DateOrStringSchema.or(z11.null()),
-  finishedAt: DateOrStringSchema.or(z11.null()),
-  testId: z11.string().or(z11.null()),
-  status: z11.nativeEnum(RunStatusEnum),
-  trigger: z11.nativeEnum(RunTriggerEnum),
-  attempts: z11.number(),
-  test: z11.object({
-    name: z11.string(),
-    id: z11.string()
-  }).or(z11.null())
-});
-var RunWithTestSchema = RunMetadataSchema.merge(
-  z11.object({
-    results: ResultSchema.array(),
-    test: z11.object({
-      name: z11.string(),
-      id: z11.string(),
-      baseUrl: z11.string()
-    }).or(z11.null())
-  })
-);
-
-// ../../packages/types/src/serialization.ts
-import { parse, stringify } from "yaml";
-import { z as z14 } from "zod";
-
-// ../../packages/types/src/test.ts
-import { z as z13 } from "zod";
-
-// ../../packages/types/src/test-settings.ts
-import { isValidCron } from "cron-validator";
-import { z as z12 } from "zod";
-var TestAdvancedSettingsSchema = z12.object({
-  availableAsModule: z12.boolean().default(false),
-  disableAICaching: z12.boolean().default(false)
-});
-var ScheduleSettingsSchema = z12.object({
-  cron: z12.string().refine(
-    (v) => {
-      return isValidCron(v);
-    },
-    { message: "Invalid cron expression." }
-  ).default("0 0 */1 * *"),
-  enabled: z12.boolean().default(false),
-  timeZone: z12.string().default("America/Los_Angeles"),
-  // this is used for removing repeatable jobs (not set by user)
-  jobKey: z12.string().optional()
-});
-var WebhookSchema = z12.object({
-  lastStatus: z12.number().optional(),
-  url: z12.string().url()
-});
-var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
-var TestSettingsSchema = z12.object({
-  name: z12.string().min(1),
-  baseUrl: z12.string().url(),
-  retries: z12.coerce.number().min(0).max(10),
-  advanced: TestAdvancedSettingsSchema
-});
-
-// ../../packages/types/src/test.ts
-var BaseTestMetadataSchema = z13.object({
-  id: z13.string(),
-  name: z13.string(),
-  baseUrl: z13.string(),
-  schemaVersion: z13.string(),
-  advanced: TestAdvancedSettingsSchema,
-  retries: z13.number()
-});
-var ExtendedTestMetadataSchema = z13.object({
-  createdAt: z13.coerce.date(),
-  updatedAt: z13.coerce.date(),
-  schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema,
-  createdBy: z13.string(),
-  organizationId: z13.string().or(z13.null())
-});
-var ResolvedTestSchema = BaseTestMetadataSchema.merge(
-  ExtendedTestMetadataSchema
-).merge(
-  z13.object({
-    steps: z13.array(ResolvedStepSchema)
-  })
-);
-var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
-  z13.object({
-    steps: z13.array(ResolvedStepSchema)
-  })
-);
-
-// ../../packages/types/src/serialization.ts
+// ../../packages/types/src/command-serialization.ts
 function clampText(text, length) {
   if (text.length < length) {
     return text;
@@ -674,119 +515,395 @@ function serializeCommand(command) {
       return assertUnreachable(command);
   }
 }
-var TestSerializationResultSchema = z14.object({
-  test: z14.string().describe("YAML for the test, including metadata and steps"),
-  modules: z14.record(z14.string(), z14.string()).describe("Map of module name to YAML for the module")
-});
-var SerializedTestSchema = BaseTestMetadataSchema.merge(
-  z14.object({
-    steps: StepSchema.array()
-  })
-);
-var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
-  type: true
-}).merge(
-  z14.object({
-    schemaVersion: z14.string()
-  })
-);
-var DeserializedTestSchema = BaseTestMetadataSchema.merge(
-  z14.object({
-    steps: z14.array(z14.record(z14.string(), z14.unknown()))
-  })
-);
-var DeserializedModuleSchema = z14.object({
-  moduleId: z14.string().uuid(),
-  name: z14.string(),
-  schemaVersion: z14.string(),
-  steps: z14.array(z14.record(z14.string(), z14.unknown()))
-});
-
-// ../../packages/types/src/card-display.ts
-var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
-  Object.values(CommandType)
-);
-var CARD_DISPLAY_NAMES = {
-  ["AI_ACTION" /* AI_ACTION */]: "AI action",
-  ["MODULE" /* MODULE */]: "Module",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
-  ["CLICK" /* CLICK */]: "Click",
-  ["HOVER" /* HOVER */]: "Hover",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["TYPE" /* TYPE */]: "Type",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["GO_BACK" /* GO_BACK */]: "Go back",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
-  ["WAIT" /* WAIT */]: "Wait",
-  ["REFRESH" /* REFRESH */]: "Refresh",
-  ["TAB" /* TAB */]: "Switch tab",
-  ["COOKIE" /* COOKIE */]: "Set cookie",
-  ["SUCCESS" /* SUCCESS */]: "Done"
-};
-var CARD_DESCRIPTIONS = {
-  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
-  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
-  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
-  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
-  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
-  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
-  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
-  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
-  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
-  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
-  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
-  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
-};
 
 // ../../packages/types/src/context.ts
-import * as z15 from "zod";
-var DynamicContextSchema = z15.object({
-  // user goal or instruction
-  goal: z15.string(),
-  // current url of the browser
-  url: z15.string(),
-  // serialized page state
-  browserState: z15.string(),
-  // serialized history of previous commands
-  history: z15.string(),
-  // number of previously executed commands
-  numPrevious: z15.number(),
-  // last executed command, if any
-  lastCommand: ExecuteCommandHistoryEntrySchema.or(z15.null())
+import * as z8 from "zod";
+
+// ../../packages/types/src/execute-results.ts
+import * as z7 from "zod";
+var ExecuteCommandHistoryEntrySchema = z7.object({
+  // type of command executed
+  type: z7.nativeEnum(StepType),
+  // if AI step type, what command was executed
+  generatedStep: UserEditableAICommandSchema.optional(),
+  // human readable descriptor for action taken, including element interacted with
+  serializedCommand: z7.string().optional(),
+  // human readable descriptor for element interacted with
+  elementInteracted: z7.string().optional()
 });
 
+// ../../packages/types/src/context.ts
+var DynamicContextSchema = z8.object({
+  // user goal or instruction
+  goal: z8.string(),
+  // current url of the browser
+  url: z8.string(),
+  // serialized page state
+  browserState: z8.string(),
+  // serialized history of previous commands
+  history: z8.string(),
+  // number of previously executed commands
+  numPrevious: z8.number(),
+  // last executed command, if any
+  lastCommand: ExecuteCommandHistoryEntrySchema.or(z8.null())
+});
+
+// ../../packages/types/src/cookies.ts
+import { parseString } from "set-cookie-parser";
+function parseCookieString(cookie) {
+  const parsedCookie = parseString(cookie);
+  if (!parsedCookie.name) {
+    throw new Error("Name missing from cookie");
+  }
+  if (!parsedCookie.value) {
+    throw new Error("Value missing from cookie");
+  }
+  let sameSite;
+  if (parsedCookie.sameSite) {
+    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
+    if (sameSiteSetting === "strict") {
+      sameSite = "Strict";
+    } else if (sameSiteSetting === "lax") {
+      sameSite = "Lax";
+    } else if (sameSiteSetting === "none") {
+      sameSite = "None";
+    } else {
+      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
+    }
+  }
+  if (!parsedCookie.path && parsedCookie.domain) {
+    parsedCookie.path = "/";
+  }
+  const result = __spreadProps(__spreadValues({}, parsedCookie), {
+    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
+    sameSite
+  });
+  return result;
+}
+
+// ../../packages/types/src/goal-splitter.ts
+import { z as z9 } from "zod";
+var InstructionsSchema = z9.string().array();
+
+// ../../packages/types/src/locator.ts
+import * as z10 from "zod";
+var AILocatorSchema = z10.object({
+  thoughts: z10.string(),
+  // a11y id
+  id: z10.number().int(),
+  // dropdowns should have options
+  options: z10.array(z10.string()).optional()
+});
+
+// ../../packages/types/src/logger.ts
+var stringToLogLevel = {
+  DEBUG: 0 /* DEBUG */,
+  INFO: 1 /* INFO */,
+  WARN: 2 /* WARN */,
+  ERROR: 3 /* ERROR */
+};
+var LogLevelTags = {
+  [0 /* DEBUG */]: "DEBUG",
+  [1 /* INFO */]: "INFO",
+  [2 /* WARN */]: "WARN",
+  [3 /* ERROR */]: "ERROR"
+};
+var LogLevelColors = {
+  [0 /* DEBUG */]: "\x1B[90m",
+  [1 /* INFO */]: "\x1B[32m",
+  [2 /* WARN */]: "\x1B[33m",
+  [3 /* ERROR */]: "\x1B[31m"
+};
+var ConsoleLogger = class _ConsoleLogger {
+  constructor(minLevel, bindings) {
+    this.minLogLevel = minLevel;
+    this.logBindings = bindings;
+  }
+  log(level, ...args) {
+    const levelName = LogLevelTags[level];
+    let objectArg;
+    if (Array.isArray(args[0])) {
+      objectArg = args[0];
+      args = args.slice(1);
+    } else if (typeof args[0] === "object") {
+      objectArg = __spreadValues(__spreadValues({}, args[0]), this.logBindings);
+      args = args.slice(1);
+    }
+    const colorSequence = LogLevelColors[level];
+    const logTokens = [
+      `${colorSequence}[${(/* @__PURE__ */ new Date()).toTimeString().slice(0, 8)}][${levelName}]`
+    ];
+    if (level !== 0 /* DEBUG */) {
+      logTokens.push("\x1B[39m");
+    }
+    logTokens.push(...args);
+    console.log(...logTokens);
+    if (objectArg && !Array.isArray(objectArg)) {
+      for (const [key, value] of Object.entries(objectArg)) {
+        let stringifiedValue = value;
+        if (typeof value === "object") {
+          stringifiedValue = JSON.stringify(value, void 0, 2);
+          stringifiedValue = stringifiedValue.split("\n").map(
+            (line, index) => index > 0 ? `  ${line}` : line
+          ).join("\n");
+        }
+        console.log(
+          level === 0 /* DEBUG */ ? `${colorSequence}  ${key}:` : `  ${key}:`,
+          stringifiedValue
+        );
+      }
+    } else if (objectArg) {
+      for (const value of objectArg) {
+        let stringifiedValue = value;
+        if (typeof value === "object") {
+          stringifiedValue = JSON.stringify(value, void 0, 2);
+          stringifiedValue = stringifiedValue.split("\n").map(
+            (line, index) => index > 0 ? `  ${line}` : line
+          ).join("\n");
+        }
+        console.log(
+          level === 0 /* DEBUG */ ? `${colorSequence}  ` : `  `,
+          stringifiedValue
+        );
+      }
+    }
+    if (level === 0 /* DEBUG */) {
+      process.stdout.write("\x1B[39m");
+    }
+  }
+  setMinLevel(level) {
+    this.minLogLevel = level;
+  }
+  info(...args) {
+    if (1 /* INFO */ < this.minLogLevel) {
+      return;
+    }
+    this.log(1 /* INFO */, ...args);
+  }
+  debug(...args) {
+    if (0 /* DEBUG */ < this.minLogLevel) {
+      return;
+    }
+    this.log(0 /* DEBUG */, ...args);
+  }
+  warn(...args) {
+    if (2 /* WARN */ < this.minLogLevel) {
+      return;
+    }
+    this.log(2 /* WARN */, ...args);
+  }
+  error(...args) {
+    if (3 /* ERROR */ < this.minLogLevel) {
+      return;
+    }
+    this.log(3 /* ERROR */, ...args);
+  }
+  child(bindings) {
+    return new _ConsoleLogger(this.minLogLevel, __spreadValues(__spreadValues({}, this.logBindings), bindings));
+  }
+  flush() {
+    return;
+  }
+  bindings() {
+    return this.logBindings;
+  }
+};
+var consoleLogger = new ConsoleLogger(1 /* INFO */, {});
+
+// ../../packages/types/src/modules.ts
+import { z as z11 } from "zod";
+var ModuleMetadataSchema = z11.object({
+  id: z11.string(),
+  createdAt: z11.coerce.date(),
+  createdBy: z11.string(),
+  organizationId: z11.string().or(z11.null()),
+  name: z11.string(),
+  schemaVersion: z11.string(),
+  // this is only used in the client and is not stored in the db
+  numSteps: z11.number()
+});
+var ModuleSchema = z11.object({
+  steps: AllowedModuleStepSchema.array()
+}).merge(ModuleMetadataSchema.omit({ numSteps: true }));
+
 // ../../packages/types/src/public-api.ts
-import * as z16 from "zod";
-var GeneratorOptionsSchema = z16.object({
-  disableCache: z16.boolean()
+import * as z15 from "zod";
+
+// ../../packages/types/src/runs.ts
+import { z as z12 } from "zod";
+var RunTriggerEnum = {
+  WEBHOOK: "WEBHOOK",
+  CRON: "CRON",
+  MANUAL: "MANUAL",
+  CLI: "CLI"
+};
+var RunStatusEnum = {
+  PENDING: "PENDING",
+  RUNNING: "RUNNING",
+  PASSED: "PASSED",
+  FAILED: "FAILED",
+  CANCELLED: "CANCELLED"
+};
+var DateOrStringSchema = z12.string().pipe(z12.coerce.date()).or(z12.date());
+var RunMetadataSchema = z12.object({
+  id: z12.string(),
+  createdAt: DateOrStringSchema,
+  createdBy: z12.string(),
+  organizationId: z12.string().or(z12.null()),
+  scheduledAt: DateOrStringSchema.or(z12.null()),
+  startedAt: DateOrStringSchema.or(z12.null()),
+  finishedAt: DateOrStringSchema.or(z12.null()),
+  testId: z12.string().or(z12.null()),
+  status: z12.nativeEnum(RunStatusEnum),
+  trigger: z12.nativeEnum(RunTriggerEnum),
+  attempts: z12.number(),
+  test: z12.object({
+    name: z12.string(),
+    id: z12.string()
+  }).or(z12.null())
+});
+var RunWithTestSchema = RunMetadataSchema.merge(
+  z12.object({
+    results: ResultSchema.array(),
+    test: z12.object({
+      name: z12.string(),
+      id: z12.string(),
+      baseUrl: z12.string()
+    }).or(z12.null())
+  })
+);
+
+// ../../packages/types/src/test.ts
+import { z as z14 } from "zod";
+
+// ../../packages/types/src/test-settings.ts
+import { isValidCron } from "cron-validator";
+import { z as z13 } from "zod";
+var TestAdvancedSettingsSchema = z13.object({
+  availableAsModule: z13.boolean().default(false),
+  disableAICaching: z13.boolean().default(false)
+});
+var ScheduleSettingsSchema = z13.object({
+  cron: z13.string().refine(
+    (v) => {
+      return isValidCron(v);
+    },
+    { message: "Invalid cron expression." }
+  ).default("0 0 */1 * *"),
+  enabled: z13.boolean().default(false),
+  timeZone: z13.string().default("America/Los_Angeles"),
+  // this is used for removing repeatable jobs (not set by user)
+  jobKey: z13.string().optional()
+});
+var WebhookSchema = z13.object({
+  lastStatus: z13.number().optional(),
+  url: z13.string().url()
+});
+var WebhookSettingsSchema = z13.array(WebhookSchema).default([]);
+
+// ../../packages/types/src/test.ts
+var TestNameSchema = z14.string().min(1).max(255).superRefine((v, ctx) => {
+  try {
+    validateTestOrModuleName(v);
+  } catch (err) {
+    ctx.addIssue({
+      code: z14.ZodIssueCode.custom,
+      message: err.message,
+      fatal: true
+    });
+    return z14.NEVER;
+  }
+});
+var BaseTestMetadataSchema = z14.object({
+  id: z14.string(),
+  name: TestNameSchema,
+  baseUrl: z14.string(),
+  schemaVersion: z14.string(),
+  advanced: TestAdvancedSettingsSchema,
+  retries: z14.number()
+});
+var UserEditableTestSettingsSchema = BaseTestMetadataSchema.pick({
+  name: true,
+  baseUrl: true,
+  retries: true,
+  advanced: true
+});
+var ExtendedTestMetadataSchema = z14.object({
+  createdAt: z14.coerce.date(),
+  updatedAt: z14.coerce.date(),
+  schedule: ScheduleSettingsSchema,
+  webhooks: WebhookSettingsSchema,
+  createdBy: z14.string(),
+  organizationId: z14.string().or(z14.null())
+});
+var ResolvedTestSchema = BaseTestMetadataSchema.merge(
+  ExtendedTestMetadataSchema
+).merge(
+  z14.object({
+    steps: z14.array(ResolvedStepSchema)
+  })
+);
+var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: z14.array(ResolvedStepSchema)
+  })
+);
+var UUID_REGEX = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+function validateTestOrModuleName(name) {
+  name = name.toLowerCase();
+  if (name.length === 0 || name.length > 255) {
+    throw new Error("Name must be between 1 and 255 characters long");
+  }
+  const invalidChars = /[<>:"\/\\|?*\x00]/;
+  if (invalidChars.test(name)) {
+    throw new Error(
+      "Name can only contain alphanumeric characters, dashes, and underscores."
+    );
+  }
+  const windowsReservedNames = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+  if (windowsReservedNames.test(name)) {
+    throw new Error(
+      `"${name}" is a reserved name on Windows and cannot be used as a filename.`
+    );
+  }
+  if (/^\.+$/.test(name) || /^\s|\s$/.test(name)) {
+    throw new Error("Name cannot start or end with a space or dot.");
+  }
+  if (name.endsWith(".yaml")) {
+    throw new Error('Name cannot end with ".yaml".');
+  }
+  if (name === "modules") {
+    throw new Error(
+      "'modules' is a reserved folder name in Momentic. Please choose a different name."
+    );
+  }
+  if (name.match(UUID_REGEX)) {
+    throw new Error("Name cannot be a UUID. Please choose a different name.");
+  }
+}
+
+// ../../packages/types/src/public-api.ts
+var GeneratorOptionsSchema = z15.object({
+  disableCache: z15.boolean()
 });
 var GetNextCommandBodySchema = DynamicContextSchema.merge(
   GeneratorOptionsSchema
 );
 var GetNextCommandResponseSchema = AICommandSchema;
-var GetAssertionResultBodySchema = z16.discriminatedUnion("vision", [
+var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
   DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
-    z16.object({
-      vision: z16.literal(false)
+    z15.object({
+      vision: z15.literal(false)
     })
   ),
   DynamicContextSchema.pick({
     goal: true,
     url: true
   }).merge(GeneratorOptionsSchema).merge(
-    z16.object({
+    z15.object({
       // base64 encoded image
-      screenshot: z16.string(),
-      vision: z16.literal(true)
+      screenshot: z15.string(),
+      vision: z15.literal(true)
     })
   )
 ]);
@@ -800,47 +917,125 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   goal: true,
   url: true
 }).merge(GeneratorOptionsSchema);
-var SplitGoalResponseSchema = z16.string().array();
-var QueueTestsBodySchema = z16.object({
-  testPaths: z16.string().array(),
-  testIds: z16.string().array()
-}).partial();
-var GetTestResponseSchema = ResolvedTestSchema;
-var ExportTestBodySchema = z16.object({
-  path: z16.string()
+var SplitGoalResponseSchema = z15.string().array();
+var QueueTestsBodySchema = z15.union([
+  z15.object({
+    testPaths: z15.string().array(),
+    all: z15.boolean().optional()
+  }),
+  z15.object({
+    testIds: z15.string().array()
+  }).describe("deprecated - for backwards compatibility only")
+]);
+var QueueTestsResponseSchema = z15.object({
+  message: z15.string(),
+  queuedTests: z15.object({
+    name: z15.string(),
+    id: z15.string()
+  }).array()
 });
-var ExportTestResponseSchema = TestSerializationResultSchema;
-var TestWithModulesYAMLSchema = z16.object({
-  test: z16.string().describe("test YAML"),
-  modules: z16.record(
-    z16.string().describe("moduleId"),
-    z16.string().describe("module YAML")
+var GetTestResponseSchema = ResolvedTestSchema;
+var GetAllTestIdsResponseSchema = z15.string().array();
+var ExportTestBodySchema = z15.union([
+  z15.object({
+    paths: z15.string().array().describe("run specific test paths (e.g. todo-test)")
+  }),
+  z15.object({
+    path: z15.string().describe("deprecated; present for backcompat")
+  }),
+  z15.object({
+    all: z15.boolean().describe("run all tests")
+  })
+]);
+var ExportTestResponseSchema = z15.object({
+  tests: z15.record(
+    z15.string().describe("Test name"),
+    z15.string().describe("Test YAML")
+  ),
+  modules: z15.record(
+    z15.string().describe("Module name"),
+    z15.string().describe("Module YAML")
+  )
+});
+var TestWithModulesYAMLSchema = z15.object({
+  test: z15.string().describe("test YAML"),
+  modules: z15.record(
+    z15.string().describe("moduleId"),
+    z15.string().describe("module YAML")
   )
 });
 var UpdateTestsBodySchema = TestWithModulesYAMLSchema.array();
-var CreateRunBodySchema = z16.object({
-  testPath: z16.string(),
-  testId: z16.string()
+var CreateRunBodySchema = z15.object({
+  testPath: z15.string(),
+  testId: z15.string()
 }).partial().merge(
-  z16.object({
-    trigger: z16.nativeEnum(RunTriggerEnum)
+  z15.object({
+    trigger: z15.nativeEnum(RunTriggerEnum)
   })
 );
 var CreateRunResponseSchema = RunWithTestSchema;
 var GetRunResponseSchema = RunWithTestSchema;
-var UpdateRunBodySchema = z16.object({
-  startedAt: z16.coerce.date(),
-  finishedAt: z16.coerce.date(),
+var UpdateRunBodySchema = z15.object({
+  startedAt: z15.coerce.date(),
+  finishedAt: z15.coerce.date(),
   results: ResultSchema.array(),
-  status: z16.nativeEnum(RunStatusEnum)
+  status: z15.nativeEnum(RunStatusEnum)
 }).partial();
-var CreateScreenshotBodySchema = z16.object({
+var CreateScreenshotBodySchema = z15.object({
   // base64 string
-  screenshot: z16.string()
+  screenshot: z15.string()
 });
-var CreateScreenshotResponseSchema = z16.object({
-  key: z16.string()
+var CreateScreenshotResponseSchema = z15.object({
+  key: z15.string()
 });
+
+// ../../packages/types/src/step-serialization.ts
+function serializeStep(step) {
+  switch (step.type) {
+    case "AI_ACTION" /* AI_ACTION */:
+      return `AI action: ${step.text}`;
+    case "PRESET_ACTION" /* PRESET_ACTION */:
+      return serializeCommand(step.command);
+    case "RESOLVED_MODULE":
+      return `Module: ${step.moduleId}`;
+  }
+}
+
+// ../../packages/types/src/test-serialization.ts
+import { stringify } from "yaml";
+import { z as z16 } from "zod";
+var TestSerializationResultSchema = z16.object({
+  test: z16.string().describe("YAML for the test, including metadata and steps"),
+  modules: z16.record(z16.string(), z16.string()).describe("Map of module name to YAML for the module")
+});
+var SerializedTestSchema = BaseTestMetadataSchema.merge(
+  z16.object({
+    steps: StepSchema.array(),
+    fileType: z16.literal("momentic/test" /* TEST */)
+  })
+);
+var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
+  type: true
+}).merge(
+  z16.object({
+    schemaVersion: z16.string(),
+    fileType: z16.literal("momentic/module")
+  })
+);
+var DeserializedTestSchema = BaseTestMetadataSchema.merge(
+  z16.object({
+    steps: z16.array(z16.record(z16.string(), z16.unknown()))
+  })
+);
+var DeserializedModuleSchema = z16.object({
+  moduleId: z16.string().uuid(),
+  name: z16.string(),
+  schemaVersion: z16.string(),
+  steps: z16.array(z16.record(z16.string(), z16.unknown()))
+});
+
+// package.json
+var version = "1.0.0";
 
 // src/api-client.ts
 var API_VERSION = "v1";
@@ -882,6 +1077,14 @@ var APIClient = class {
       return GetTestResponseSchema.parse(result);
     });
   }
+  getAllTestIds() {
+    return __async(this, null, function* () {
+      const result = yield this.sendRequest(`/${API_VERSION}/tests`, {
+        method: "GET"
+      });
+      return GetAllTestIdsResponseSchema.parse(result);
+    });
+  }
   getTestYAMLExport(body) {
     return __async(this, null, function* () {
       const result = yield this.sendRequest(`/${API_VERSION}/tests/export`, {
@@ -901,10 +1104,11 @@ var APIClient = class {
   }
   queueTests(body) {
     return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION}/tests/queue`, {
+      const result = yield this.sendRequest(`/${API_VERSION}/tests/queue`, {
         method: "POST",
         body
       });
+      return QueueTestsResponseSchema.parse(result);
     });
   }
   uploadScreenshot(body) {
@@ -916,9 +1120,9 @@ var APIClient = class {
       return CreateScreenshotResponseSchema.parse(result);
     });
   }
-  sendRequest(path2, options) {
+  sendRequest(path3, options) {
     return __async(this, null, function* () {
-      const response = yield fetch(`${this.baseURL}${path2}`, {
+      const response = yield fetch(`${this.baseURL}${path3}`, {
         method: options.method,
         body: options.body ? JSON.stringify(options.body) : void 0,
         headers: {
@@ -934,7 +1138,7 @@ var APIClient = class {
           body = yield response.text();
         }
         throw new Error(
-          `Request to ${path2} failed with status ${response.status}: ${JSON.stringify(body)}`
+          `Request to ${path3} failed with status ${response.status}: ${JSON.stringify(body)}`
         );
       }
       if (response.status === 204) {
@@ -974,10 +1178,10 @@ var yesOption = new Option("-y, --yes", "Skip confirmation prompts.");
 var testNameArgument = new Argument(
   "<test>",
   "Name of a test (case insensitive). Spaces may be replaced with dashes, such as `hello-world`."
-).argRequired();
+).argOptional();
 var testsVariadicArgument = new Argument(
   "<tests...>",
-  "Names of tests (case insensitive). Spaces may be replaced with dashes, such as `hello-world`. If using --local, you may also specify paths to Momentic YAML files locally."
+  "Names of tests (case insensitive). Spaces may be replaced with dashes, such as `hello-world`. To read tests from the local file system, specify file paths to Momentic YAML files that exist locally (requires --local option as well)."
 ).argRequired();
 var pathsVariadicArgument = new Argument(
   "<paths...>",
@@ -987,6 +1191,10 @@ var outDirOption = new Option(
   "-o --out-dir <outDir>",
   "Root directory to write output files to. Can be absolute or relative to the current directory. Defaults to `momentic`."
 ).default(DEFAULT_FOLDER_PATH);
+var allOption = new Option(
+  "-a --all",
+  "Select all tests from the cloud Momentic server. Cannot be used together with <tests> arguments."
+).default(false).preset(true);
 
 // src/prompt.ts
 import chalk from "chalk";
@@ -1000,7 +1208,7 @@ function promptForConfirmation(question, yellow) {
       output: process.stdout
     });
     question = `${question} (y/N) `;
-    const questionContent = yellow ? chalk.yellow(question) : question;
+    const questionContent = yellow ? chalk.bold.yellow(question) : question;
     const answer = yield rl.question(questionContent);
     rl.close();
     if (answer.toLowerCase() === "y") {
@@ -1012,14 +1220,14 @@ function promptForConfirmation(question, yellow) {
 }
 
 // src/pull-test.ts
-import chalk2 from "chalk";
 import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 function fetchAndSaveTestToDisk(_0) {
   return __async(this, arguments, function* ({
-    name,
+    name = "",
     client,
-    outDir
+    outDir,
+    all
   }) {
     if (name.endsWith(".yaml")) {
       name = name.slice(0, -5);
@@ -1032,41 +1240,42 @@ function fetchAndSaveTestToDisk(_0) {
     if (!existsSync(rootModuleDir)) {
       mkdirSync(rootModuleDir, { recursive: true });
     }
-    const testFilePath = join(rootDir, nameToYAMLFileName(name));
-    const { test, modules } = yield client.getTestYAMLExport({ path: name });
-    if (!(yield checkAndPromptForOverwrite(testFilePath))) {
-      console.log(chalk2.red("Pull cancelled"));
-      return;
+    const { tests, modules } = yield client.getTestYAMLExport({
+      paths: name ? [name] : void 0,
+      all
+    });
+    const numTests = Object.keys(tests).length;
+    for (const [testName, testYAML] of Object.entries(tests)) {
+      const testFilePath = join(rootDir, nameToYAMLFileName(testName));
+      if (!(yield checkAndPromptForOverwrite(testFilePath))) {
+        consoleLogger.error("Pull cancelled");
+        return;
+      }
+      writeFileSync(testFilePath, testYAML, "utf-8");
+      consoleLogger.info(`Wrote '${testFilePath}'`);
     }
-    writeFileSync(testFilePath, test, "utf-8");
-    console.log(
-      // escape spaces in name when printing
-      chalk2.green(`Wrote '${testFilePath}'`)
-    );
     const numModules = Object.keys(modules).length;
     for (const [moduleName, moduleYAML] of Object.entries(modules)) {
       const modulePath = join(rootModuleDir, nameToYAMLFileName(moduleName));
       if (!(yield checkAndPromptForOverwrite(modulePath))) {
-        console.log(chalk2.red("Pull cancelled"));
+        consoleLogger.error("Pull cancelled");
         return;
       }
       writeFileSync(modulePath, moduleYAML, "utf-8");
-      console.log(chalk2.green(`Wrote '${modulePath}'`));
+      consoleLogger.info(`Wrote '${modulePath}'`);
     }
-    console.log(
-      chalk2.green(
-        `Pulled 1 test${numModules ? ` and ${numModules} modules` : ""}!`
-      )
+    consoleLogger.info(
+      `Pulled ${numTests} test${numTests > 1 ? "s" : ""}${numModules ? ` and ${numModules} module${numModules > 1 ? "s" : ""}` : ""}!`
     );
   });
 }
-function checkAndPromptForOverwrite(path2) {
+function checkAndPromptForOverwrite(path3) {
   return __async(this, null, function* () {
-    if (!existsSync(path2)) {
+    if (!existsSync(path3)) {
       return true;
     }
     return promptForConfirmation(
-      `File '${path2.replace(/(\s+)/g, "\\$1")}' already exists. Overwrite?`,
+      `File '${path3.replace(/(\s+)/g, "\\$1")}' already exists. Overwrite?`,
       true
     );
   });
@@ -1076,7 +1285,6 @@ function nameToYAMLFileName(name) {
 }
 
 // src/push-test.ts
-import chalk3 from "chalk";
 import { existsSync as existsSync2, readFileSync, readdirSync, statSync } from "fs";
 import path from "path";
 function saveTestToServer(params) {
@@ -1099,25 +1307,25 @@ function saveTestToServer(params) {
         rootTestPaths.add(fullPath);
       }
     }
-    console.log(`Found ${rootTestPaths.size} test(s) to push:`);
-    rootTestPaths.forEach((testPath) => console.log(`  - ${testPath}`));
-    console.log(`Loading file contents and resolving dependent modules`);
+    consoleLogger.info(`Found ${rootTestPaths.size} test(s) to push:`);
+    rootTestPaths.forEach((testPath) => consoleLogger.info(`  - ${testPath}`));
+    consoleLogger.info(`Loading file contents and resolving dependent modules`);
     const testUpdates = Array.from(rootTestPaths).map(readTestWithModules);
     const moduleIds = new Set(
       testUpdates.flatMap((update) => Object.keys(update.modules))
     );
-    console.log(
+    consoleLogger.info(
       `Resolved ${rootTestPaths.size} test(s) and ${moduleIds.size} module(s)`
     );
     if (!params.yes) {
       const warning = "Pushing tests overwrites tests on production and will instantly affect scheduled runs. Continue?";
       if (!(yield promptForConfirmation(warning, true))) {
-        console.log(chalk3.red("Push cancelled"));
+        consoleLogger.error("Push cancelled");
         return;
       }
     }
     yield params.client.updateTestWithYAML(testUpdates);
-    console.log(chalk3.green("Update successful!"));
+    consoleLogger.info("Update successful!");
   });
 }
 function readTestWithModules(testFilePath) {
@@ -1179,7 +1387,7 @@ function getModuleFile(dir, moduleId) {
 // src/run-tests-locally.ts
 import exec from "@actions/exec";
 import io from "@actions/io";
-import chalk5 from "chalk";
+import { existsSync as existsSync3, statSync as statSync2 } from "fs";
 import quote from "quote";
 import parseArgsStringToArgv2 from "string-argv";
 import waitOnFn from "wait-on";
@@ -1902,7 +2110,9 @@ var _ChromeBrowser = class _ChromeBrowser {
           backendNodeId: node.backendNodeID
         });
       } catch (err) {
-        this.logger.warn({ err }, "Failed to add node highlight");
+        this.logger.warn(
+          "Failed to add node highlight, a page navigation likely occurred. This is non-fatal for tests."
+        );
       }
       const hideHighlight = () => __async(this, null, function* () {
         try {
@@ -1995,11 +2205,13 @@ var _ChromeBrowser = class _ChromeBrowser {
             return true;
           }
         }
-        if (!rejected) {
+        if (!rejected && unfinishedRequests.size > 0) {
           this.logger.warn(
             {
               url: this.url,
-              requests: JSON.stringify(Array.from(unfinishedRequests.entries()))
+              unfinishedRequests: JSON.stringify(
+                Array.from(unfinishedRequests.entries())
+              )
             },
             "Timeout elapsed waiting for network idle, continuing anyways..."
           );
@@ -2058,7 +2270,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       const proposedNode = this.nodeMap.get(`${target.id}`);
       if (proposedNode) {
         if (getNodeComparisonScore(proposedNode, target) >= 2) {
-          this.logger.info(
+          this.logger.debug(
             "Resolved cached a11y target to node with exact same id"
           );
           saveNodeDetailsToCache(proposedNode, target);
@@ -2069,7 +2281,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       let closestNode;
       for (const node of this.nodeMap.values()) {
         if (getNodeComparisonScore(node, target) >= 2) {
-          this.logger.info(
+          this.logger.debug(
             { newNode: node.getLogForm(), target },
             "Resolved cached a11y target to new node with field comparison"
           );
@@ -2095,7 +2307,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         }
       }
       if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
-        this.logger.info(
+        this.logger.debug(
           { newNode: closestNode.getLogForm(), target },
           "Resolved cached a11y target to new node with pure levenshtein distance"
         );
@@ -2198,7 +2410,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       );
       let accessibilityTreeLoadFired = false;
       const accessibilityLoadListener = () => {
-        this.logger.info({ url }, `A11y tree load event fired`);
+        this.logger.info({ url }, `Load event fired on page`);
         accessibilityTreeLoadFired = true;
       };
       this.cdpClient.addListener(
@@ -2724,10 +2936,8 @@ var AgentController = class {
           command,
           disableCache
         );
-        this.logger.info(
-          { result, duration: Date.now() - executionStart },
-          "Got execution result"
-        );
+        const duration = Date.now() - executionStart;
+        this.logger.debug({ result, duration }, "Got execution result");
       } catch (e) {
         if (e instanceof Error) {
           throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
@@ -2923,6 +3133,9 @@ var AgentController = class {
           yield this.browser.switchToPage(command.url);
           break;
         case "COOKIE" /* COOKIE */:
+          if (!command.value) {
+            break;
+          }
           yield this.browser.setCookie(command.value);
           break;
         case "TYPE" /* TYPE */: {
@@ -3070,10 +3283,10 @@ var APIGenerator = class {
       return SplitGoalResponseSchema.parse(result);
     });
   }
-  sendRequest(path2, body) {
+  sendRequest(path3, body) {
     return __async(this, null, function* () {
-      const response = yield fetch2(`${this.baseURL}${path2}`, {
-        retries: 3,
+      const response = yield fetch2(`${this.baseURL}${path3}`, {
+        retries: 1,
         retryDelay: 1e3,
         method: "POST",
         body: JSON.stringify(body),
@@ -3084,7 +3297,7 @@ var APIGenerator = class {
       });
       if (!response.ok) {
         throw new Error(
-          `Request to ${path2} failed with status ${response.status}: ${yield response.text()}`
+          `Request to ${path3} failed with status ${response.status}: ${yield response.text()}`
         );
       }
       return response.json();
@@ -3092,8 +3305,59 @@ var APIGenerator = class {
   }
 };
 
-// src/run-test.ts
-import chalk4 from "chalk";
+// src/get-tests.ts
+import fs from "fs";
+import path2 from "path";
+var bannedDirs = /* @__PURE__ */ new Set([
+  "modules",
+  // this is reserved directory
+  "node_modules",
+  "dist",
+  "bin",
+  ".git",
+  "logs",
+  ".npm",
+  ".next",
+  "out",
+  ".yarn",
+  "__pycache__",
+  "build",
+  ".env",
+  ".venv",
+  "venv",
+  "env",
+  "wheels"
+]);
+function getTestFilesRecursively(dir) {
+  var _a;
+  const dirName = (_a = dir.split(path2.sep).pop()) != null ? _a : "";
+  if (bannedDirs.has(dirName)) {
+    if (dirName !== "modules") {
+      consoleLogger.warn(
+        `Skipping directory '${dir}' because it is likely an artifact folder.`
+      );
+    }
+    return [];
+  }
+  const files = fs.readdirSync(dir);
+  let filePathList = [];
+  files.forEach((file) => {
+    const filepath = path2.join(dir, file);
+    if (fs.statSync(filepath).isDirectory()) {
+      filePathList = filePathList.concat(getTestFilesRecursively(filepath));
+    } else if (file.endsWith(".yaml")) {
+      const contents = fs.readFileSync(filepath, "utf-8");
+      if (contents.includes("momentic/test" /* TEST */)) {
+        filePathList.push(filepath);
+      } else {
+        consoleLogger.warn(
+          `Skipping file '${filepath}' because it does not appear to be a valid Momentic test.`
+        );
+      }
+    }
+  });
+  return filePathList;
+}
 
 // ../../packages/execute/src/constants.ts
 var MAX_COMMANDS_PER_STEP = 20;
@@ -3171,7 +3435,9 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
         status: "SUCCESS" /* SUCCESS */
       };
       logger.info(
-        `Executing command ${commandIndex}: ${serializeCommand(command)}`
+        `Starting sub-command ${commandIndex} within AI step: ${serializeCommand(
+          command
+        )}`
       );
       try {
         const executionResult = yield controller.executeCommand(
@@ -3179,6 +3445,7 @@ var executeAIStep = (_a) => __async(void 0, null, function* () {
           advanced.disableAICaching,
           useSavedCommands
         );
+        logger.info(`AI sub-command ${commandIndex} completed successfully`);
         cmdResult.elementInteracted = executionResult.elementInteracted;
         (_c = callbacks.onCommandExecuted) == null ? void 0 : _c.call(callbacks, {
           commandIndex,
@@ -3390,7 +3657,12 @@ var executeModuleStep = (_a) => __async(void 0, null, function* () {
   };
   for (let i = 0; i < step.steps.length; i++) {
     const moduleStep = step.steps[i];
-    logger.info({ i, moduleStep }, `Starting module step`);
+    logger.debug({ i, moduleStep }, `Starting module step`);
+    logger.info(
+      `Starting module sub-step ${i + 1}/${step.steps.length}: ${serializeStep(
+        moduleStep
+      )}`
+    );
     let moduleStepResult;
     switch (moduleStep.type) {
       case "PRESET_ACTION" /* PRESET_ACTION */:
@@ -3528,6 +3800,9 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
   const results = [];
   for (let i = 0; i < test.steps.length; i++) {
     const step = test.steps[i];
+    logger.info(
+      `Starting step ${i + 1}/${test.steps.length}: ${serializeStep(step)}`
+    );
     let result;
     switch (step.type) {
       case "PRESET_ACTION" /* PRESET_ACTION */:
@@ -3568,6 +3843,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
       results
     });
     if (result.status === "FAILED" /* FAILED */) {
+      logger.info(`Step ${i} of ${test.steps.length} failed`);
       failed = true;
       for (let j = i + 1; j < test.steps.length; j++) {
         const skippedStep = test.steps[j];
@@ -3601,6 +3877,8 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
           results.push(skippedResult);
         }
       }
+    } else {
+      logger.info(`Step ${i}/${test.steps.length} succeeded`);
     }
     if (failed) {
       break;
@@ -3943,28 +4221,28 @@ function migrateStepLikeArrayRecursively(inputSteps, migration) {
 }
 
 // src/run-test.ts
-import { parse as parse2 } from "yaml";
+import { parse } from "yaml";
 function runTest(_0) {
   return __async(this, arguments, function* ({
-    path: path2,
+    path: path3,
     apiClient,
     generator,
-    newBaseURL
+    newBaseURL,
+    useLocalFiles
   }) {
-    console.log("Collecting tests...");
     let test;
-    if (path2.endsWith(".yaml")) {
-      console.log(`Reading ${path2} from local filesystem`);
-      test = yield resolveLocalTest(path2);
+    if (useLocalFiles) {
+      consoleLogger.info(`Reading ${path3} from local filesystem`);
+      test = yield resolveLocalTest(path3);
     } else {
-      console.log(`Fetching ${path2} from Momentic server (${apiClient.baseURL})`);
-      test = yield apiClient.getTest(path2);
+      consoleLogger.info(
+        `Fetching ${path3} from Momentic server (${apiClient.baseURL})`
+      );
+      test = yield apiClient.getTest(path3);
     }
     if (test.schemaVersion > LATEST_VERSION) {
-      console.log(
-        chalk4.yellow(
-          `Test ${path2} has schema version ${test.schemaVersion}, which is greater than what is currently supported by this SDK. Please update your momentic package version to avoid unexpected behavior.`
-        )
+      consoleLogger.warn(
+        `Test ${path3} has schema version ${test.schemaVersion}, which is greater than what is currently supported by this SDK. Please update your momentic package version to avoid unexpected behavior.`
       );
     }
     const originalURL = new URL(test.baseUrl);
@@ -3984,10 +4262,16 @@ function runTest(_0) {
       config: DEFAULT_CONTROLLER_CONFIG,
       logger: consoleLogger
     });
-    const run = yield apiClient.createRun({
-      testId: test.id,
-      trigger: "CLI"
-    });
+    let run;
+    try {
+      run = yield apiClient.createRun({
+        testId: test.id,
+        trigger: "CLI"
+      });
+    } catch (err) {
+      consoleLogger.info(err);
+      throw new Error(`Are you sure test ${test.name} exists on the server?`);
+    }
     let failed = true;
     try {
       failed = yield executeTest({
@@ -4018,7 +4302,7 @@ function runTest(_0) {
 function resolveLocalTest(filePath) {
   return __async(this, null, function* () {
     const { test, modules: unmigratedModules } = readTestWithModules(filePath);
-    const unmigratedTest = parse2(test);
+    const unmigratedTest = parse(test);
     if (!unmigratedTest.steps || !Array.isArray(unmigratedTest.steps)) {
       throw new Error(`Test ${filePath} is missing steps`);
     }
@@ -4027,10 +4311,8 @@ function resolveLocalTest(filePath) {
     }
     let steps;
     if (unmigratedTest.schemaVersion < LATEST_VERSION) {
-      console.log(
-        chalk4.yellow(
-          `Test ${filePath} has schema version ${unmigratedTest.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your test will be migrated to the latest version before execution.`
-        )
+      consoleLogger.warn(
+        `Test ${filePath} has schema version ${unmigratedTest.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your test will be migrated to the latest version before execution.`
       );
       const { steps: migratedSteps } = yield runStepMigrations({
         metadata: unmigratedTest,
@@ -4045,7 +4327,7 @@ function resolveLocalTest(filePath) {
     for (const [moduleId, unmigratedModuleYAML] of Object.entries(
       unmigratedModules
     )) {
-      const unmigratedModule = parse2(unmigratedModuleYAML);
+      const unmigratedModule = parse(unmigratedModuleYAML);
       if (!unmigratedModule.schemaVersion || !unmigratedModule.moduleId) {
         throw new Error(`Module ${moduleId} is missing an ID or schema version`);
       }
@@ -4053,10 +4335,8 @@ function resolveLocalTest(filePath) {
         throw new Error(`Module ${moduleId} is missing steps`);
       }
       if (unmigratedModule.schemaVersion < LATEST_VERSION) {
-        console.log(
-          chalk4.yellow(
-            `Module ${moduleId} has schema version ${unmigratedModule.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your module will be migrated to the latest version before execution.`
-          )
+        consoleLogger.warn(
+          `Module ${moduleId} has schema version ${unmigratedModule.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your module will be migrated to the latest version before execution.`
         );
         const { steps: migratedSteps } = yield runStepMigrations({
           metadata: {
@@ -4104,14 +4384,16 @@ function runTestsLocally(_0) {
     start,
     waitOn,
     waitOnTimeout,
-    client
+    client,
+    all,
+    parallelization = 1
   }) {
     if (start) {
-      console.log(`Running start command: ${start}`);
+      consoleLogger.info(`Running start command: ${start}`);
       yield execCommand(start, false);
     }
     if (waitOn) {
-      console.log(
+      consoleLogger.info(
         `Waiting for ${waitOn} to be accessible (timeout: ${waitOnTimeout}s)`
       );
       yield waitOnFn({
@@ -4123,34 +4405,79 @@ function runTestsLocally(_0) {
       baseURL: client.baseURL,
       apiKey: client.apiKey
     });
-    const promises = tests.map((path2) => __async(this, null, function* () {
-      let failed = true;
-      try {
-        failed = yield runTest({
-          path: path2,
-          apiClient: client,
-          generator: apiGenerator,
-          newBaseURL: waitOn
-        });
-      } catch (e) {
-        console.error(e);
+    let useLocalFiles = false;
+    if (tests.some((testPath) => testPath.endsWith(".yaml"))) {
+      useLocalFiles = true;
+    } else if (tests.some((testPath) => existsSync3(testPath))) {
+      useLocalFiles = true;
+    }
+    let testsToRun = [];
+    if (useLocalFiles) {
+      consoleLogger.info(
+        tests,
+        `Reading tests from the following file paths locally`
+      );
+      tests.forEach((testPath) => {
+        if (!existsSync3(testPath)) {
+          throw new Error(`Path '${testPath}' does not exist.`);
+        }
+        const statResult = statSync2(testPath);
+        if (statResult.isDirectory()) {
+          testsToRun = testsToRun.concat(getTestFilesRecursively(testPath));
+        } else if (testPath.endsWith(".yaml")) {
+          testsToRun.push(testPath);
+        } else {
+          throw new Error(
+            `Path '${testPath}' is not a directory or a .yaml file.`
+          );
+        }
+      });
+    } else {
+      consoleLogger.info(
+        `Fetching tests from remote Momentic server (${client.baseURL})`
+      );
+      if (all) {
+        testsToRun = yield client.getAllTestIds();
+      } else {
+        testsToRun = tests;
       }
-      return { failed, path: path2 };
-    }));
-    const results = yield Promise.all(promises);
+    }
+    consoleLogger.info(
+      testsToRun,
+      `Identified ${testsToRun.length} tests locally`
+    );
+    let results = [];
+    for (let i = 0; i < testsToRun.length; i += parallelization) {
+      const blockResults = yield Promise.all(
+        testsToRun.slice(i, i + parallelization).map((path3) => __async(this, null, function* () {
+          let failed = true;
+          try {
+            failed = yield runTest({
+              useLocalFiles,
+              path: path3,
+              apiClient: client,
+              generator: apiGenerator,
+              newBaseURL: waitOn
+            });
+          } catch (e) {
+            consoleLogger.error(e);
+          }
+          return { failed, path: path3 };
+        }))
+      );
+      results = results.concat(blockResults);
+    }
     const failedResults = results.filter((result) => result.failed);
     if (failedResults.length > 0) {
-      console.log(
-        chalk5.red(
-          `Failed ${failedResults.length} out of ${results.length} tests:`
-        )
+      consoleLogger.error(
+        `Failed ${failedResults.length} out of ${results.length} tests:`
       );
       failedResults.forEach((result) => {
-        console.log(chalk5.red(`- ${result.path}`));
+        consoleLogger.error(`- ${result.path}`);
       });
       process.exit(1);
     }
-    console.log(chalk5.green(`All ${results.length} tests passed!`));
+    consoleLogger.info(`All ${results.length} tests passed!`);
     process.exit(0);
   });
 }
@@ -4167,16 +4494,17 @@ function execCommand(fullCommand, waitToFinish = true) {
 }
 
 // src/run-tests-remotely.ts
-import chalk6 from "chalk";
 function runTestsRemotely(_0) {
   return __async(this, arguments, function* ({
     tests,
-    client
+    client,
+    all
   }) {
-    yield client.queueTests({
-      testPaths: tests
+    const { queuedTests } = yield client.queueTests({
+      testPaths: tests,
+      all
     });
-    console.log(chalk6.green(`Successfully queued ${tests.length} tests!`));
+    consoleLogger.info(`Successfully queued ${queuedTests.length} tests!`);
   });
 }
 
@@ -4186,7 +4514,12 @@ program.name("momentic").description("Momentic CLI").version(version);
 program.command("install-browsers").action(() => __async(void 0, null, function* () {
   yield installBrowsers();
 }));
-program.command("run").alias("run-tests").addArgument(testsVariadicArgument).addOption(apiKeyOption).addOption(serverAddressOption).addOption(
+program.addOption(
+  new Option2("--log-level <level>").choices(["debug", "info", "warn", "error"]).default("info")
+).on("option:log-level", (level) => {
+  consoleLogger.setMinLevel(stringToLogLevel[level.toUpperCase()]);
+});
+program.command("run").alias("run-tests").addOption(apiKeyOption).addOption(serverAddressOption).addOption(allOption).addOption(
   new Option2(
     "-r, --remote",
     "Run tests remotely. The production version of this test will be queued for execution."
@@ -4196,7 +4529,7 @@ program.command("run").alias("run-tests").addArgument(testsVariadicArgument).add
 ).addOption(
   new Option2(
     "-l, --local",
-    "Run tests locally. Useful for accessing apps on localhost."
+    "Run tests locally. Useful for accessing apps on localhost. This option does not control where tests are read from (see <tests> argument documentation)."
   ).implies({
     remote: false
   })
@@ -4215,29 +4548,17 @@ program.command("run").alias("run-tests").addArgument(testsVariadicArgument).add
     "--wait-on-timeout <timeout>",
     "Max time to wait for the --wait-on URL to become accessible."
   ).default(60, "one minute")
-).action((tests, options) => __async(void 0, null, function* () {
-  const { apiKey, server, remote, local } = options;
+).addOption(
+  new Option2(
+    "-p, --parallel <parallelization>",
+    "When running with the --local flag, the number of tests to run in parallel. Defaults to 1."
+  ).default(1)
+).addArgument(testsVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
+  const { apiKey, server, remote, local, all } = options;
   const client = new APIClient({
     baseURL: server,
     apiKey
   });
-  if (remote) {
-    if (tests.some((test) => test.endsWith(".yaml"))) {
-      const prompt = "A local test file was provided without the --local flag. The production version of this test will be queued remotely. Continue?";
-      if (!(yield promptForConfirmation(prompt, true))) {
-        console.log("Run cancelled");
-        process.exit(1);
-      }
-      tests = tests.map((test) => {
-        if (test.endsWith(".yaml")) {
-          return test.slice(0, -5);
-        }
-        return test;
-      });
-    }
-    yield runTestsRemotely({ tests, client });
-    return;
-  }
   if (local) {
     try {
       yield runTestsLocally(__spreadValues({
@@ -4245,22 +4566,42 @@ program.command("run").alias("run-tests").addArgument(testsVariadicArgument).add
         client
       }, options));
     } catch (e) {
-      console.error(e);
+      consoleLogger.error(e);
       process.exit(1);
     }
+    return;
+  }
+  if (remote) {
+    if (tests.some((test) => test.endsWith(".yaml") || existsSync4(test))) {
+      const prompt = "A local file path was provided without the --local flag. The production version of the specified test will be queued remotely. Continue?";
+      if (!(yield promptForConfirmation(prompt, true))) {
+        consoleLogger.info("Run cancelled");
+        process.exit(1);
+      }
+      tests = tests.map((test) => {
+        if (test.endsWith(".yaml")) {
+          test = test.slice(0, -5);
+        }
+        return test;
+      });
+    }
+    yield runTestsRemotely({ tests, client, all });
     return;
   }
   throw new Error("One of remote or local must be specified");
 }));
 program.command("pull").description(
   "Fetch a test from your organization and save it in YAML format onto local disk."
-).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
-  const { apiKey, server, outDir } = options;
+).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addOption(allOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
+  const { apiKey, server, outDir, all } = options;
+  if (!all && !test) {
+    throw new Error("At least one test name or --all must be provided");
+  }
   const client = new APIClient({
     baseURL: server,
     apiKey
   });
-  yield fetchAndSaveTestToDisk({ name: test, client, outDir });
+  yield fetchAndSaveTestToDisk({ name: test, client, outDir, all });
 }));
 program.command("push").description(
   "Save a local YAML file containing a test to your cloud workspace."

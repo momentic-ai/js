@@ -325,6 +325,51 @@ var LLMOutputSchema = z5.object({
 });
 var NumericStringSchema = z5.string().pipe(z5.coerce.number());
 
+// ../../packages/types/src/card-display.ts
+var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
+  Object.values(CommandType)
+);
+var CARD_DISPLAY_NAMES = {
+  ["AI_ACTION" /* AI_ACTION */]: "AI action",
+  ["MODULE" /* MODULE */]: "Module",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
+  ["CLICK" /* CLICK */]: "Click",
+  ["HOVER" /* HOVER */]: "Hover",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
+  ["TYPE" /* TYPE */]: "Type",
+  ["PRESS" /* PRESS */]: "Press",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
+  ["GO_BACK" /* GO_BACK */]: "Go back",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
+  ["WAIT" /* WAIT */]: "Wait",
+  ["REFRESH" /* REFRESH */]: "Refresh",
+  ["TAB" /* TAB */]: "Switch tab",
+  ["COOKIE" /* COOKIE */]: "Set cookie",
+  ["SUCCESS" /* SUCCESS */]: "Done"
+};
+var CARD_DESCRIPTIONS = {
+  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
+  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
+  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
+  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
+  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
+  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
+  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
+  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
+  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
+  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
+  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
+  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
+  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
+  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
+  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
+  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
+  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
+  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
+};
+
 // ../../packages/types/src/command-results.ts
 import * as z6 from "zod";
 var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
@@ -397,195 +442,7 @@ var ResultSchema = z6.discriminatedUnion("type", [
   ModuleResultSchema
 ]);
 
-// ../../packages/types/src/cookies.ts
-import { parseString } from "set-cookie-parser";
-function parseCookieString(cookie) {
-  const parsedCookie = parseString(cookie);
-  if (!parsedCookie.name) {
-    throw new Error("Name missing from cookie");
-  }
-  if (!parsedCookie.value) {
-    throw new Error("Value missing from cookie");
-  }
-  let sameSite;
-  if (parsedCookie.sameSite) {
-    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
-    if (sameSiteSetting === "strict") {
-      sameSite = "Strict";
-    } else if (sameSiteSetting === "lax") {
-      sameSite = "Lax";
-    } else if (sameSiteSetting === "none") {
-      sameSite = "None";
-    } else {
-      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
-    }
-  }
-  if (!parsedCookie.path && parsedCookie.domain) {
-    parsedCookie.path = "/";
-  }
-  const result = __spreadProps(__spreadValues({}, parsedCookie), {
-    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
-    sameSite
-  });
-  return result;
-}
-
-// ../../packages/types/src/execute-results.ts
-import * as z7 from "zod";
-var ExecuteCommandHistoryEntrySchema = z7.object({
-  // type of command executed
-  type: z7.nativeEnum(StepType),
-  // if AI step type, what command was executed
-  generatedStep: UserEditableAICommandSchema.optional(),
-  // human readable descriptor for action taken, including element interacted with
-  serializedCommand: z7.string().optional(),
-  // human readable descriptor for element interacted with
-  elementInteracted: z7.string().optional()
-});
-
-// ../../packages/types/src/goal-splitter.ts
-import { z as z8 } from "zod";
-var InstructionsSchema = z8.string().array();
-
-// ../../packages/types/src/locator.ts
-import * as z9 from "zod";
-var AILocatorSchema = z9.object({
-  thoughts: z9.string(),
-  // a11y id
-  id: z9.number().int(),
-  // dropdowns should have options
-  options: z9.array(z9.string()).optional()
-});
-
-// ../../packages/types/src/modules.ts
-import { z as z10 } from "zod";
-var ModuleMetadataSchema = z10.object({
-  id: z10.string(),
-  createdAt: z10.coerce.date(),
-  createdBy: z10.string(),
-  organizationId: z10.string().or(z10.null()),
-  name: z10.string(),
-  schemaVersion: z10.string(),
-  // this is only used in the client and is not stored in the db
-  numSteps: z10.number()
-});
-var ModuleSchema = z10.object({
-  steps: AllowedModuleStepSchema.array()
-}).merge(ModuleMetadataSchema.omit({ numSteps: true }));
-
-// ../../packages/types/src/runs.ts
-import { z as z11 } from "zod";
-var RunTriggerEnum = {
-  WEBHOOK: "WEBHOOK",
-  CRON: "CRON",
-  MANUAL: "MANUAL",
-  CLI: "CLI"
-};
-var RunStatusEnum = {
-  PENDING: "PENDING",
-  RUNNING: "RUNNING",
-  PASSED: "PASSED",
-  FAILED: "FAILED",
-  CANCELLED: "CANCELLED"
-};
-var DateOrStringSchema = z11.string().pipe(z11.coerce.date()).or(z11.date());
-var RunMetadataSchema = z11.object({
-  id: z11.string(),
-  createdAt: DateOrStringSchema,
-  createdBy: z11.string(),
-  organizationId: z11.string().or(z11.null()),
-  scheduledAt: DateOrStringSchema.or(z11.null()),
-  startedAt: DateOrStringSchema.or(z11.null()),
-  finishedAt: DateOrStringSchema.or(z11.null()),
-  testId: z11.string().or(z11.null()),
-  status: z11.nativeEnum(RunStatusEnum),
-  trigger: z11.nativeEnum(RunTriggerEnum),
-  attempts: z11.number(),
-  test: z11.object({
-    name: z11.string(),
-    id: z11.string()
-  }).or(z11.null())
-});
-var RunWithTestSchema = RunMetadataSchema.merge(
-  z11.object({
-    results: ResultSchema.array(),
-    test: z11.object({
-      name: z11.string(),
-      id: z11.string(),
-      baseUrl: z11.string()
-    }).or(z11.null())
-  })
-);
-
-// ../../packages/types/src/serialization.ts
-import { parse, stringify } from "yaml";
-import { z as z14 } from "zod";
-
-// ../../packages/types/src/test.ts
-import { z as z13 } from "zod";
-
-// ../../packages/types/src/test-settings.ts
-import { isValidCron } from "cron-validator";
-import { z as z12 } from "zod";
-var TestAdvancedSettingsSchema = z12.object({
-  availableAsModule: z12.boolean().default(false),
-  disableAICaching: z12.boolean().default(false)
-});
-var ScheduleSettingsSchema = z12.object({
-  cron: z12.string().refine(
-    (v) => {
-      return isValidCron(v);
-    },
-    { message: "Invalid cron expression." }
-  ).default("0 0 */1 * *"),
-  enabled: z12.boolean().default(false),
-  timeZone: z12.string().default("America/Los_Angeles"),
-  // this is used for removing repeatable jobs (not set by user)
-  jobKey: z12.string().optional()
-});
-var WebhookSchema = z12.object({
-  lastStatus: z12.number().optional(),
-  url: z12.string().url()
-});
-var WebhookSettingsSchema = z12.array(WebhookSchema).default([]);
-var TestSettingsSchema = z12.object({
-  name: z12.string().min(1),
-  baseUrl: z12.string().url(),
-  retries: z12.coerce.number().min(0).max(10),
-  advanced: TestAdvancedSettingsSchema
-});
-
-// ../../packages/types/src/test.ts
-var BaseTestMetadataSchema = z13.object({
-  id: z13.string(),
-  name: z13.string(),
-  baseUrl: z13.string(),
-  schemaVersion: z13.string(),
-  advanced: TestAdvancedSettingsSchema,
-  retries: z13.number()
-});
-var ExtendedTestMetadataSchema = z13.object({
-  createdAt: z13.coerce.date(),
-  updatedAt: z13.coerce.date(),
-  schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema,
-  createdBy: z13.string(),
-  organizationId: z13.string().or(z13.null())
-});
-var ResolvedTestSchema = BaseTestMetadataSchema.merge(
-  ExtendedTestMetadataSchema
-).merge(
-  z13.object({
-    steps: z13.array(ResolvedStepSchema)
-  })
-);
-var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
-  z13.object({
-    steps: z13.array(ResolvedStepSchema)
-  })
-);
-
-// ../../packages/types/src/serialization.ts
+// ../../packages/types/src/command-serialization.ts
 function clampText(text, length) {
   if (text.length < length) {
     return text;
@@ -651,119 +508,389 @@ function serializeCommand(command) {
       return assertUnreachable(command);
   }
 }
-var TestSerializationResultSchema = z14.object({
-  test: z14.string().describe("YAML for the test, including metadata and steps"),
-  modules: z14.record(z14.string(), z14.string()).describe("Map of module name to YAML for the module")
-});
-var SerializedTestSchema = BaseTestMetadataSchema.merge(
-  z14.object({
-    steps: StepSchema.array()
-  })
-);
-var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
-  type: true
-}).merge(
-  z14.object({
-    schemaVersion: z14.string()
-  })
-);
-var DeserializedTestSchema = BaseTestMetadataSchema.merge(
-  z14.object({
-    steps: z14.array(z14.record(z14.string(), z14.unknown()))
-  })
-);
-var DeserializedModuleSchema = z14.object({
-  moduleId: z14.string().uuid(),
-  name: z14.string(),
-  schemaVersion: z14.string(),
-  steps: z14.array(z14.record(z14.string(), z14.unknown()))
-});
-
-// ../../packages/types/src/card-display.ts
-var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
-  Object.values(CommandType)
-);
-var CARD_DISPLAY_NAMES = {
-  ["AI_ACTION" /* AI_ACTION */]: "AI action",
-  ["MODULE" /* MODULE */]: "Module",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
-  ["CLICK" /* CLICK */]: "Click",
-  ["HOVER" /* HOVER */]: "Hover",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["TYPE" /* TYPE */]: "Type",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["GO_BACK" /* GO_BACK */]: "Go back",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
-  ["WAIT" /* WAIT */]: "Wait",
-  ["REFRESH" /* REFRESH */]: "Refresh",
-  ["TAB" /* TAB */]: "Switch tab",
-  ["COOKIE" /* COOKIE */]: "Set cookie",
-  ["SUCCESS" /* SUCCESS */]: "Done"
-};
-var CARD_DESCRIPTIONS = {
-  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
-  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
-  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
-  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
-  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
-  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
-  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
-  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
-  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
-  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
-  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
-  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
-};
 
 // ../../packages/types/src/context.ts
-import * as z15 from "zod";
-var DynamicContextSchema = z15.object({
-  // user goal or instruction
-  goal: z15.string(),
-  // current url of the browser
-  url: z15.string(),
-  // serialized page state
-  browserState: z15.string(),
-  // serialized history of previous commands
-  history: z15.string(),
-  // number of previously executed commands
-  numPrevious: z15.number(),
-  // last executed command, if any
-  lastCommand: ExecuteCommandHistoryEntrySchema.or(z15.null())
+import * as z8 from "zod";
+
+// ../../packages/types/src/execute-results.ts
+import * as z7 from "zod";
+var ExecuteCommandHistoryEntrySchema = z7.object({
+  // type of command executed
+  type: z7.nativeEnum(StepType),
+  // if AI step type, what command was executed
+  generatedStep: UserEditableAICommandSchema.optional(),
+  // human readable descriptor for action taken, including element interacted with
+  serializedCommand: z7.string().optional(),
+  // human readable descriptor for element interacted with
+  elementInteracted: z7.string().optional()
 });
 
+// ../../packages/types/src/context.ts
+var DynamicContextSchema = z8.object({
+  // user goal or instruction
+  goal: z8.string(),
+  // current url of the browser
+  url: z8.string(),
+  // serialized page state
+  browserState: z8.string(),
+  // serialized history of previous commands
+  history: z8.string(),
+  // number of previously executed commands
+  numPrevious: z8.number(),
+  // last executed command, if any
+  lastCommand: ExecuteCommandHistoryEntrySchema.or(z8.null())
+});
+
+// ../../packages/types/src/cookies.ts
+import { parseString } from "set-cookie-parser";
+function parseCookieString(cookie) {
+  const parsedCookie = parseString(cookie);
+  if (!parsedCookie.name) {
+    throw new Error("Name missing from cookie");
+  }
+  if (!parsedCookie.value) {
+    throw new Error("Value missing from cookie");
+  }
+  let sameSite;
+  if (parsedCookie.sameSite) {
+    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
+    if (sameSiteSetting === "strict") {
+      sameSite = "Strict";
+    } else if (sameSiteSetting === "lax") {
+      sameSite = "Lax";
+    } else if (sameSiteSetting === "none") {
+      sameSite = "None";
+    } else {
+      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
+    }
+  }
+  if (!parsedCookie.path && parsedCookie.domain) {
+    parsedCookie.path = "/";
+  }
+  const result = __spreadProps(__spreadValues({}, parsedCookie), {
+    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
+    sameSite
+  });
+  return result;
+}
+
+// ../../packages/types/src/goal-splitter.ts
+import { z as z9 } from "zod";
+var InstructionsSchema = z9.string().array();
+
+// ../../packages/types/src/locator.ts
+import * as z10 from "zod";
+var AILocatorSchema = z10.object({
+  thoughts: z10.string(),
+  // a11y id
+  id: z10.number().int(),
+  // dropdowns should have options
+  options: z10.array(z10.string()).optional()
+});
+
+// ../../packages/types/src/logger.ts
+var LogLevelTags = {
+  [0 /* DEBUG */]: "DEBUG",
+  [1 /* INFO */]: "INFO",
+  [2 /* WARN */]: "WARN",
+  [3 /* ERROR */]: "ERROR"
+};
+var LogLevelColors = {
+  [0 /* DEBUG */]: "\x1B[90m",
+  [1 /* INFO */]: "\x1B[32m",
+  [2 /* WARN */]: "\x1B[33m",
+  [3 /* ERROR */]: "\x1B[31m"
+};
+var ConsoleLogger = class _ConsoleLogger {
+  constructor(minLevel, bindings) {
+    this.minLogLevel = minLevel;
+    this.logBindings = bindings;
+  }
+  log(level, ...args) {
+    const levelName = LogLevelTags[level];
+    let objectArg;
+    if (Array.isArray(args[0])) {
+      objectArg = args[0];
+      args = args.slice(1);
+    } else if (typeof args[0] === "object") {
+      objectArg = __spreadValues(__spreadValues({}, args[0]), this.logBindings);
+      args = args.slice(1);
+    }
+    const colorSequence = LogLevelColors[level];
+    const logTokens = [
+      `${colorSequence}[${(/* @__PURE__ */ new Date()).toTimeString().slice(0, 8)}][${levelName}]`
+    ];
+    if (level !== 0 /* DEBUG */) {
+      logTokens.push("\x1B[39m");
+    }
+    logTokens.push(...args);
+    console.log(...logTokens);
+    if (objectArg && !Array.isArray(objectArg)) {
+      for (const [key, value] of Object.entries(objectArg)) {
+        let stringifiedValue = value;
+        if (typeof value === "object") {
+          stringifiedValue = JSON.stringify(value, void 0, 2);
+          stringifiedValue = stringifiedValue.split("\n").map(
+            (line, index) => index > 0 ? `  ${line}` : line
+          ).join("\n");
+        }
+        console.log(
+          level === 0 /* DEBUG */ ? `${colorSequence}  ${key}:` : `  ${key}:`,
+          stringifiedValue
+        );
+      }
+    } else if (objectArg) {
+      for (const value of objectArg) {
+        let stringifiedValue = value;
+        if (typeof value === "object") {
+          stringifiedValue = JSON.stringify(value, void 0, 2);
+          stringifiedValue = stringifiedValue.split("\n").map(
+            (line, index) => index > 0 ? `  ${line}` : line
+          ).join("\n");
+        }
+        console.log(
+          level === 0 /* DEBUG */ ? `${colorSequence}  ` : `  `,
+          stringifiedValue
+        );
+      }
+    }
+    if (level === 0 /* DEBUG */) {
+      process.stdout.write("\x1B[39m");
+    }
+  }
+  setMinLevel(level) {
+    this.minLogLevel = level;
+  }
+  info(...args) {
+    if (1 /* INFO */ < this.minLogLevel) {
+      return;
+    }
+    this.log(1 /* INFO */, ...args);
+  }
+  debug(...args) {
+    if (0 /* DEBUG */ < this.minLogLevel) {
+      return;
+    }
+    this.log(0 /* DEBUG */, ...args);
+  }
+  warn(...args) {
+    if (2 /* WARN */ < this.minLogLevel) {
+      return;
+    }
+    this.log(2 /* WARN */, ...args);
+  }
+  error(...args) {
+    if (3 /* ERROR */ < this.minLogLevel) {
+      return;
+    }
+    this.log(3 /* ERROR */, ...args);
+  }
+  child(bindings) {
+    return new _ConsoleLogger(this.minLogLevel, __spreadValues(__spreadValues({}, this.logBindings), bindings));
+  }
+  flush() {
+    return;
+  }
+  bindings() {
+    return this.logBindings;
+  }
+};
+var consoleLogger = new ConsoleLogger(1 /* INFO */, {});
+
+// ../../packages/types/src/modules.ts
+import { z as z11 } from "zod";
+var ModuleMetadataSchema = z11.object({
+  id: z11.string(),
+  createdAt: z11.coerce.date(),
+  createdBy: z11.string(),
+  organizationId: z11.string().or(z11.null()),
+  name: z11.string(),
+  schemaVersion: z11.string(),
+  // this is only used in the client and is not stored in the db
+  numSteps: z11.number()
+});
+var ModuleSchema = z11.object({
+  steps: AllowedModuleStepSchema.array()
+}).merge(ModuleMetadataSchema.omit({ numSteps: true }));
+
 // ../../packages/types/src/public-api.ts
-import * as z16 from "zod";
-var GeneratorOptionsSchema = z16.object({
-  disableCache: z16.boolean()
+import * as z15 from "zod";
+
+// ../../packages/types/src/runs.ts
+import { z as z12 } from "zod";
+var RunTriggerEnum = {
+  WEBHOOK: "WEBHOOK",
+  CRON: "CRON",
+  MANUAL: "MANUAL",
+  CLI: "CLI"
+};
+var RunStatusEnum = {
+  PENDING: "PENDING",
+  RUNNING: "RUNNING",
+  PASSED: "PASSED",
+  FAILED: "FAILED",
+  CANCELLED: "CANCELLED"
+};
+var DateOrStringSchema = z12.string().pipe(z12.coerce.date()).or(z12.date());
+var RunMetadataSchema = z12.object({
+  id: z12.string(),
+  createdAt: DateOrStringSchema,
+  createdBy: z12.string(),
+  organizationId: z12.string().or(z12.null()),
+  scheduledAt: DateOrStringSchema.or(z12.null()),
+  startedAt: DateOrStringSchema.or(z12.null()),
+  finishedAt: DateOrStringSchema.or(z12.null()),
+  testId: z12.string().or(z12.null()),
+  status: z12.nativeEnum(RunStatusEnum),
+  trigger: z12.nativeEnum(RunTriggerEnum),
+  attempts: z12.number(),
+  test: z12.object({
+    name: z12.string(),
+    id: z12.string()
+  }).or(z12.null())
+});
+var RunWithTestSchema = RunMetadataSchema.merge(
+  z12.object({
+    results: ResultSchema.array(),
+    test: z12.object({
+      name: z12.string(),
+      id: z12.string(),
+      baseUrl: z12.string()
+    }).or(z12.null())
+  })
+);
+
+// ../../packages/types/src/test.ts
+import { z as z14 } from "zod";
+
+// ../../packages/types/src/test-settings.ts
+import { isValidCron } from "cron-validator";
+import { z as z13 } from "zod";
+var TestAdvancedSettingsSchema = z13.object({
+  availableAsModule: z13.boolean().default(false),
+  disableAICaching: z13.boolean().default(false)
+});
+var ScheduleSettingsSchema = z13.object({
+  cron: z13.string().refine(
+    (v) => {
+      return isValidCron(v);
+    },
+    { message: "Invalid cron expression." }
+  ).default("0 0 */1 * *"),
+  enabled: z13.boolean().default(false),
+  timeZone: z13.string().default("America/Los_Angeles"),
+  // this is used for removing repeatable jobs (not set by user)
+  jobKey: z13.string().optional()
+});
+var WebhookSchema = z13.object({
+  lastStatus: z13.number().optional(),
+  url: z13.string().url()
+});
+var WebhookSettingsSchema = z13.array(WebhookSchema).default([]);
+
+// ../../packages/types/src/test.ts
+var TestNameSchema = z14.string().min(1).max(255).superRefine((v, ctx) => {
+  try {
+    validateTestOrModuleName(v);
+  } catch (err) {
+    ctx.addIssue({
+      code: z14.ZodIssueCode.custom,
+      message: err.message,
+      fatal: true
+    });
+    return z14.NEVER;
+  }
+});
+var BaseTestMetadataSchema = z14.object({
+  id: z14.string(),
+  name: TestNameSchema,
+  baseUrl: z14.string(),
+  schemaVersion: z14.string(),
+  advanced: TestAdvancedSettingsSchema,
+  retries: z14.number()
+});
+var UserEditableTestSettingsSchema = BaseTestMetadataSchema.pick({
+  name: true,
+  baseUrl: true,
+  retries: true,
+  advanced: true
+});
+var ExtendedTestMetadataSchema = z14.object({
+  createdAt: z14.coerce.date(),
+  updatedAt: z14.coerce.date(),
+  schedule: ScheduleSettingsSchema,
+  webhooks: WebhookSettingsSchema,
+  createdBy: z14.string(),
+  organizationId: z14.string().or(z14.null())
+});
+var ResolvedTestSchema = BaseTestMetadataSchema.merge(
+  ExtendedTestMetadataSchema
+).merge(
+  z14.object({
+    steps: z14.array(ResolvedStepSchema)
+  })
+);
+var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
+  z14.object({
+    steps: z14.array(ResolvedStepSchema)
+  })
+);
+var UUID_REGEX = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
+function validateTestOrModuleName(name) {
+  name = name.toLowerCase();
+  if (name.length === 0 || name.length > 255) {
+    throw new Error("Name must be between 1 and 255 characters long");
+  }
+  const invalidChars = /[<>:"\/\\|?*\x00]/;
+  if (invalidChars.test(name)) {
+    throw new Error(
+      "Name can only contain alphanumeric characters, dashes, and underscores."
+    );
+  }
+  const windowsReservedNames = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
+  if (windowsReservedNames.test(name)) {
+    throw new Error(
+      `"${name}" is a reserved name on Windows and cannot be used as a filename.`
+    );
+  }
+  if (/^\.+$/.test(name) || /^\s|\s$/.test(name)) {
+    throw new Error("Name cannot start or end with a space or dot.");
+  }
+  if (name.endsWith(".yaml")) {
+    throw new Error('Name cannot end with ".yaml".');
+  }
+  if (name === "modules") {
+    throw new Error(
+      "'modules' is a reserved folder name in Momentic. Please choose a different name."
+    );
+  }
+  if (name.match(UUID_REGEX)) {
+    throw new Error("Name cannot be a UUID. Please choose a different name.");
+  }
+}
+
+// ../../packages/types/src/public-api.ts
+var GeneratorOptionsSchema = z15.object({
+  disableCache: z15.boolean()
 });
 var GetNextCommandBodySchema = DynamicContextSchema.merge(
   GeneratorOptionsSchema
 );
 var GetNextCommandResponseSchema = AICommandSchema;
-var GetAssertionResultBodySchema = z16.discriminatedUnion("vision", [
+var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
   DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
-    z16.object({
-      vision: z16.literal(false)
+    z15.object({
+      vision: z15.literal(false)
     })
   ),
   DynamicContextSchema.pick({
     goal: true,
     url: true
   }).merge(GeneratorOptionsSchema).merge(
-    z16.object({
+    z15.object({
       // base64 encoded image
-      screenshot: z16.string(),
-      vision: z16.literal(true)
+      screenshot: z15.string(),
+      vision: z15.literal(true)
     })
   )
 ]);
@@ -777,42 +904,106 @@ var SplitGoalBodySchema = DynamicContextSchema.pick({
   goal: true,
   url: true
 }).merge(GeneratorOptionsSchema);
-var SplitGoalResponseSchema = z16.string().array();
-var QueueTestsBodySchema = z16.object({
-  testPaths: z16.string().array(),
-  testIds: z16.string().array()
-}).partial();
-var ExportTestBodySchema = z16.object({
-  path: z16.string()
+var SplitGoalResponseSchema = z15.string().array();
+var QueueTestsBodySchema = z15.union([
+  z15.object({
+    testPaths: z15.string().array(),
+    all: z15.boolean().optional()
+  }),
+  z15.object({
+    testIds: z15.string().array()
+  }).describe("deprecated - for backwards compatibility only")
+]);
+var QueueTestsResponseSchema = z15.object({
+  message: z15.string(),
+  queuedTests: z15.object({
+    name: z15.string(),
+    id: z15.string()
+  }).array()
 });
-var TestWithModulesYAMLSchema = z16.object({
-  test: z16.string().describe("test YAML"),
-  modules: z16.record(
-    z16.string().describe("moduleId"),
-    z16.string().describe("module YAML")
+var GetAllTestIdsResponseSchema = z15.string().array();
+var ExportTestBodySchema = z15.union([
+  z15.object({
+    paths: z15.string().array().describe("run specific test paths (e.g. todo-test)")
+  }),
+  z15.object({
+    path: z15.string().describe("deprecated; present for backcompat")
+  }),
+  z15.object({
+    all: z15.boolean().describe("run all tests")
+  })
+]);
+var ExportTestResponseSchema = z15.object({
+  tests: z15.record(
+    z15.string().describe("Test name"),
+    z15.string().describe("Test YAML")
+  ),
+  modules: z15.record(
+    z15.string().describe("Module name"),
+    z15.string().describe("Module YAML")
+  )
+});
+var TestWithModulesYAMLSchema = z15.object({
+  test: z15.string().describe("test YAML"),
+  modules: z15.record(
+    z15.string().describe("moduleId"),
+    z15.string().describe("module YAML")
   )
 });
 var UpdateTestsBodySchema = TestWithModulesYAMLSchema.array();
-var CreateRunBodySchema = z16.object({
-  testPath: z16.string(),
-  testId: z16.string()
+var CreateRunBodySchema = z15.object({
+  testPath: z15.string(),
+  testId: z15.string()
 }).partial().merge(
-  z16.object({
-    trigger: z16.nativeEnum(RunTriggerEnum)
+  z15.object({
+    trigger: z15.nativeEnum(RunTriggerEnum)
   })
 );
-var UpdateRunBodySchema = z16.object({
-  startedAt: z16.coerce.date(),
-  finishedAt: z16.coerce.date(),
+var UpdateRunBodySchema = z15.object({
+  startedAt: z15.coerce.date(),
+  finishedAt: z15.coerce.date(),
   results: ResultSchema.array(),
-  status: z16.nativeEnum(RunStatusEnum)
+  status: z15.nativeEnum(RunStatusEnum)
 }).partial();
-var CreateScreenshotBodySchema = z16.object({
+var CreateScreenshotBodySchema = z15.object({
   // base64 string
-  screenshot: z16.string()
+  screenshot: z15.string()
 });
-var CreateScreenshotResponseSchema = z16.object({
-  key: z16.string()
+var CreateScreenshotResponseSchema = z15.object({
+  key: z15.string()
+});
+
+// ../../packages/types/src/test-serialization.ts
+import { stringify } from "yaml";
+import { z as z16 } from "zod";
+var TestSerializationResultSchema = z16.object({
+  test: z16.string().describe("YAML for the test, including metadata and steps"),
+  modules: z16.record(z16.string(), z16.string()).describe("Map of module name to YAML for the module")
+});
+var SerializedTestSchema = BaseTestMetadataSchema.merge(
+  z16.object({
+    steps: StepSchema.array(),
+    fileType: z16.literal("momentic/test" /* TEST */)
+  })
+);
+var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
+  type: true
+}).merge(
+  z16.object({
+    schemaVersion: z16.string(),
+    fileType: z16.literal("momentic/module")
+  })
+);
+var DeserializedTestSchema = BaseTestMetadataSchema.merge(
+  z16.object({
+    steps: z16.array(z16.record(z16.string(), z16.unknown()))
+  })
+);
+var DeserializedModuleSchema = z16.object({
+  moduleId: z16.string().uuid(),
+  name: z16.string(),
+  schemaVersion: z16.string(),
+  steps: z16.array(z16.record(z16.string(), z16.unknown()))
 });
 
 // ../../packages/web-agent/src/utils/url.ts
@@ -1524,7 +1715,9 @@ var _ChromeBrowser = class _ChromeBrowser {
           backendNodeId: node.backendNodeID
         });
       } catch (err) {
-        this.logger.warn({ err }, "Failed to add node highlight");
+        this.logger.warn(
+          "Failed to add node highlight, a page navigation likely occurred. This is non-fatal for tests."
+        );
       }
       const hideHighlight = () => __async(this, null, function* () {
         try {
@@ -1617,11 +1810,13 @@ var _ChromeBrowser = class _ChromeBrowser {
             return true;
           }
         }
-        if (!rejected) {
+        if (!rejected && unfinishedRequests.size > 0) {
           this.logger.warn(
             {
               url: this.url,
-              requests: JSON.stringify(Array.from(unfinishedRequests.entries()))
+              unfinishedRequests: JSON.stringify(
+                Array.from(unfinishedRequests.entries())
+              )
             },
             "Timeout elapsed waiting for network idle, continuing anyways..."
           );
@@ -1680,7 +1875,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       const proposedNode = this.nodeMap.get(`${target.id}`);
       if (proposedNode) {
         if (getNodeComparisonScore(proposedNode, target) >= 2) {
-          this.logger.info(
+          this.logger.debug(
             "Resolved cached a11y target to node with exact same id"
           );
           saveNodeDetailsToCache(proposedNode, target);
@@ -1691,7 +1886,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       let closestNode;
       for (const node of this.nodeMap.values()) {
         if (getNodeComparisonScore(node, target) >= 2) {
-          this.logger.info(
+          this.logger.debug(
             { newNode: node.getLogForm(), target },
             "Resolved cached a11y target to new node with field comparison"
           );
@@ -1717,7 +1912,7 @@ var _ChromeBrowser = class _ChromeBrowser {
         }
       }
       if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
-        this.logger.info(
+        this.logger.debug(
           { newNode: closestNode.getLogForm(), target },
           "Resolved cached a11y target to new node with pure levenshtein distance"
         );
@@ -1820,7 +2015,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       );
       let accessibilityTreeLoadFired = false;
       const accessibilityLoadListener = () => {
-        this.logger.info({ url }, `A11y tree load event fired`);
+        this.logger.info({ url }, `Load event fired on page`);
         accessibilityTreeLoadFired = true;
       };
       this.cdpClient.addListener(
@@ -2346,10 +2541,8 @@ var AgentController = class {
           command,
           disableCache
         );
-        this.logger.info(
-          { result, duration: Date.now() - executionStart },
-          "Got execution result"
-        );
+        const duration = Date.now() - executionStart;
+        this.logger.debug({ result, duration }, "Got execution result");
       } catch (e) {
         if (e instanceof Error) {
           throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
@@ -2545,6 +2738,9 @@ var AgentController = class {
           yield this.browser.switchToPage(command.url);
           break;
         case "COOKIE" /* COOKIE */:
+          if (!command.value) {
+            break;
+          }
           yield this.browser.setCookie(command.value);
           break;
         case "TYPE" /* TYPE */: {
@@ -2695,7 +2891,7 @@ var APIGenerator = class {
   sendRequest(path, body) {
     return __async(this, null, function* () {
       const response = yield fetch(`${this.baseURL}${path}`, {
-        retries: 3,
+        retries: 1,
         retryDelay: 1e3,
         method: "POST",
         body: JSON.stringify(body),
