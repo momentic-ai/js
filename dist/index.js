@@ -1030,6 +1030,7 @@ var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var HIGHLIGHT_DURATION_MS = 3e3;
 var MAX_LEVENSHTEIN_DISTANCE = 300;
 var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.2;
+var MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO = 0.1;
 var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
   "about:blank",
   "chrome-error://chromewebdata/"
@@ -1052,7 +1053,8 @@ var defaultA11yNodeSerializeParams = {
   noID: false,
   noChildren: false,
   noProperties: false,
-  maxLevel: void 0
+  maxLevel: void 0,
+  neighbors: void 0
 };
 var ProcessedA11yNode = class {
   constructor(params) {
@@ -1086,6 +1088,7 @@ var ProcessedA11yNode = class {
     return !!this.name.trim() || !!this.content;
   }
   serialize(opts = defaultA11yNodeSerializeParams) {
+    var _a, _b;
     const { indentLevel, noChildren, noProperties, noID } = Object.assign(
       {},
       defaultA11yNodeSerializeParams,
@@ -1129,12 +1132,26 @@ var ProcessedA11yNode = class {
       return s;
     } else {
       s += ">\n";
-    }
-    for (const child of this.children) {
-      s += child.serialize(__spreadProps(__spreadValues({}, opts), { indentLevel: indentLevel + 2 }));
-    }
-    s += `${indent}</${this.role}>
+      for (const child of this.children) {
+        s += child.serialize(__spreadProps(__spreadValues({}, opts), { indentLevel: indentLevel + 2 }));
+      }
+      s += `${indent}</${this.role}>
 `;
+    }
+    if (opts.neighbors !== void 0 && opts.neighbors > 0 && this.parent) {
+      const currentIndex = this.parent.children.findIndex(
+        (n) => n.id === this.id
+      );
+      const before = currentIndex > 0 ? (_a = this.parent.children[currentIndex - 1]) == null ? void 0 : _a.serialize(__spreadProps(__spreadValues({}, opts), {
+        neighbors: 0
+      })) : "";
+      const after = currentIndex < this.parent.children.length - 1 ? (_b = this.parent.children[currentIndex + 1]) == null ? void 0 : _b.serialize(__spreadProps(__spreadValues({}, opts), {
+        neighbors: 0
+      })) : "";
+      return `${before ? before : ""}
+${s}
+${after ? after : ""}`;
+    }
     return s;
   }
 };
@@ -1295,7 +1312,12 @@ var saveNodeDetailsToCache = (node, target) => {
   target.name = node.name;
   target.role = node.role;
   target.numChildren = node.children.length;
-  target.serializedForm = node.serialize({ noID: true, maxLevel: 1 });
+  target.serializedForm = node.serialize({
+    noID: true,
+    maxLevel: 1,
+    neighbors: 1
+    // only 1 neighbor is supported right now
+  });
 };
 var getNodeComparisonScore = (node, target) => {
   var _a;
@@ -1308,17 +1330,23 @@ var getNodeComparisonScore = (node, target) => {
     if (!((_a = node[attr]) == null ? void 0 : _a.trim())) {
       continue;
     }
-    if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_CHANGE_RATIO) {
+    if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
       score++;
     }
   }
   if (target.numChildren !== void 0) {
-    if (node.children.length === target.numChildren) {
+    if (node.children.length === target.numChildren && target.numChildren > 0) {
       score++;
     } else if (target.numChildren > 0 && node.children.length === 0) {
       score--;
     } else if (Math.abs(node.children.length - target.numChildren) > 2) {
       score--;
+    }
+  }
+  if (target.serializedForm) {
+    const serializedNode = node.serialize({ noID: true, maxLevel: 1 });
+    if (distance(serializedNode, target.serializedForm) / Math.min(serializedNode.length, target.serializedForm.length) <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
+      score++;
     }
   }
   return score;
@@ -1758,21 +1786,9 @@ var _ChromeBrowser = class _ChromeBrowser {
       const requestFiredListener = (request) => {
         var _a;
         if (!isRequestRelevantForPageLoad(request, this.url)) {
-          this.logger.debug(
-            {
-              uri: serializeRequest(request)
-            },
-            "Ignoring request for page load network stability"
-          );
           return;
         }
         const key = serializeRequest(request);
-        this.logger.debug(
-          {
-            uri: key
-          },
-          "Request fired on page load, delaying network stability"
-        );
         firedRequests.set(key, ((_a = firedRequests.get(key)) != null ? _a : 0) + 1);
         lastRequestReceived = Date.now();
       };
@@ -1804,7 +1820,6 @@ var _ChromeBrowser = class _ChromeBrowser {
           let anyDifference = false;
           for (const key of firedRequests.keys()) {
             if (firedRequests.get(key) !== finishedRequests.get(key)) {
-              this.logger.debug({ uri: key }, "Waiting on request to finish");
               anyDifference = true;
               unfinishedRequests.add(key);
             }
@@ -1884,7 +1899,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       yield this.getA11yTree();
       const proposedNode = this.nodeMap.get(`${target.id}`);
       if (proposedNode) {
-        if (getNodeComparisonScore(proposedNode, target) >= 2) {
+        if (getNodeComparisonScore(proposedNode, target) >= 3) {
           this.logger.debug(
             "Resolved cached a11y target to node with exact same id"
           );
@@ -1896,7 +1911,7 @@ var _ChromeBrowser = class _ChromeBrowser {
       let smallestLevenshteinRatio = Infinity;
       let closestNode;
       for (const node of this.nodeMap.values()) {
-        if (getNodeComparisonScore(node, target) >= 3) {
+        if (getNodeComparisonScore(node, target) > 3) {
           this.logger.debug(
             { newNode: node.getLogForm(), target },
             "Resolved cached a11y target to new node with field comparison"
@@ -1907,7 +1922,8 @@ var _ChromeBrowser = class _ChromeBrowser {
         if (target.serializedForm) {
           const serializedNode = node.serialize({
             noID: true,
-            maxLevel: 1
+            maxLevel: 1,
+            neighbors: 1
           });
           if (Math.abs(serializedNode.length - target.serializedForm.length) > MAX_LEVENSHTEIN_DISTANCE) {
             continue;
@@ -2651,7 +2667,10 @@ var AgentController = class {
       }
       try {
         const result = yield action(target.a11yData);
-        this.logger.debug("Successfully used cached target to perform action");
+        this.logger.debug(
+          { target },
+          "Successfully used cached target to perform action"
+        );
         return result;
       } catch (err) {
         if (!newlyGenerated) {
