@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.17-rc.6",
+  "version": "0.0.17-rc.7",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",

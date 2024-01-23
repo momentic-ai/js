@@ -64,6 +64,7 @@ var A11yTargetWithCacheSchema = z.object({
   // to assist in re-execution
   role: z.string().optional(),
   name: z.string().optional(),
+  numChildren: z.number().optional(),
   content: z.string().optional(),
   pathFromRoot: z.string().optional(),
   serializedForm: z.string().optional()
@@ -716,7 +717,7 @@ var ModuleMetadataSchema = z11.object({
   id: z11.string(),
   createdAt: z11.coerce.date(),
   createdBy: z11.string(),
-  organizationId: z11.string().or(z11.null()),
+  organizationId: z11.string(),
   name: z11.string(),
   schemaVersion: z11.string(),
   // this is only used in the client and is not stored in the db
@@ -749,7 +750,7 @@ var RunMetadataSchema = z12.object({
   id: z12.string(),
   createdAt: DateOrStringSchema,
   createdBy: z12.string(),
-  organizationId: z12.string().or(z12.null()),
+  organizationId: z12.string(),
   scheduledAt: DateOrStringSchema.or(z12.null()),
   startedAt: DateOrStringSchema.or(z12.null()),
   finishedAt: DateOrStringSchema.or(z12.null()),
@@ -795,11 +796,10 @@ var ScheduleSettingsSchema = z13.object({
   // this is used for removing repeatable jobs (not set by user)
   jobKey: z13.string().optional()
 });
-var WebhookSchema = z13.object({
-  lastStatus: z13.number().optional(),
-  url: z13.string().url()
+var NotificationSettingsSchema = z13.object({
+  onSuccess: z13.boolean().default(false),
+  onFailure: z13.boolean().default(true)
 });
-var WebhookSettingsSchema = z13.array(WebhookSchema).default([]);
 
 // ../../packages/types/src/test.ts
 var TestNameSchema = z14.string().min(1).max(255).superRefine((v, ctx) => {
@@ -832,9 +832,9 @@ var ExtendedTestMetadataSchema = z14.object({
   createdAt: z14.coerce.date(),
   updatedAt: z14.coerce.date(),
   schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema,
+  notification: NotificationSettingsSchema,
   createdBy: z14.string(),
-  organizationId: z14.string().or(z14.null())
+  organizationId: z14.string()
 });
 var ResolvedTestSchema = BaseTestMetadataSchema.merge(
   ExtendedTestMetadataSchema
@@ -1175,15 +1175,15 @@ var serverAddressOption = new Option(
   "Momentic server to use. Leave unchanged unless using Momentic on-premise."
 ).default("https://api.momentic.ai");
 var yesOption = new Option("-y, --yes", "Skip confirmation prompts.");
-var testNameArgument = new Argument(
-  "<test>",
-  "Name of a test (case insensitive). Spaces may be replaced with dashes, such as `hello-world`."
-).argOptional();
-var testsVariadicArgument = new Argument(
+var testPathsVariadicArgument = new Argument(
   "<tests...>",
-  "Names of tests (case insensitive). Spaces may be replaced with dashes, such as `hello-world`. To read tests from the local file system, specify file paths to Momentic YAML files that exist locally (requires --local option as well)."
+  "One or more test paths. A test path is a lowercased version of your test name where spaces are replaced with underscores (e.g. `hello-world`)"
+).argOptional();
+var testsOrFilesVariadicArgument = new Argument(
+  "<tests...>",
+  "One or more test identifiers. To use tests stored on your local file system, specify file paths to Momentic YAML files or folders to search (this requires the --local option as well). To use tests stored remotely, you may pass test UUIDs or test paths. A test path is a lowercased version of your test name where spaces are replaced with underscores (e.g. `hello-world`)."
 ).argRequired();
-var pathsVariadicArgument = new Argument(
+var filePathsVariadicArgument = new Argument(
   "<paths...>",
   "File paths pointing to one or more YAML files containing Momentic tests, or a directory of Momentic YAML files."
 );
@@ -1224,14 +1224,11 @@ import { existsSync, mkdirSync, writeFileSync } from "fs";
 import { join } from "path";
 function fetchAndSaveTestToDisk(_0) {
   return __async(this, arguments, function* ({
-    name = "",
+    testPaths,
     client,
     outDir,
     all
   }) {
-    if (name.endsWith(".yaml")) {
-      name = name.slice(0, -5);
-    }
     const rootDir = outDir != null ? outDir : DEFAULT_FOLDER_PATH;
     if (!existsSync(rootDir)) {
       mkdirSync(rootDir, { recursive: true });
@@ -1241,7 +1238,7 @@ function fetchAndSaveTestToDisk(_0) {
       mkdirSync(rootModuleDir, { recursive: true });
     }
     const { tests, modules } = yield client.getTestYAMLExport({
-      paths: name ? [name] : void 0,
+      paths: testPaths,
       all
     });
     const numTests = Object.keys(tests).length;
@@ -1424,7 +1421,7 @@ var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var HIGHLIGHT_DURATION_MS = 3e3;
 var MAX_LEVENSHTEIN_DISTANCE = 300;
-var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.25;
+var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.2;
 var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
   "about:blank",
   "chrome-error://chromewebdata/"
@@ -1689,11 +1686,12 @@ var saveNodeDetailsToCache = (node, target) => {
   target.content = node.content;
   target.name = node.name;
   target.role = node.role;
+  target.numChildren = node.children.length;
   target.serializedForm = node.serialize({ noID: true, maxLevel: 1 });
 };
 var getNodeComparisonScore = (node, target) => {
   var _a;
-  let score = 0;
+  let score = 1;
   if (node.role === target.role) {
     score++;
   }
@@ -1704,6 +1702,15 @@ var getNodeComparisonScore = (node, target) => {
     }
     if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_CHANGE_RATIO) {
       score++;
+    }
+  }
+  if (target.numChildren !== void 0) {
+    if (node.children.length === target.numChildren) {
+      score++;
+    } else if (target.numChildren > 0 && node.children.length === 0) {
+      score--;
+    } else if (Math.abs(node.children.length - target.numChildren) > 2) {
+      score--;
     }
   }
   return score;
@@ -2278,9 +2285,10 @@ var _ChromeBrowser = class _ChromeBrowser {
         }
       }
       let closestLevenshteinDistance = Infinity;
+      let smallestLevenshteinRatio = Infinity;
       let closestNode;
       for (const node of this.nodeMap.values()) {
-        if (getNodeComparisonScore(node, target) >= 2) {
+        if (getNodeComparisonScore(node, target) >= 3) {
           this.logger.debug(
             { newNode: node.getLogForm(), target },
             "Resolved cached a11y target to new node with field comparison"
@@ -2300,15 +2308,22 @@ var _ChromeBrowser = class _ChromeBrowser {
             target.serializedForm,
             serializedNode
           );
-          if (levenshteinDistance < closestLevenshteinDistance && levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length) < MAX_LEVENSHTEIN_CHANGE_RATIO) {
+          const ratio = levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length);
+          if (levenshteinDistance < closestLevenshteinDistance && ratio < MAX_LEVENSHTEIN_CHANGE_RATIO) {
             closestLevenshteinDistance = levenshteinDistance;
+            smallestLevenshteinRatio = ratio;
             closestNode = node;
           }
         }
       }
       if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
         this.logger.debug(
-          { newNode: closestNode.getLogForm(), target },
+          {
+            newNode: closestNode.getLogForm(),
+            target,
+            distance: closestLevenshteinDistance,
+            ratio: smallestLevenshteinRatio
+          },
           "Resolved cached a11y target to new node with pure levenshtein distance"
         );
         saveNodeDetailsToCache(closestNode, target);
@@ -3790,6 +3805,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
   onUpdateRun,
   onSaveScreenshot
 }) {
+  var _a;
   const advanced = TestAdvancedSettingsSchema.parse(test.advanced);
   logger.info(`Starting run ${runId} for test ${test.id}`);
   yield onUpdateRun({
@@ -3843,7 +3859,13 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
       results
     });
     if (result.status === "FAILED" /* FAILED */) {
-      logger.info(`Step ${i} of ${test.steps.length} failed`);
+      logger.error(`Step ${i + 1}/${test.steps.length} failed`);
+      logger.error(
+        {
+          message: (_a = results[results.length - 1]) == null ? void 0 : _a.message
+        },
+        `Last result:`
+      );
       failed = true;
       for (let j = i + 1; j < test.steps.length; j++) {
         const skippedStep = test.steps[j];
@@ -3878,7 +3900,7 @@ var executeTest = (_0) => __async(void 0, [_0], function* ({
         }
       }
     } else {
-      logger.info(`Step ${i}/${test.steps.length} succeeded`);
+      logger.info(`Step ${i + 1}/${test.steps.length} succeeded`);
     }
     if (failed) {
       break;
@@ -4415,7 +4437,7 @@ function runTestsLocally(_0) {
     if (useLocalFiles) {
       consoleLogger.info(
         tests,
-        `Reading tests from the following file paths locally`
+        `Reading tests from the following local file paths:`
       );
       tests.forEach((testPath) => {
         if (!existsSync3(testPath)) {
@@ -4433,8 +4455,11 @@ function runTestsLocally(_0) {
         }
       });
     } else {
+      consoleLogger.warn(
+        "The paths you specified are not files or directories that exist locally."
+      );
       consoleLogger.info(
-        `Fetching tests from remote Momentic server (${client.baseURL})`
+        `Fetching tests from remote Momentic server (${client.baseURL})...`
       );
       if (all) {
         testsToRun = yield client.getAllTestIds();
@@ -4444,7 +4469,7 @@ function runTestsLocally(_0) {
     }
     consoleLogger.info(
       testsToRun,
-      `Identified ${testsToRun.length} tests locally`
+      `Identified ${testsToRun.length} tests to run locally:`
     );
     let results = [];
     for (let i = 0; i < testsToRun.length; i += parallelization) {
@@ -4460,7 +4485,7 @@ function runTestsLocally(_0) {
               newBaseURL: waitOn
             });
           } catch (e) {
-            consoleLogger.error(e);
+            consoleLogger.error(`${e}`);
           }
           return { failed, path: path3 };
         }))
@@ -4553,7 +4578,7 @@ program.command("run").alias("run-tests").addOption(apiKeyOption).addOption(serv
     "-p, --parallel <parallelization>",
     "When running with the --local flag, the number of tests to run in parallel. Defaults to 1."
   ).default(1)
-).addArgument(testsVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
+).addArgument(testsOrFilesVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
   const { apiKey, server, remote, local, all } = options;
   const client = new APIClient({
     baseURL: server,
@@ -4591,21 +4616,21 @@ program.command("run").alias("run-tests").addOption(apiKeyOption).addOption(serv
   throw new Error("One of remote or local must be specified");
 }));
 program.command("pull").description(
-  "Fetch a test from your organization and save it in YAML format onto local disk."
-).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addOption(allOption).addArgument(testNameArgument).action((test, options) => __async(void 0, null, function* () {
+  "Fetch one or more tests from your organization and save it in YAML format on local disk."
+).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addOption(allOption).addArgument(testPathsVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
   const { apiKey, server, outDir, all } = options;
-  if (!all && !test) {
+  if (!all && !(tests == null ? void 0 : tests.length)) {
     throw new Error("At least one test name or --all must be provided");
   }
   const client = new APIClient({
     baseURL: server,
     apiKey
   });
-  yield fetchAndSaveTestToDisk({ name: test, client, outDir, all });
+  yield fetchAndSaveTestToDisk({ testPaths: tests, client, outDir, all });
 }));
 program.command("push").description(
   "Save a local YAML file containing a test to your cloud workspace."
-).addOption(yesOption).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(pathsVariadicArgument).action((paths, options) => __async(void 0, null, function* () {
+).addOption(yesOption).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(filePathsVariadicArgument).action((paths, options) => __async(void 0, null, function* () {
   const { apiKey, server, yes } = options;
   const client = new APIClient({
     baseURL: server,
