@@ -51,6 +51,7 @@ var A11yTargetWithCacheSchema = z.object({
   // to assist in re-execution
   role: z.string().optional(),
   name: z.string().optional(),
+  numChildren: z.number().optional(),
   content: z.string().optional(),
   pathFromRoot: z.string().optional(),
   serializedForm: z.string().optional()
@@ -703,7 +704,7 @@ var ModuleMetadataSchema = z11.object({
   id: z11.string(),
   createdAt: z11.coerce.date(),
   createdBy: z11.string(),
-  organizationId: z11.string().or(z11.null()),
+  organizationId: z11.string(),
   name: z11.string(),
   schemaVersion: z11.string(),
   // this is only used in the client and is not stored in the db
@@ -736,7 +737,7 @@ var RunMetadataSchema = z12.object({
   id: z12.string(),
   createdAt: DateOrStringSchema,
   createdBy: z12.string(),
-  organizationId: z12.string().or(z12.null()),
+  organizationId: z12.string(),
   scheduledAt: DateOrStringSchema.or(z12.null()),
   startedAt: DateOrStringSchema.or(z12.null()),
   finishedAt: DateOrStringSchema.or(z12.null()),
@@ -782,11 +783,10 @@ var ScheduleSettingsSchema = z13.object({
   // this is used for removing repeatable jobs (not set by user)
   jobKey: z13.string().optional()
 });
-var WebhookSchema = z13.object({
-  lastStatus: z13.number().optional(),
-  url: z13.string().url()
+var NotificationSettingsSchema = z13.object({
+  onSuccess: z13.boolean().default(false),
+  onFailure: z13.boolean().default(true)
 });
-var WebhookSettingsSchema = z13.array(WebhookSchema).default([]);
 
 // ../../packages/types/src/test.ts
 var TestNameSchema = z14.string().min(1).max(255).superRefine((v, ctx) => {
@@ -819,9 +819,9 @@ var ExtendedTestMetadataSchema = z14.object({
   createdAt: z14.coerce.date(),
   updatedAt: z14.coerce.date(),
   schedule: ScheduleSettingsSchema,
-  webhooks: WebhookSettingsSchema,
+  notification: NotificationSettingsSchema,
   createdBy: z14.string(),
-  organizationId: z14.string().or(z14.null())
+  organizationId: z14.string()
 });
 var ResolvedTestSchema = BaseTestMetadataSchema.merge(
   ExtendedTestMetadataSchema
@@ -1029,7 +1029,7 @@ var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
 var HIGHLIGHT_DURATION_MS = 3e3;
 var MAX_LEVENSHTEIN_DISTANCE = 300;
-var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.25;
+var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.2;
 var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
   "about:blank",
   "chrome-error://chromewebdata/"
@@ -1294,11 +1294,12 @@ var saveNodeDetailsToCache = (node, target) => {
   target.content = node.content;
   target.name = node.name;
   target.role = node.role;
+  target.numChildren = node.children.length;
   target.serializedForm = node.serialize({ noID: true, maxLevel: 1 });
 };
 var getNodeComparisonScore = (node, target) => {
   var _a;
-  let score = 0;
+  let score = 1;
   if (node.role === target.role) {
     score++;
   }
@@ -1309,6 +1310,15 @@ var getNodeComparisonScore = (node, target) => {
     }
     if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_CHANGE_RATIO) {
       score++;
+    }
+  }
+  if (target.numChildren !== void 0) {
+    if (node.children.length === target.numChildren) {
+      score++;
+    } else if (target.numChildren > 0 && node.children.length === 0) {
+      score--;
+    } else if (Math.abs(node.children.length - target.numChildren) > 2) {
+      score--;
     }
   }
   return score;
@@ -1883,9 +1893,10 @@ var _ChromeBrowser = class _ChromeBrowser {
         }
       }
       let closestLevenshteinDistance = Infinity;
+      let smallestLevenshteinRatio = Infinity;
       let closestNode;
       for (const node of this.nodeMap.values()) {
-        if (getNodeComparisonScore(node, target) >= 2) {
+        if (getNodeComparisonScore(node, target) >= 3) {
           this.logger.debug(
             { newNode: node.getLogForm(), target },
             "Resolved cached a11y target to new node with field comparison"
@@ -1905,15 +1916,22 @@ var _ChromeBrowser = class _ChromeBrowser {
             target.serializedForm,
             serializedNode
           );
-          if (levenshteinDistance < closestLevenshteinDistance && levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length) < MAX_LEVENSHTEIN_CHANGE_RATIO) {
+          const ratio = levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length);
+          if (levenshteinDistance < closestLevenshteinDistance && ratio < MAX_LEVENSHTEIN_CHANGE_RATIO) {
             closestLevenshteinDistance = levenshteinDistance;
+            smallestLevenshteinRatio = ratio;
             closestNode = node;
           }
         }
       }
       if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
         this.logger.debug(
-          { newNode: closestNode.getLogForm(), target },
+          {
+            newNode: closestNode.getLogForm(),
+            target,
+            distance: closestLevenshteinDistance,
+            ratio: smallestLevenshteinRatio
+          },
           "Resolved cached a11y target to new node with pure levenshtein distance"
         );
         saveNodeDetailsToCache(closestNode, target);
