@@ -1031,6 +1031,7 @@ var HIGHLIGHT_DURATION_MS = 3e3;
 var MAX_LEVENSHTEIN_DISTANCE = 300;
 var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.2;
 var MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO = 0.1;
+var MIN_SIMILARITY_SCORE_TO_REUSE = 5;
 var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
   "about:blank",
   "chrome-error://chromewebdata/"
@@ -1330,7 +1331,10 @@ var getNodeComparisonScore = (node, target) => {
     if (!((_a = node[attr]) == null ? void 0 : _a.trim())) {
       continue;
     }
-    if (distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length) <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
+    const fieldChangeRatio = distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length);
+    if (fieldChangeRatio === 0) {
+      score += 2;
+    } else if (fieldChangeRatio <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
       score++;
     }
   }
@@ -1344,8 +1348,15 @@ var getNodeComparisonScore = (node, target) => {
     }
   }
   if (target.serializedForm) {
-    const serializedNode = node.serialize({ noID: true, maxLevel: 1 });
-    if (distance(serializedNode, target.serializedForm) / Math.min(serializedNode.length, target.serializedForm.length) <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
+    const serializedNode = node.serialize({
+      noID: true,
+      maxLevel: 1,
+      neighbors: 1
+    });
+    const levenshteinRatio = distance(serializedNode, target.serializedForm) / Math.min(serializedNode.length, target.serializedForm.length);
+    if (levenshteinRatio === 0) {
+      score += 2;
+    } else if (levenshteinRatio <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
       score++;
     }
   }
@@ -1899,8 +1910,10 @@ var _ChromeBrowser = class _ChromeBrowser {
       yield this.getA11yTree();
       const proposedNode = this.nodeMap.get(`${target.id}`);
       if (proposedNode) {
-        if (getNodeComparisonScore(proposedNode, target) >= 3) {
+        const comparisonScore = getNodeComparisonScore(proposedNode, target);
+        if (comparisonScore >= MIN_SIMILARITY_SCORE_TO_REUSE) {
           this.logger.debug(
+            { target, proposedNode: proposedNode.getLogForm(), comparisonScore },
             "Resolved cached a11y target to node with exact same id"
           );
           saveNodeDetailsToCache(proposedNode, target);
@@ -1911,9 +1924,10 @@ var _ChromeBrowser = class _ChromeBrowser {
       let smallestLevenshteinRatio = Infinity;
       let closestNode;
       for (const node of this.nodeMap.values()) {
-        if (getNodeComparisonScore(node, target) > 3) {
+        const comparisonScore = getNodeComparisonScore(node, target);
+        if (comparisonScore >= MIN_SIMILARITY_SCORE_TO_REUSE) {
           this.logger.debug(
-            { newNode: node.getLogForm(), target },
+            { newNode: node.getLogForm(), target, comparisonScore },
             "Resolved cached a11y target to new node with field comparison"
           );
           saveNodeDetailsToCache(node, target);
