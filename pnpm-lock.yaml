@@ -41,6 +41,9 @@ dependencies:
   playwright-extra:
     specifier: ^4.3.6
     version: 4.3.6(playwright-core@1.40.1)(playwright@1.40.1)
+  puppeteer-extra-plugin-recaptcha:
+    specifier: ^3.6.8
+    version: 3.6.8(playwright-extra@4.3.6)
   puppeteer-extra-plugin-stealth:
     specifier: ^2.11.2
     version: 2.11.2(playwright-extra@4.3.6)
@@ -56,6 +59,9 @@ dependencies:
   string-argv:
     specifier: ^0.3.2
     version: 0.3.2
+  uuid:
+    specifier: ^9.0.1
+    version: 9.0.1
   wait-on:
     specifier: ^7.2.0
     version: 7.2.0
@@ -479,6 +485,26 @@ packages:
     resolution: {integrity: sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg==}
     dev: false
 
+  /puppeteer-extra-plugin-recaptcha@3.6.8(playwright-extra@4.3.6):
+    resolution: {integrity: sha512-AY2HG1ZFlSi4xs+Hy84LtRJ95DIfnbjR3Az64dJGVW8gr/hBAGEWRlXTMzea7YOmxO3Nc8Ak3CcUgjgp1gIu1w==}
+    engines: {node: '>=9.11.2'}
+    peerDependencies:
+      playwright-extra: '*'
+      puppeteer-extra: '*'
+    peerDependenciesMeta:
+      playwright-extra:
+        optional: true
+      puppeteer-extra:
+        optional: true
+    dependencies:
+      debug: 4.3.4
+      merge-deep: 3.0.3
+      playwright-extra: 4.3.6(playwright-core@1.40.1)(playwright@1.40.1)
+      puppeteer-extra-plugin: 3.2.3(playwright-extra@4.3.6)
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
   /puppeteer-extra-plugin-stealth@2.11.2(playwright-extra@4.3.6):
     resolution: {integrity: sha512-bUemM5XmTj9i2ZerBzsk2AN5is0wHMNE6K0hXBzBXOzP5m5G3Wl0RHhiqKeHToe/uIH8AoZiGhc1tCkLZQPKTQ==}
     engines: {node: '>=8'}
@@ -612,6 +638,11 @@ packages:
   /universalify@2.0.1:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
+    dev: false
+
+  /uuid@9.0.1:
+    resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    hasBin: true
     dev: false
 
   /wait-on@7.2.0:
