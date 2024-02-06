@@ -1,4681 +1,586 @@
 #!/usr/bin/env node
-var __defProp = Object.defineProperty;
-var __defProps = Object.defineProperties;
-var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-var __spreadValues = (a, b) => {
-  for (var prop in b || (b = {}))
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
-  if (__getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
-    }
-  return a;
-};
-var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __objRest = (source, exclude) => {
-  var target = {};
-  for (var prop in source)
-    if (__hasOwnProp.call(source, prop) && exclude.indexOf(prop) < 0)
-      target[prop] = source[prop];
-  if (source != null && __getOwnPropSymbols)
-    for (var prop of __getOwnPropSymbols(source)) {
-      if (exclude.indexOf(prop) < 0 && __propIsEnum.call(source, prop))
-        target[prop] = source[prop];
-    }
-  return target;
-};
-var __async = (__this, __arguments, generator) => {
-  return new Promise((resolve, reject) => {
-    var fulfilled = (value) => {
-      try {
-        step(generator.next(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var rejected = (value) => {
-      try {
-        step(generator.throw(value));
-      } catch (e) {
-        reject(e);
-      }
-    };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
-    step((generator = generator.apply(__this, __arguments)).next());
-  });
-};
-
-// src/cli.ts
-import { Command as Command3, Option as Option2 } from "commander";
-import { existsSync as existsSync4 } from "fs";
-
-// ../../packages/types/src/a11y-targets.ts
-import * as z from "zod";
-var A11yTargetWithCacheSchema = z.object({
-  // a11y ID
-  id: z.number().int(),
-  // additional metadata stored after the action is executed
-  // to assist in re-execution
-  role: z.string().optional(),
-  name: z.string().optional(),
-  numChildren: z.number().optional(),
-  content: z.string().optional(),
-  pathFromRoot: z.string().optional(),
-  serializedForm: z.string().optional()
-});
-
-// ../../packages/types/src/assertions.ts
-import { z as z2 } from "zod";
-var AIAssertionResultSchema = z2.object({
-  thoughts: z2.string(),
-  result: z2.boolean(),
-  relevantElements: z2.array(z2.number()).optional()
-});
-
-// ../../packages/types/src/ai-command-generation.ts
-import parseArgsStringToArgv from "string-argv";
-import { z as z4 } from "zod";
-
-// ../../packages/types/src/commands.ts
-import dedent from "dedent";
-import * as z3 from "zod";
-var CommandType = /* @__PURE__ */ ((CommandType2) => {
-  CommandType2["AI_ASSERTION"] = "AI_ASSERTION";
-  CommandType2["CLICK"] = "CLICK";
-  CommandType2["SELECT_OPTION"] = "SELECT_OPTION";
-  CommandType2["TYPE"] = "TYPE";
-  CommandType2["PRESS"] = "PRESS";
-  CommandType2["NAVIGATE"] = "NAVIGATE";
-  CommandType2["SCROLL_UP"] = "SCROLL_UP";
-  CommandType2["SCROLL_DOWN"] = "SCROLL_DOWN";
-  CommandType2["GO_BACK"] = "GO_BACK";
-  CommandType2["GO_FORWARD"] = "GO_FORWARD";
-  CommandType2["WAIT"] = "WAIT";
-  CommandType2["REFRESH"] = "REFRESH";
-  CommandType2["TAB"] = "TAB";
-  CommandType2["COOKIE"] = "COOKIE";
-  CommandType2["HOVER"] = "HOVER";
-  CommandType2["SUCCESS"] = "SUCCESS";
-  return CommandType2;
-})(CommandType || {});
-var ElementTargetSchema = z3.object({
-  // natural language passed to LLM
-  elementDescriptor: z3.string(),
-  // Cached A11y target - when a user creates a preset action, this will not exist
-  a11yData: A11yTargetWithCacheSchema.optional()
-});
-var CommonCommandSchema = z3.object({
-  // If the command is suggested by AI, why it did so
-  thoughts: z3.string().optional()
-});
-var NavigateCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("NAVIGATE" /* NAVIGATE */),
-    url: z3.string()
-  })
-).describe("NAVIGATE <url> - Go to the specified url");
-var ScrollUpCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SCROLL_UP" /* SCROLL_UP */)
-  })
-).describe("SCROLL_UP - Scroll up one page");
-var ScrollDownCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SCROLL_DOWN" /* SCROLL_DOWN */)
-  })
-).describe("SCROLL_DOWN - Scroll down one page");
-var WaitCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("WAIT" /* WAIT */),
-    delay: z3.number()
-    // seconds
-  })
-);
-var RefreshCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("REFRESH" /* REFRESH */)
-  })
-);
-var GoBackCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("GO_BACK" /* GO_BACK */)
-  })
-);
-var GoForwardCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("GO_FORWARD" /* GO_FORWARD */)
-  })
-);
-var ClickCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("CLICK" /* CLICK */),
-    target: ElementTargetSchema,
-    doubleClick: z3.boolean().default(false),
-    rightClick: z3.boolean().default(false)
-  })
-).describe(
-  dedent`CLICK <id> - click on the element that has the specified id.
+var un=Object.defineProperty,mn=Object.defineProperties;var pn=Object.getOwnPropertyDescriptors;var Re=Object.getOwnPropertySymbols;var _t=Object.prototype.hasOwnProperty,zt=Object.prototype.propertyIsEnumerable;var Pt=(n,e,t)=>e in n?un(n,e,{enumerable:!0,configurable:!0,writable:!0,value:t}):n[e]=t,C=(n,e)=>{for(var t in e||(e={}))_t.call(e,t)&&Pt(n,t,e[t]);if(Re)for(var t of Re(e))zt.call(e,t)&&Pt(n,t,e[t]);return n},O=(n,e)=>mn(n,pn(e));var ne=(n,e)=>{var t={};for(var o in n)_t.call(n,o)&&e.indexOf(o)<0&&(t[o]=n[o]);if(n!=null&&Re)for(var o of Re(n))e.indexOf(o)<0&&zt.call(n,o)&&(t[o]=n[o]);return t};var l=(n,e,t)=>new Promise((o,r)=>{var s=c=>{try{i(t.next(c))}catch(d){r(d)}},a=c=>{try{i(t.throw(c))}catch(d){r(d)}},i=c=>c.done?o(c.value):Promise.resolve(c.value).then(s,a);i((t=t.apply(n,e)).next())});import{Command as si,Option as te}from"commander";import ai from"dedent";import{existsSync as li}from"fs";import*as k from"zod";var Ie=k.object({id:k.number().int(),role:k.string().optional(),name:k.string().optional(),numChildren:k.number().optional(),content:k.string().optional(),pathFromRoot:k.string().optional(),serializedForm:k.string().optional()});function Le(n){return n.name||n.role||n.content||n.serializedForm}import{z as me}from"zod";var Ut=me.object({thoughts:me.string(),result:me.boolean(),relevantElements:me.array(me.number()).optional()});import Ti from"string-argv";import{z as ge}from"zod";import hn from"dedent";import*as f from"zod";var B=(u=>(u.AI_ASSERTION="AI_ASSERTION",u.CLICK="CLICK",u.SELECT_OPTION="SELECT_OPTION",u.TYPE="TYPE",u.PRESS="PRESS",u.NAVIGATE="NAVIGATE",u.SCROLL_UP="SCROLL_UP",u.SCROLL_DOWN="SCROLL_DOWN",u.GO_BACK="GO_BACK",u.GO_FORWARD="GO_FORWARD",u.WAIT="WAIT",u.REFRESH="REFRESH",u.TAB="TAB",u.COOKIE="COOKIE",u.HOVER="HOVER",u.CAPTCHA="CAPTCHA",u.SUCCESS="SUCCESS",u))(B||{}),re=f.object({elementDescriptor:f.string(),a11yData:Ie.optional()}),D=f.object({thoughts:f.string().optional()}),gn=D.merge(f.object({type:f.literal("NAVIGATE"),url:f.string()})).describe("NAVIGATE <URL> - Go to the specified URL. Only navigate to URLs relevant to the user goal."),fn=D.merge(f.object({target:re.optional(),type:f.literal("SCROLL_UP"),useVision:f.boolean().default(!1)})).describe("SCROLL_UP [id] - Scroll up while hovering over the element with the specified id. If no id is provided, scroll the entire page."),yn=D.merge(f.object({target:re.optional(),type:f.literal("SCROLL_DOWN"),useVision:f.boolean().default(!1)})).describe("SCROLL_DOWN [id] - Scroll down while hovering over the element with the specified id. If no id is provided, scroll the entire page."),Sn=D.merge(f.object({type:f.literal("WAIT"),delay:f.number()})),wn=D.merge(f.object({type:f.literal("REFRESH")})),bn=D.merge(f.object({type:f.literal("GO_BACK")})),An=D.merge(f.object({type:f.literal("GO_FORWARD")})),En=D.merge(f.object({type:f.literal("CAPTCHA"),useVision:f.boolean().default(!1)})),Tn=D.merge(f.object({type:f.literal("CLICK"),target:re,doubleClick:f.boolean().default(!1),rightClick:f.boolean().default(!1),useVision:f.boolean().default(!1)})).describe(hn`CLICK <id> - click on the element that has the specified id.
   You are NOT allowed to click on disabled, hidden or StaticText elements.
   Only click on elements on the Current Page.
   Only click on elements with the following tag names: button, input, link, image, generic.
-  `.replaceAll("\n", " ")
-);
-var HoverCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("HOVER" /* HOVER */),
-    target: ElementTargetSchema
-  })
-);
-var SelectOptionCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SELECT_OPTION" /* SELECT_OPTION */),
-    target: ElementTargetSchema,
-    option: z3.string()
-  })
-).describe(
-  // TODO: if we move to a non-mutative way of selecting elements (e.g. by selector), we should update this description
-  `SELECT_OPTION <id> "<option>" - select the specified item from the select with the specified id. The item should exist on the page. Use the name of the item instead of the id. Make sure to include quotes around the option.`
-);
-var AIAssertionCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("AI_ASSERTION" /* AI_ASSERTION */),
-    assertion: z3.string(),
-    useVision: z3.boolean().default(false),
-    disableCache: z3.boolean().default(false)
-  })
-);
-var TypeOptionsSchema = z3.object({
-  clearContent: z3.boolean().default(true),
-  pressKeysSequentially: z3.boolean().default(false)
-});
-var TypeCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("TYPE" /* TYPE */),
-    target: ElementTargetSchema,
-    value: z3.string(),
-    pressEnter: z3.boolean().default(false)
-  })
-).merge(TypeOptionsSchema).describe(
-  `TYPE <id> "<text>" - type the specified text into the input with the specified id. The text should be specified by the user - do not use text from the EXAMPLES or generate text yourself. Make sure to include quotes around the text.`
-);
-var PressCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("PRESS" /* PRESS */),
-    value: z3.string()
-  })
-).describe(
-  `PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.`
-);
-var TabCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("TAB" /* TAB */),
-    url: z3.string()
-  })
-);
-var CookieCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("COOKIE" /* COOKIE */),
-    value: z3.string()
-  })
-);
-var SuccessCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("SUCCESS" /* SUCCESS */),
-    condition: AIAssertionCommandSchema.optional()
-  })
-).describe("SUCCESS - the user goal has been successfully achieved");
-var UserEditableAICommandSchema = z3.discriminatedUnion("type", [
-  ClickCommandSchema,
-  TypeCommandSchema,
-  PressCommandSchema,
-  SelectOptionCommandSchema,
-  NavigateCommandSchema,
-  ScrollDownCommandSchema,
-  ScrollUpCommandSchema,
-  SuccessCommandSchema
-]);
-var UserEditablePresetCommandSchema = z3.discriminatedUnion("type", [
-  GoBackCommandSchema,
-  GoForwardCommandSchema,
-  RefreshCommandSchema,
-  AIAssertionCommandSchema,
-  WaitCommandSchema,
-  TabCommandSchema,
-  CookieCommandSchema,
-  HoverCommandSchema
-]);
-var CommandSchema = z3.discriminatedUnion("type", [
-  // Commands that can be either specified manually or auto-created by AI in an AI step
-  ...UserEditableAICommandSchema.options,
-  // Commands that can only be specified manually ("preset commands")
-  ...UserEditablePresetCommandSchema.options
-]);
-var FailureCommandSchema = CommonCommandSchema.merge(
-  z3.object({
-    type: z3.literal("FAILURE")
-  })
-).describe(
-  "FAILURE - there are no commands to suggest that could make progress that have not already been tried before"
-);
-var AICommandSchema = z3.discriminatedUnion("type", [
-  ...UserEditableAICommandSchema.options,
-  FailureCommandSchema
-]);
-
-// ../../packages/types/src/errors.ts
-var BrowserExecutionError = class extends Error {
-  constructor(message, options = {}) {
-    super(message, options);
-    this.name = "BrowserExecutionError";
-  }
-};
-var EmptyA11yTreeError = class extends Error {
-  constructor(options = {}) {
-    super("Got empty a11y tree", options);
-    this.name = "EmptyA11yTreeError";
-  }
-};
-
-// ../../packages/types/src/ai-command-generation.ts
-var LLMOutputSchema = z4.object({
-  command: z4.string(),
-  thoughts: z4.string()
-});
-var NumericStringSchema = z4.string().pipe(z4.coerce.number());
-
-// ../../packages/types/src/steps.ts
-import * as z5 from "zod";
-var LATEST_VERSION = "1.0.6";
-var StepType = /* @__PURE__ */ ((StepType2) => {
-  StepType2["AI_ACTION"] = "AI_ACTION";
-  StepType2["PRESET_ACTION"] = "PRESET_ACTION";
-  StepType2["MODULE"] = "MODULE";
-  return StepType2;
-})(StepType || {});
-var AIActionSchema = z5.object({
-  type: z5.literal("AI_ACTION" /* AI_ACTION */),
-  text: z5.string(),
-  // Cached commands for this step
-  commands: z5.array(UserEditableAICommandSchema).optional()
-});
-var PresetActionSchema = z5.object({
-  type: z5.literal("PRESET_ACTION" /* PRESET_ACTION */),
-  command: CommandSchema
-});
-var ModuleStepSchema = z5.object({
-  type: z5.literal("MODULE" /* MODULE */),
-  moduleId: z5.string().uuid()
-});
-var AllowedModuleStepSchema = z5.union([
-  AIActionSchema,
-  PresetActionSchema
-]);
-var ResolvedModuleStepSchema = z5.object({
-  type: z5.literal("RESOLVED_MODULE"),
-  moduleId: z5.string().uuid(),
-  name: z5.string(),
-  steps: AllowedModuleStepSchema.array()
-});
-var StepSchema = z5.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ModuleStepSchema
-]);
-var ResolvedStepSchema = z5.union([
-  AIActionSchema,
-  PresetActionSchema,
-  ResolvedModuleStepSchema
-]);
-
-// ../../packages/types/src/card-display.ts
-var SELECTABLE_PRESET_COMMAND_OPTIONS_SET = new Set(
-  Object.values(CommandType)
-);
-var CARD_DISPLAY_NAMES = {
-  ["AI_ACTION" /* AI_ACTION */]: "AI action",
-  ["MODULE" /* MODULE */]: "Module",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "AI check",
-  ["CLICK" /* CLICK */]: "Click",
-  ["HOVER" /* HOVER */]: "Hover",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select",
-  ["TYPE" /* TYPE */]: "Type",
-  ["PRESS" /* PRESS */]: "Press",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down",
-  ["GO_BACK" /* GO_BACK */]: "Go back",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward",
-  ["WAIT" /* WAIT */]: "Wait",
-  ["REFRESH" /* REFRESH */]: "Refresh",
-  ["TAB" /* TAB */]: "Switch tab",
-  ["COOKIE" /* COOKIE */]: "Set cookie",
-  ["SUCCESS" /* SUCCESS */]: "Done"
-};
-var CARD_DESCRIPTIONS = {
-  ["AI_ACTION" /* AI_ACTION */]: "Ask AI to plan and execute something on the page.",
-  ["MODULE" /* MODULE */]: "A list of steps that can be reused in multiple tests.",
-  ["AI_ASSERTION" /* AI_ASSERTION */]: "Ask AI whether something is true on the page.",
-  ["CLICK" /* CLICK */]: "Click on an element on the page based on a description.",
-  ["HOVER" /* HOVER */]: "Hover over an element on the page based on a description.",
-  ["SELECT_OPTION" /* SELECT_OPTION */]: "Select an option from a dropdown based on a description.",
-  ["TYPE" /* TYPE */]: "Type the specified text into an element.",
-  ["PRESS" /* PRESS */]: "Press the specified keys using the keyboard. (e.g. Ctrl+A)",
-  ["NAVIGATE" /* NAVIGATE */]: "Navigate to the specified URL.",
-  ["SCROLL_UP" /* SCROLL_UP */]: "Scroll up one page.",
-  ["SCROLL_DOWN" /* SCROLL_DOWN */]: "Scroll down one page.",
-  ["GO_BACK" /* GO_BACK */]: "Go back in browser history.",
-  ["GO_FORWARD" /* GO_FORWARD */]: "Go forward in browser history.",
-  ["WAIT" /* WAIT */]: "Wait for the specified number of seconds.",
-  ["REFRESH" /* REFRESH */]: "Refresh the page. This will not clear cookies or session data.",
-  ["TAB" /* TAB */]: "Switch to different tab in the browser.",
-  ["COOKIE" /* COOKIE */]: "Set a cookie that will persist throughout the browser session",
-  ["SUCCESS" /* SUCCESS */]: "Indicate the entire AI action has succeeded, optionally based on a condition."
-};
-
-// ../../packages/types/src/command-results.ts
-import * as z6 from "zod";
-var ResultStatus = /* @__PURE__ */ ((ResultStatus2) => {
-  ResultStatus2["SUCCESS"] = "SUCCESS";
-  ResultStatus2["FAILED"] = "FAILED";
-  ResultStatus2["RUNNING"] = "RUNNING";
-  ResultStatus2["IDLE"] = "IDLE";
-  ResultStatus2["CANCELLED"] = "CANCELLED";
-  return ResultStatus2;
-})(ResultStatus || {});
-var CommandStatus = /* @__PURE__ */ ((CommandStatus2) => {
-  CommandStatus2["SUCCESS"] = "SUCCESS";
-  CommandStatus2["FAILED"] = "FAILED";
-  return CommandStatus2;
-})(CommandStatus || {});
-var CommandMetadataSchema = z6.object({
-  beforeUrl: z6.string(),
-  // FIXME: this should be a discriminated union of string | Buffer
-  // but to avoid too much schema wranging we leave this for now
-  // https://github.com/colinhacks/zod/issues/153
-  beforeScreenshot: z6.string().or(z6.instanceof(Buffer)),
-  afterUrl: z6.string().optional(),
-  afterScreenshot: z6.string().or(z6.instanceof(Buffer)).optional(),
-  startedAt: z6.coerce.date(),
-  finishedAt: z6.coerce.date(),
-  viewport: z6.object({
-    height: z6.number(),
-    width: z6.number()
-  }),
-  status: z6.nativeEnum(CommandStatus),
-  // used for error message and thoughts
-  message: z6.string().optional(),
-  elementInteracted: z6.string().optional()
-});
-var StepResultMetadataSchema = z6.object({
-  startedAt: z6.coerce.date(),
-  finishedAt: z6.coerce.date(),
-  status: z6.nativeEnum(ResultStatus),
-  // used for error message and thoughts
-  message: z6.string().optional(),
-  // browser info
-  userAgent: z6.string().optional()
-});
-var PresetActionResultSchema = PresetActionSchema.merge(
-  StepResultMetadataSchema
-).merge(
-  z6.object({
-    // Array just for consistency with other result types, should only ever be one for preset.
-    results: CommandMetadataSchema.array()
-  })
-);
-var AIActionResultSchema = AIActionSchema.merge(
-  StepResultMetadataSchema
-).merge(
-  z6.object({
-    results: PresetActionResultSchema.array()
-  })
-);
-var ModuleResultSchema = ModuleStepSchema.merge(
-  StepResultMetadataSchema
-).merge(
-  z6.object({
-    // nested results
-    results: z6.union([AIActionResultSchema, PresetActionResultSchema]).array()
-  })
-);
-var ResultSchema = z6.discriminatedUnion("type", [
-  AIActionResultSchema,
-  PresetActionResultSchema,
-  ModuleResultSchema
-]);
-
-// ../../packages/types/src/command-serialization.ts
-function clampText(text, length) {
-  if (text.length < length) {
-    return text;
-  }
-  return text.slice(0, length - 3) + "[...]";
-}
-function serializeCommand(command) {
-  var _a, _b, _c;
-  switch (command.type) {
-    case "SUCCESS" /* SUCCESS */:
-      if ((_a = command.condition) == null ? void 0 : _a.assertion) {
-        return `Check success condition: ${command.condition.assertion}`;
-      }
-      return `All commands completed`;
-    case "NAVIGATE" /* NAVIGATE */:
-      return `Go to URL: ${clampText(command.url, 30)}`;
-    case "GO_BACK" /* GO_BACK */:
-      return `Go back to the previous page`;
-    case "GO_FORWARD" /* GO_FORWARD */:
-      return `Go forward to the next page`;
-    case "SCROLL_DOWN" /* SCROLL_DOWN */:
-      return `Scroll down one page`;
-    case "SCROLL_UP" /* SCROLL_UP */:
-      return `Scroll up one page`;
-    case "WAIT" /* WAIT */:
-      return `Wait for ${command.delay} seconds`;
-    case "REFRESH" /* REFRESH */:
-      return `Refresh the page`;
-    case "CLICK" /* CLICK */:
-      return `Click on '${command.target.elementDescriptor}'`;
-    case "TYPE" /* TYPE */: {
-      let serializedTarget = "";
-      if ((_b = command.target.a11yData) == null ? void 0 : _b.serializedForm) {
-        serializedTarget = ` in element ${command.target.a11yData.serializedForm}`;
-      } else if (command.target.elementDescriptor.length > 0) {
-        serializedTarget = ` in element ${command.target.elementDescriptor}`;
-      }
-      return `Type${serializedTarget}: '${command.value}'`;
-    }
-    case "HOVER" /* HOVER */: {
-      let serializedTarget = "";
-      if ((_c = command.target.a11yData) == null ? void 0 : _c.serializedForm) {
-        serializedTarget = ` over element: ${command.target.a11yData.serializedForm}`;
-      } else if (command.target.elementDescriptor.length > 0) {
-        serializedTarget = ` over element: ${command.target.elementDescriptor}`;
-      }
-      return `Hover${serializedTarget}`;
-    }
-    case "PRESS" /* PRESS */:
-      return `Press '${command.value}'`;
-    case "SELECT_OPTION" /* SELECT_OPTION */:
-      return `Select option '${command.option}' in '${command.target.elementDescriptor}'`;
-    case "TAB" /* TAB */:
-      return `Switch to tab: ${command.url}`;
-    case "COOKIE" /* COOKIE */:
-      return `Set cookie: ${command.value}`;
-    case "AI_ASSERTION" /* AI_ASSERTION */:
-      return `${command.useVision ? "Visual assertion" : "Assertion"}: '${command.assertion}'`;
-    default:
-      const assertUnreachable = (_x) => {
-        throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-      };
-      return assertUnreachable(command);
-  }
-}
-
-// ../../packages/types/src/context.ts
-import * as z8 from "zod";
-
-// ../../packages/types/src/execute-results.ts
-import * as z7 from "zod";
-var ExecuteCommandHistoryEntrySchema = z7.object({
-  // type of command executed
-  type: z7.nativeEnum(StepType),
-  // if AI step type, what command was executed
-  generatedStep: UserEditableAICommandSchema.optional(),
-  // human readable descriptor for action taken, including element interacted with
-  serializedCommand: z7.string().optional(),
-  // human readable descriptor for element interacted with
-  elementInteracted: z7.string().optional()
-});
-
-// ../../packages/types/src/context.ts
-var DynamicContextSchema = z8.object({
-  // user goal or instruction
-  goal: z8.string(),
-  // current url of the browser
-  url: z8.string(),
-  // serialized page state
-  browserState: z8.string(),
-  // serialized history of previous commands
-  history: z8.string(),
-  // number of previously executed commands
-  numPrevious: z8.number(),
-  // last executed command, if any
-  lastCommand: ExecuteCommandHistoryEntrySchema.or(z8.null())
-});
-
-// ../../packages/types/src/cookies.ts
-import { parseString } from "set-cookie-parser";
-function parseCookieString(cookie) {
-  const parsedCookie = parseString(cookie);
-  if (!parsedCookie.name) {
-    throw new Error("Name missing from cookie");
-  }
-  if (!parsedCookie.value) {
-    throw new Error("Value missing from cookie");
-  }
-  let sameSite;
-  if (parsedCookie.sameSite) {
-    const sameSiteSetting = parsedCookie.sameSite.trim().toLowerCase();
-    if (sameSiteSetting === "strict") {
-      sameSite = "Strict";
-    } else if (sameSiteSetting === "lax") {
-      sameSite = "Lax";
-    } else if (sameSiteSetting === "none") {
-      sameSite = "None";
-    } else {
-      throw new Error(`Invalid sameSite setting in cookie: ${sameSiteSetting}`);
-    }
-  }
-  if (!parsedCookie.path && parsedCookie.domain) {
-    parsedCookie.path = "/";
-  }
-  const result = __spreadProps(__spreadValues({}, parsedCookie), {
-    expires: parsedCookie.expires ? parsedCookie.expires.getTime() / 1e3 : void 0,
-    sameSite
-  });
-  return result;
-}
-
-// ../../packages/types/src/goal-splitter.ts
-import { z as z9 } from "zod";
-var InstructionsSchema = z9.string().array();
-
-// ../../packages/types/src/locator.ts
-import * as z10 from "zod";
-var AILocatorSchema = z10.object({
-  thoughts: z10.string(),
-  // a11y id
-  id: z10.number().int(),
-  // dropdowns should have options
-  options: z10.array(z10.string()).optional()
-});
-
-// ../../packages/types/src/logger.ts
-var stringToLogLevel = {
-  DEBUG: 0 /* DEBUG */,
-  INFO: 1 /* INFO */,
-  WARN: 2 /* WARN */,
-  ERROR: 3 /* ERROR */
-};
-var LogLevelTags = {
-  [0 /* DEBUG */]: "DEBUG",
-  [1 /* INFO */]: "INFO",
-  [2 /* WARN */]: "WARN",
-  [3 /* ERROR */]: "ERROR"
-};
-var LogLevelColors = {
-  [0 /* DEBUG */]: "\x1B[90m",
-  [1 /* INFO */]: "\x1B[32m",
-  [2 /* WARN */]: "\x1B[33m",
-  [3 /* ERROR */]: "\x1B[31m"
-};
-var ConsoleLogger = class _ConsoleLogger {
-  constructor(minLevel, bindings) {
-    this.minLogLevel = minLevel;
-    this.logBindings = bindings;
-  }
-  log(level, ...args) {
-    const levelName = LogLevelTags[level];
-    let objectArg;
-    if (Array.isArray(args[0])) {
-      objectArg = args[0];
-      args = args.slice(1);
-    } else if (typeof args[0] === "object") {
-      objectArg = __spreadValues(__spreadValues({}, args[0]), this.logBindings);
-      args = args.slice(1);
-    }
-    const colorSequence = LogLevelColors[level];
-    const logTokens = [
-      `${colorSequence}[${(/* @__PURE__ */ new Date()).toTimeString().slice(0, 8)}][${levelName}]`
-    ];
-    if (level !== 0 /* DEBUG */) {
-      logTokens.push("\x1B[39m");
-    }
-    logTokens.push(...args);
-    console.log(...logTokens);
-    if (objectArg && !Array.isArray(objectArg)) {
-      for (const [key, value] of Object.entries(objectArg)) {
-        let stringifiedValue = value;
-        if (typeof value === "object") {
-          stringifiedValue = JSON.stringify(value, void 0, 2);
-          stringifiedValue = stringifiedValue.split("\n").map(
-            (line, index) => index > 0 ? `  ${line}` : line
-          ).join("\n");
-        }
-        console.log(
-          level === 0 /* DEBUG */ ? `${colorSequence}  ${key}:` : `  ${key}:`,
-          stringifiedValue
-        );
-      }
-    } else if (objectArg) {
-      for (const value of objectArg) {
-        let stringifiedValue = value;
-        if (typeof value === "object") {
-          stringifiedValue = JSON.stringify(value, void 0, 2);
-          stringifiedValue = stringifiedValue.split("\n").map(
-            (line, index) => index > 0 ? `  ${line}` : line
-          ).join("\n");
-        }
-        console.log(
-          level === 0 /* DEBUG */ ? `${colorSequence}  ` : `  `,
-          stringifiedValue
-        );
-      }
-    }
-    if (level === 0 /* DEBUG */) {
-      process.stdout.write("\x1B[39m");
-    }
-  }
-  setMinLevel(level) {
-    this.minLogLevel = level;
-  }
-  info(...args) {
-    if (1 /* INFO */ < this.minLogLevel) {
-      return;
-    }
-    this.log(1 /* INFO */, ...args);
-  }
-  debug(...args) {
-    if (0 /* DEBUG */ < this.minLogLevel) {
-      return;
-    }
-    this.log(0 /* DEBUG */, ...args);
-  }
-  warn(...args) {
-    if (2 /* WARN */ < this.minLogLevel) {
-      return;
-    }
-    this.log(2 /* WARN */, ...args);
-  }
-  error(...args) {
-    if (3 /* ERROR */ < this.minLogLevel) {
-      return;
-    }
-    this.log(3 /* ERROR */, ...args);
-  }
-  child(bindings) {
-    return new _ConsoleLogger(this.minLogLevel, __spreadValues(__spreadValues({}, this.logBindings), bindings));
-  }
-  flush() {
-    return;
-  }
-  bindings() {
-    return this.logBindings;
-  }
-};
-var consoleLogger = new ConsoleLogger(1 /* INFO */, {});
-
-// ../../packages/types/src/modules.ts
-import { z as z11 } from "zod";
-var ModuleMetadataSchema = z11.object({
-  id: z11.string(),
-  createdAt: z11.coerce.date(),
-  createdBy: z11.string(),
-  organizationId: z11.string(),
-  name: z11.string(),
-  schemaVersion: z11.string(),
-  // this is only used in the client and is not stored in the db
-  numSteps: z11.number()
-});
-var ModuleSchema = z11.object({
-  steps: AllowedModuleStepSchema.array()
-}).merge(ModuleMetadataSchema.omit({ numSteps: true }));
-
-// ../../packages/types/src/public-api.ts
-import * as z15 from "zod";
-
-// ../../packages/types/src/runs.ts
-import { z as z12 } from "zod";
-var RunTriggerEnum = {
-  WEBHOOK: "WEBHOOK",
-  CRON: "CRON",
-  MANUAL: "MANUAL",
-  CLI: "CLI"
-};
-var RunStatusEnum = {
-  PENDING: "PENDING",
-  RUNNING: "RUNNING",
-  PASSED: "PASSED",
-  FAILED: "FAILED",
-  CANCELLED: "CANCELLED"
-};
-var DateOrStringSchema = z12.string().pipe(z12.coerce.date()).or(z12.date());
-var RunMetadataSchema = z12.object({
-  id: z12.string(),
-  createdAt: DateOrStringSchema,
-  createdBy: z12.string(),
-  organizationId: z12.string(),
-  scheduledAt: DateOrStringSchema.or(z12.null()),
-  startedAt: DateOrStringSchema.or(z12.null()),
-  finishedAt: DateOrStringSchema.or(z12.null()),
-  testId: z12.string().or(z12.null()),
-  status: z12.nativeEnum(RunStatusEnum),
-  trigger: z12.nativeEnum(RunTriggerEnum),
-  attempts: z12.number(),
-  test: z12.object({
-    name: z12.string(),
-    id: z12.string()
-  }).or(z12.null())
-});
-var RunWithTestSchema = RunMetadataSchema.merge(
-  z12.object({
-    results: ResultSchema.array(),
-    test: z12.object({
-      name: z12.string(),
-      id: z12.string(),
-      baseUrl: z12.string()
-    }).or(z12.null())
-  })
-);
-
-// ../../packages/types/src/test.ts
-import { z as z14 } from "zod";
-
-// ../../packages/types/src/test-settings.ts
-import { isValidCron } from "cron-validator";
-import { z as z13 } from "zod";
-var TestAdvancedSettingsSchema = z13.object({
-  availableAsModule: z13.boolean().default(false),
-  disableAICaching: z13.boolean().default(false)
-});
-var ScheduleSettingsSchema = z13.object({
-  cron: z13.string().refine(
-    (v) => {
-      return isValidCron(v);
-    },
-    { message: "Invalid cron expression." }
-  ).default("0 0 */1 * *"),
-  enabled: z13.boolean().default(false),
-  timeZone: z13.string().default("America/Los_Angeles"),
-  // this is used for removing repeatable jobs (not set by user)
-  jobKey: z13.string().optional()
-});
-var NotificationSettingsSchema = z13.object({
-  onSuccess: z13.boolean().default(false),
-  onFailure: z13.boolean().default(true)
-});
-
-// ../../packages/types/src/test.ts
-var TestNameSchema = z14.string().min(1).max(255).superRefine((v, ctx) => {
-  try {
-    validateTestOrModuleName(v);
-  } catch (err) {
-    ctx.addIssue({
-      code: z14.ZodIssueCode.custom,
-      message: err.message,
-      fatal: true
-    });
-    return z14.NEVER;
-  }
-});
-var BaseTestMetadataSchema = z14.object({
-  id: z14.string(),
-  name: TestNameSchema,
-  baseUrl: z14.string(),
-  schemaVersion: z14.string(),
-  advanced: TestAdvancedSettingsSchema,
-  retries: z14.number()
-});
-var UserEditableTestSettingsSchema = BaseTestMetadataSchema.pick({
-  name: true,
-  baseUrl: true,
-  retries: true,
-  advanced: true
-});
-var ExtendedTestMetadataSchema = z14.object({
-  createdAt: z14.coerce.date(),
-  updatedAt: z14.coerce.date(),
-  schedule: ScheduleSettingsSchema,
-  notification: NotificationSettingsSchema,
-  createdBy: z14.string(),
-  organizationId: z14.string()
-});
-var ResolvedTestSchema = BaseTestMetadataSchema.merge(
-  ExtendedTestMetadataSchema
-).merge(
-  z14.object({
-    steps: z14.array(ResolvedStepSchema)
-  })
-);
-var MinimalRunnableResolvedTestSchema = BaseTestMetadataSchema.merge(
-  z14.object({
-    steps: z14.array(ResolvedStepSchema)
-  })
-);
-var UUID_REGEX = /^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/;
-function validateTestOrModuleName(name) {
-  name = name.toLowerCase();
-  if (name.length === 0 || name.length > 255) {
-    throw new Error("Name must be between 1 and 255 characters long");
-  }
-  const invalidChars = /[<>:"\/\\|?*\x00]/;
-  if (invalidChars.test(name)) {
-    throw new Error(
-      "Name can only contain alphanumeric characters, dashes, and underscores."
-    );
-  }
-  const windowsReservedNames = /^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i;
-  if (windowsReservedNames.test(name)) {
-    throw new Error(
-      `"${name}" is a reserved name on Windows and cannot be used as a filename.`
-    );
-  }
-  if (/^\.+$/.test(name) || /^\s|\s$/.test(name)) {
-    throw new Error("Name cannot start or end with a space or dot.");
-  }
-  if (name.endsWith(".yaml")) {
-    throw new Error('Name cannot end with ".yaml".');
-  }
-  if (name === "modules") {
-    throw new Error(
-      "'modules' is a reserved folder name in Momentic. Please choose a different name."
-    );
-  }
-  if (name.match(UUID_REGEX)) {
-    throw new Error("Name cannot be a UUID. Please choose a different name.");
-  }
-}
-
-// ../../packages/types/src/public-api.ts
-var GeneratorOptionsSchema = z15.object({
-  disableCache: z15.boolean()
-});
-var GetNextCommandBodySchema = DynamicContextSchema.merge(
-  GeneratorOptionsSchema
-);
-var GetNextCommandResponseSchema = AICommandSchema;
-var GetAssertionResultBodySchema = z15.discriminatedUnion("vision", [
-  DynamicContextSchema.merge(GeneratorOptionsSchema).merge(
-    z15.object({
-      vision: z15.literal(false)
-    })
-  ),
-  DynamicContextSchema.pick({
-    goal: true,
-    url: true
-  }).merge(GeneratorOptionsSchema).merge(
-    z15.object({
-      // base64 encoded image
-      screenshot: z15.string(),
-      vision: z15.literal(true)
-    })
-  )
-]);
-var GetAssertionResponseSchema = AIAssertionResultSchema;
-var LocateBodySchema = DynamicContextSchema.pick({
-  browserState: true,
-  goal: true
-}).merge(GeneratorOptionsSchema);
-var LocateResponseSchema = AILocatorSchema;
-var SplitGoalBodySchema = DynamicContextSchema.pick({
-  goal: true,
-  url: true
-}).merge(GeneratorOptionsSchema);
-var SplitGoalResponseSchema = z15.string().array();
-var QueueTestsBodySchema = z15.union([
-  z15.object({
-    testPaths: z15.string().array(),
-    all: z15.boolean().optional()
-  }),
-  z15.object({
-    testIds: z15.string().array()
-  }).describe("deprecated - for backwards compatibility only")
-]);
-var QueueTestsResponseSchema = z15.object({
-  message: z15.string(),
-  queuedTests: z15.object({
-    name: z15.string(),
-    id: z15.string()
-  }).array()
-});
-var GetTestResponseSchema = ResolvedTestSchema;
-var GetAllTestIdsResponseSchema = z15.string().array();
-var ExportTestBodySchema = z15.union([
-  z15.object({
-    paths: z15.string().array().describe("run specific test paths (e.g. todo-test)")
-  }),
-  z15.object({
-    path: z15.string().describe("deprecated; present for backcompat")
-  }),
-  z15.object({
-    all: z15.boolean().describe("run all tests")
-  })
-]);
-var ExportTestResponseSchema = z15.object({
-  tests: z15.record(
-    z15.string().describe("Test name"),
-    z15.string().describe("Test YAML")
-  ),
-  modules: z15.record(
-    z15.string().describe("Module name"),
-    z15.string().describe("Module YAML")
-  )
-});
-var TestWithModulesYAMLSchema = z15.object({
-  test: z15.string().describe("test YAML"),
-  modules: z15.record(
-    z15.string().describe("moduleId"),
-    z15.string().describe("module YAML")
-  )
-});
-var UpdateTestsBodySchema = TestWithModulesYAMLSchema.array();
-var CreateRunBodySchema = z15.object({
-  testPath: z15.string(),
-  testId: z15.string()
-}).partial().merge(
-  z15.object({
-    trigger: z15.nativeEnum(RunTriggerEnum)
-  })
-);
-var CreateRunResponseSchema = RunWithTestSchema;
-var GetRunResponseSchema = RunWithTestSchema;
-var UpdateRunBodySchema = z15.object({
-  startedAt: z15.coerce.date(),
-  finishedAt: z15.coerce.date(),
-  results: ResultSchema.array(),
-  status: z15.nativeEnum(RunStatusEnum)
-}).partial();
-var CreateScreenshotBodySchema = z15.object({
-  // base64 string
-  screenshot: z15.string()
-});
-var CreateScreenshotResponseSchema = z15.object({
-  key: z15.string()
-});
-
-// ../../packages/types/src/step-serialization.ts
-function serializeStep(step) {
-  switch (step.type) {
-    case "AI_ACTION" /* AI_ACTION */:
-      return `AI action: ${step.text}`;
-    case "PRESET_ACTION" /* PRESET_ACTION */:
-      return serializeCommand(step.command);
-    case "RESOLVED_MODULE":
-      return `Module: ${step.moduleId}`;
-  }
-}
-
-// ../../packages/types/src/test-serialization.ts
-import { stringify } from "yaml";
-import { z as z16 } from "zod";
-var TestSerializationResultSchema = z16.object({
-  test: z16.string().describe("YAML for the test, including metadata and steps"),
-  modules: z16.record(z16.string(), z16.string()).describe("Map of module name to YAML for the module")
-});
-var SerializedTestSchema = BaseTestMetadataSchema.merge(
-  z16.object({
-    steps: StepSchema.array(),
-    fileType: z16.literal("momentic/test" /* TEST */)
-  })
-);
-var SerializedModuleSchema = ResolvedModuleStepSchema.omit({
-  type: true
-}).merge(
-  z16.object({
-    schemaVersion: z16.string(),
-    fileType: z16.literal("momentic/module")
-  })
-);
-var DeserializedTestSchema = BaseTestMetadataSchema.merge(
-  z16.object({
-    steps: z16.array(z16.record(z16.string(), z16.unknown()))
-  })
-);
-var DeserializedModuleSchema = z16.object({
-  moduleId: z16.string().uuid(),
-  name: z16.string(),
-  schemaVersion: z16.string(),
-  steps: z16.array(z16.record(z16.string(), z16.unknown()))
-});
-
-// src/api-client.ts
-var API_VERSION = "v1";
-var APIClient = class {
-  constructor(params) {
-    this.baseURL = params.baseURL;
-    this.apiKey = params.apiKey;
-  }
-  getRun(runId) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/runs/${runId}`, {
-        method: "GET"
-      });
-      return GetRunResponseSchema.parse(result);
-    });
-  }
-  createRun(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/runs`, {
-        method: "POST",
-        body
-      });
-      return CreateRunResponseSchema.parse(result);
-    });
-  }
-  updateRun(runId, body) {
-    return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION}/runs/${runId}`, {
-        method: "PATCH",
-        body
-      });
-    });
-  }
-  getTest(testPath) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/tests/${testPath}`, {
-        method: "GET"
-      });
-      return GetTestResponseSchema.parse(result);
-    });
-  }
-  getAllTestIds() {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/tests`, {
-        method: "GET"
-      });
-      return GetAllTestIdsResponseSchema.parse(result);
-    });
-  }
-  getTestYAMLExport(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/tests/export`, {
-        method: "POST",
-        body
-      });
-      return ExportTestResponseSchema.parse(result);
-    });
-  }
-  updateTestWithYAML(body) {
-    return __async(this, null, function* () {
-      yield this.sendRequest(`/${API_VERSION}/tests/update`, {
-        method: "POST",
-        body
-      });
-    });
-  }
-  queueTests(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/tests/queue`, {
-        method: "POST",
-        body
-      });
-      return QueueTestsResponseSchema.parse(result);
-    });
-  }
-  uploadScreenshot(body) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(`/${API_VERSION}/screenshots`, {
-        method: "POST",
-        body
-      });
-      return CreateScreenshotResponseSchema.parse(result);
-    });
-  }
-  sendRequest(path3, options) {
-    return __async(this, null, function* () {
-      const response = yield fetch(`${this.baseURL}${path3}`, {
-        method: options.method,
-        body: options.body ? JSON.stringify(options.body) : void 0,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      if (!response.ok) {
-        let body;
-        try {
-          body = yield response.json();
-        } catch (err) {
-          body = yield response.text();
-        }
-        throw new Error(
-          `Request to ${path3} failed with status ${response.status}: ${JSON.stringify(body)}`
-        );
-      }
-      if (response.status === 204) {
-        return response.text();
-      }
-      return response.json();
-    });
-  }
-};
-
-// src/install-browsers.ts
-import { registry } from "playwright-core/lib/server";
-function installBrowsers() {
-  return __async(this, null, function* () {
-    const executables = registry.defaultExecutables();
-    yield registry.installDeps(executables, false);
-    yield registry.install(executables, false);
-  });
-}
-
-// src/options.ts
-import { Argument, Option } from "commander";
-
-// src/constants.ts
-var DEFAULT_FOLDER_PATH = "momentic";
-var MODULES_FOLDER_NAME = "modules";
-
-// src/options.ts
-var apiKeyOption = new Option(
-  "--api-key <key>",
-  "API key for authentication. If not supplied, attempts to read the MOMENTIC_API_KEY env var."
-).env("MOMENTIC_API_KEY").makeOptionMandatory(true);
-var serverAddressOption = new Option(
-  "--server <server>",
-  "Momentic server to use. Leave unchanged unless using Momentic on-premise."
-).default("https://api.momentic.ai");
-var yesOption = new Option("-y, --yes", "Skip confirmation prompts.");
-var testPathsVariadicArgument = new Argument(
-  "<tests...>",
-  "One or more test paths. A test path is a lowercased version of your test name where spaces are replaced with underscores (e.g. `hello-world`)"
-).argOptional();
-var testsOrFilesVariadicArgument = new Argument(
-  "<tests...>",
-  "One or more test identifiers. To use tests stored on your local file system, specify file paths to Momentic YAML files or folders to search (this requires the --local option as well). To use tests stored remotely, you may pass test UUIDs or test paths. A test path is a lowercased version of your test name where spaces are replaced with underscores (e.g. `hello-world`)."
-).argRequired();
-var filePathsVariadicArgument = new Argument(
-  "<paths...>",
-  "File paths pointing to one or more YAML files containing Momentic tests, or a directory of Momentic YAML files."
-);
-var outDirOption = new Option(
-  "-o --out-dir <outDir>",
-  "Root directory to write output files to. Can be absolute or relative to the current directory. Defaults to `momentic`."
-).default(DEFAULT_FOLDER_PATH);
-var allOption = new Option(
-  "-a --all",
-  "Select all tests from the cloud Momentic server. Cannot be used together with <tests> arguments."
-).default(false).preset(true);
-
-// src/package.json
-var version = "0.0.18";
-
-// src/prompt.ts
-import chalk from "chalk";
-import readline from "readline/promises";
-function promptForConfirmation(question, yellow) {
-  return __async(this, null, function* () {
-    if (process.env.CI)
-      return true;
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    question = `${question} (y/N) `;
-    const questionContent = yellow ? chalk.bold.yellow(question) : question;
-    const answer = yield rl.question(questionContent);
-    rl.close();
-    if (answer.toLowerCase() === "y") {
-      return true;
-    } else {
-      return false;
-    }
-  });
-}
-
-// src/pull-test.ts
-import { existsSync, mkdirSync, writeFileSync } from "fs";
-import { join } from "path";
-function fetchAndSaveTestToDisk(_0) {
-  return __async(this, arguments, function* ({
-    testPaths,
-    client,
-    outDir,
-    all
-  }) {
-    const rootDir = outDir != null ? outDir : DEFAULT_FOLDER_PATH;
-    if (!existsSync(rootDir)) {
-      mkdirSync(rootDir, { recursive: true });
-    }
-    const rootModuleDir = join(rootDir, MODULES_FOLDER_NAME);
-    if (!existsSync(rootModuleDir)) {
-      mkdirSync(rootModuleDir, { recursive: true });
-    }
-    const { tests, modules } = yield client.getTestYAMLExport({
-      paths: testPaths,
-      all
-    });
-    const numTests = Object.keys(tests).length;
-    for (const [testName, testYAML] of Object.entries(tests)) {
-      const testFilePath = join(rootDir, nameToYAMLFileName(testName));
-      if (!(yield checkAndPromptForOverwrite(testFilePath))) {
-        consoleLogger.error("Pull cancelled");
-        return;
-      }
-      writeFileSync(testFilePath, testYAML, "utf-8");
-      consoleLogger.info(`Wrote '${testFilePath}'`);
-    }
-    const numModules = Object.keys(modules).length;
-    for (const [moduleName, moduleYAML] of Object.entries(modules)) {
-      const modulePath = join(rootModuleDir, nameToYAMLFileName(moduleName));
-      if (!(yield checkAndPromptForOverwrite(modulePath))) {
-        consoleLogger.error("Pull cancelled");
-        return;
-      }
-      writeFileSync(modulePath, moduleYAML, "utf-8");
-      consoleLogger.info(`Wrote '${modulePath}'`);
-    }
-    consoleLogger.info(
-      `Pulled ${numTests} test${numTests > 1 ? "s" : ""}${numModules ? ` and ${numModules} module${numModules > 1 ? "s" : ""}` : ""}!`
-    );
-  });
-}
-function checkAndPromptForOverwrite(path3) {
-  return __async(this, null, function* () {
-    if (!existsSync(path3)) {
-      return true;
-    }
-    return promptForConfirmation(
-      `File '${path3.replace(/(\s+)/g, "\\$1")}' already exists. Overwrite?`,
-      true
-    );
-  });
-}
-function nameToYAMLFileName(name) {
-  return `${name.toLowerCase().replaceAll(" ", "-")}.yaml`;
-}
-
-// src/push-test.ts
-import { existsSync as existsSync2, readFileSync, readdirSync, statSync } from "fs";
-import path from "path";
-function saveTestToServer(params) {
-  return __async(this, null, function* () {
-    const rootTestPaths = /* @__PURE__ */ new Set();
-    for (const testPathOrDir of params.paths) {
-      const fullPath = path.resolve(testPathOrDir);
-      if (fullPath && existsSync2(fullPath) && statSync(fullPath).isDirectory()) {
-        const files = readdirSync(fullPath);
-        for (const file of files) {
-          if (file.endsWith(".yaml")) {
-            rootTestPaths.add(path.join(fullPath, file));
-          }
-        }
-      }
-      if (fullPath.endsWith(".yaml")) {
-        if (!existsSync2(fullPath) || !statSync(fullPath).isFile()) {
-          throw new Error(`File not found or unreadable: ${fullPath}`);
-        }
-        rootTestPaths.add(fullPath);
-      }
-    }
-    consoleLogger.info(`Found ${rootTestPaths.size} test(s) to push:`);
-    rootTestPaths.forEach((testPath) => consoleLogger.info(`  - ${testPath}`));
-    consoleLogger.info(`Loading file contents and resolving dependent modules`);
-    const testUpdates = Array.from(rootTestPaths).map(readTestWithModules);
-    const moduleIds = new Set(
-      testUpdates.flatMap((update) => Object.keys(update.modules))
-    );
-    consoleLogger.info(
-      `Resolved ${rootTestPaths.size} test(s) and ${moduleIds.size} module(s)`
-    );
-    if (!params.yes) {
-      const warning = "Pushing tests overwrites tests on production and will instantly affect scheduled runs. Continue?";
-      if (!(yield promptForConfirmation(warning, true))) {
-        consoleLogger.error("Push cancelled");
-        return;
-      }
-    }
-    yield params.client.updateTestWithYAML(testUpdates);
-    consoleLogger.info("Update successful!");
-  });
-}
-function readTestWithModules(testFilePath) {
-  let testContent;
-  try {
-    testContent = readFileSync(testFilePath, "utf8");
-    testContent = testContent.replace(/\r\n|\r/g, "\n");
-  } catch (err) {
-    throw new Error(`Could not read test file ${testFilePath}: ${err}`);
-  }
-  const moduleIds = /* @__PURE__ */ new Set();
-  const moduleIdRegex = /moduleId: (.*)/g;
-  let moduleIdMatch;
-  while ((moduleIdMatch = moduleIdRegex.exec(testContent)) !== null) {
-    moduleIds.add(moduleIdMatch[1].trim());
-  }
-  const modules = {};
-  if (moduleIds.size > 0) {
-    const modulesDir = findModulesDir(testFilePath);
-    moduleIds.forEach((moduleId) => {
-      if (!modules[moduleId]) {
-        modules[moduleId] = getModuleFile(modulesDir, moduleId);
-      }
-    });
-  }
-  return {
-    test: testContent,
-    modules
-  };
-}
-function findModulesDir(startDir) {
-  let currentDir = startDir;
-  while (currentDir !== "/") {
-    const modulesDir = path.join(currentDir, MODULES_FOLDER_NAME);
-    if (existsSync2(modulesDir)) {
-      return modulesDir;
-    } else {
-      currentDir = path.dirname(currentDir);
-    }
-  }
-  throw new Error(
-    `No '${MODULES_FOLDER_NAME}' directory found in the path ${startDir} or any of its parents`
-  );
-}
-function getModuleFile(dir, moduleId) {
-  const files = readdirSync(dir);
-  for (const file of files) {
-    const filePath = path.join(dir, file);
-    const fileContent = readFileSync(filePath, "utf8");
-    if (fileContent.includes(moduleId)) {
-      return fileContent;
-    }
-  }
-  throw new Error(
-    `Could not find module file for module ${moduleId} in ${dir}`
-  );
-}
-
-// src/run-tests-locally.ts
-import exec from "@actions/exec";
-import io from "@actions/io";
-import { existsSync as existsSync3, statSync as statSync2 } from "fs";
-import quote from "quote";
-import parseArgsStringToArgv2 from "string-argv";
-import waitOnFn from "wait-on";
-
-// ../../packages/web-agent/src/browsers/chrome.ts
-import { distance as distance2 } from "fastest-levenshtein";
-import {
-  chromium,
-  devices
-} from "playwright";
-import { addExtra } from "playwright-extra";
-import pluginStealth from "puppeteer-extra-plugin-stealth";
-
-// ../../packages/web-agent/src/utils/url.ts
-var urlChanged = (url1, url2) => {
-  const { hostname, pathname } = new URL(url1);
-  const { hostname: hostname2, pathname: pathname2 } = new URL(url2);
-  return hostname !== hostname2 || pathname !== pathname2;
-};
-
-// ../../packages/web-agent/src/browsers/a11y.ts
-import { distance } from "fastest-levenshtein";
-
-// ../../packages/web-agent/src/browsers/constants.ts
-var RETINA_WINDOW_SCALE_FACTOR = 2;
-var MAX_LOAD_TIMEOUT_MS = 8e3;
-var NETWORK_STABLE_DURATION_MS = 1250;
-var NETWORK_IDLE_TIMEOUT_MS = 3e3;
-var CHECK_INTERVAL_MS = 250;
-var A11Y_LOAD_TIMEOUT_MS = 1e3;
-var A11Y_STABLE_TIMEOUT_MS = NETWORK_IDLE_TIMEOUT_MS;
-var A11Y_STABLE_DURATION_MS = NETWORK_STABLE_DURATION_MS;
-var BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var COMPLICATED_BROWSER_ACTION_TIMEOUT_MS = MAX_LOAD_TIMEOUT_MS;
-var HIGHLIGHT_DURATION_MS = 3e3;
-var MAX_LEVENSHTEIN_DISTANCE = 300;
-var MAX_LEVENSHTEIN_CHANGE_RATIO = 0.2;
-var MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO = 0.1;
-var MIN_SIMILARITY_SCORE_TO_REUSE = 5;
-var CHROME_INTERNAL_URLS = /* @__PURE__ */ new Set([
-  "about:blank",
-  "chrome-error://chromewebdata/"
-]);
-var MAX_BROWSER_ACTION_ATTEMPTS = 2;
-
-// ../../packages/web-agent/src/browsers/a11y.ts
-var bannedProperties = /* @__PURE__ */ new Set(["focusable"]);
-var alwaysInterestingRoles = /* @__PURE__ */ new Set([
-  "textbox",
-  "checkbox",
-  "combobox",
-  "button",
-  "link",
-  "combobox"
-]);
-var rolesToOmitID = /* @__PURE__ */ new Set(["paragraph", "option"]);
-var defaultA11yNodeSerializeParams = {
-  indentLevel: 0,
-  noID: false,
-  noChildren: false,
-  noProperties: false,
-  maxLevel: void 0,
-  neighbors: void 0
-};
-var ProcessedA11yNode = class {
-  constructor(params) {
-    this.id = params.id;
-    this.role = params.role;
-    this.name = params.name;
-    this.content = params.content;
-    this.properties = params.properties;
-    this.pathFromRoot = params.pathFromRoot;
-    this.children = params.children;
-    this.backendNodeID = params.backendNodeID;
-  }
-  getLogForm() {
-    var _a, _b;
-    return JSON.stringify({
-      id: this.id,
-      name: (_a = this.name) != null ? _a : "",
-      role: (_b = this.role) != null ? _b : "",
-      backendNodeId: this.backendNodeID
-    });
-  }
-  /**
-   * Returns true if the current node contains interesting properties.
-   * Does not go through children.
-   */
-  isInteresting() {
-    if (alwaysInterestingRoles.has(this.role))
-      return true;
-    if (this.children.some((child) => child.role === "StaticText"))
-      return true;
-    return !!this.name.trim() || !!this.content;
-  }
-  serialize(opts = defaultA11yNodeSerializeParams) {
-    var _a, _b;
-    const { indentLevel, noChildren, noProperties, noID } = Object.assign(
-      {},
-      defaultA11yNodeSerializeParams,
-      opts
-    );
-    const indent = " ".repeat(indentLevel);
-    if (this.role === "StaticText") {
-      return `${indent}${this.name}
-`;
-    }
-    let s = `${indent}<${this.role}`;
-    if (!noID && !rolesToOmitID.has(this.role)) {
-      s += ` id="${this.id}"`;
-    }
-    if (this.name) {
-      s += ` name="${this.name}"`;
-    }
-    if (this.content) {
-      s += ` content="${this.content}"`;
-    }
-    if (Object.keys(this.properties).length > 0 && !noProperties) {
-      Object.entries(this.properties).forEach(([k, v]) => {
-        if (bannedProperties.has(k)) {
-          return;
-        } else if (typeof v === "string") {
-          s += ` ${k}="${v}"`;
-        } else if (typeof v === "boolean") {
-          if (v) {
-            s += ` ${k}`;
-          } else {
-            s += ` ${k}={false}`;
-          }
-        } else if (typeof v !== "undefined") {
-          s += ` ${k}={${JSON.stringify(v)}}`;
-        }
-      });
-    }
-    const maxLevelExceeded = opts.maxLevel !== void 0 && indentLevel / 2 >= opts.maxLevel;
-    if (this.children.length === 0 || noChildren || maxLevelExceeded) {
-      s += " />\n";
-      return s;
-    } else {
-      s += ">\n";
-      for (const child of this.children) {
-        s += child.serialize(__spreadProps(__spreadValues({}, opts), { indentLevel: indentLevel + 2 }));
-      }
-      s += `${indent}</${this.role}>
-`;
-    }
-    if (opts.neighbors !== void 0 && opts.neighbors > 0 && this.parent) {
-      const currentIndex = this.parent.children.findIndex(
-        (n) => n.id === this.id
-      );
-      const before = currentIndex > 0 ? (_a = this.parent.children[currentIndex - 1]) == null ? void 0 : _a.serialize(__spreadProps(__spreadValues({}, opts), {
-        neighbors: 0
-      })) : "";
-      const after = currentIndex < this.parent.children.length - 1 ? (_b = this.parent.children[currentIndex + 1]) == null ? void 0 : _b.serialize(__spreadProps(__spreadValues({}, opts), {
-        neighbors: 0
-      })) : "";
-      return `${before ? before : ""}
-${s}
-${after ? after : ""}`;
-    }
-    return s;
-  }
-};
-var ProcessedA11yTree = class {
-  constructor(root, nodeMap) {
-    this.root = root;
-    this.nodeMap = nodeMap;
-  }
-  serialize() {
-    if (!this.root) {
-      return "";
-    }
-    return this.root.serialize();
-  }
-  // public diff(other: ProcessedA11yTree): string[] {
-  //   const results: string[] = [];
-  // }
-};
-function getNodePathIdentifier(node) {
-  var _a, _b;
-  if ((_a = node.name) == null ? void 0 : _a.value) {
-    return `"${node.name.value}"`;
-  }
-  if (((_b = node.role) == null ? void 0 : _b.value) && node.role.value !== "none" && node.role.value !== "generic") {
-    return `"${node.role.value}"`;
-  }
-  return `"${node.nodeId}"`;
-}
-function processA11yTreeDFS(node, parent, inputNodeMap, outputNodeMap) {
-  var _a, _b, _c, _d, _e, _f, _g;
-  if (!parent && node.parentId) {
-    throw new Error(
-      `Got no parent for accessibility node ${node.nodeId}: ${JSON.stringify(
-        node
-      )}`
-    );
-  }
-  const processedNode = new ProcessedA11yNode({
-    id: node.nodeId,
-    role: ((_a = node.role) == null ? void 0 : _a.value) || "",
-    name: ((_b = node.name) == null ? void 0 : _b.value) || "",
-    content: ((_c = node.value) == null ? void 0 : _c.value) || "",
-    properties: {},
-    children: [],
-    pathFromRoot: (parent ? `${parent.pathFromRoot} ` : "") + getNodePathIdentifier(node),
-    backendNodeID: node.backendDOMNodeId
-    // md5Sum: "",
-  });
-  if ((_d = node.value) == null ? void 0 : _d.value) {
-    processedNode.content = `${(_e = node.value) == null ? void 0 : _e.value}`;
-  }
-  if (node.properties) {
-    node.properties.forEach((prop) => {
-      processedNode.properties[prop.name] = prop.value.value;
-    });
-  }
-  outputNodeMap.set(processedNode.id, processedNode);
-  const children = (_f = node.childIds) != null ? _f : [];
-  for (const childId of children) {
-    if (!childId) {
-      continue;
-    }
-    const child = inputNodeMap.get(childId);
-    if (!child) {
-      continue;
-    }
-    const processedChildren = processA11yTreeDFS(
-      child,
-      processedNode,
-      inputNodeMap,
-      outputNodeMap
-    );
-    if (!processedChildren.length) {
-      continue;
-    }
-    processedNode.children = processedNode.children.concat(processedChildren);
-  }
-  if (processedNode.role === "StaticText") {
-    processedNode.children = [];
-  }
-  if (processedNode.children.length === 1 && processedNode.children[0].role === "StaticText") {
-    const currentName = processedNode.name;
-    const childName = (_g = processedNode.children[0]) == null ? void 0 : _g.name;
-    if (currentName === childName || !childName) {
-      processedNode.children = [];
-    }
-  }
-  const staticTextGroupedChildren = [];
-  for (let i = processedNode.children.length - 1; i >= 0; i--) {
-    const node2 = processedNode.children[i];
-    if (node2.role !== "StaticText") {
-      staticTextGroupedChildren.push(node2);
-      continue;
-    }
-    if (i === 0 || processedNode.children[i - 1].role !== "StaticText") {
-      staticTextGroupedChildren.push(node2);
-      continue;
-    }
-    processedNode.children[i - 1].name += ` ${node2.name}`;
-  }
-  processedNode.children = staticTextGroupedChildren.reverse();
-  for (const child of processedNode.children) {
-    child.parent = processedNode;
-  }
-  const interesting = processedNode.isInteresting();
-  if (!interesting) {
-    if (processedNode.children.length === 0) {
-      return [];
-    } else if (processedNode.children.length === 1) {
-      return [processedNode.children[0]];
-    } else if (node.parentId) {
-      return processedNode.children;
-    }
-  }
-  return [processedNode];
-}
-function processA11yTree(graph) {
-  if (!graph.root) {
-    throw new Error("a11y tree has null root");
-  }
-  graph.allNodes = graph.allNodes.filter((node) => {
-    var _a;
-    if (!node.ignored) {
-      return true;
-    }
-    return !((_a = node.ignoredReasons) == null ? void 0 : _a.find(
-      (reason) => {
-        var _a2;
-        return reason.name === "notRendered" && ((_a2 = reason.value) == null ? void 0 : _a2.value);
-      }
-    ));
-  });
-  const nodeMap = /* @__PURE__ */ new Map();
-  for (const node of graph.allNodes) {
-    nodeMap.set(node.nodeId, node);
-  }
-  const outputNodeMap = /* @__PURE__ */ new Map();
-  const processedRoot = processA11yTreeDFS(
-    graph.root,
-    null,
-    nodeMap,
-    outputNodeMap
-  );
-  if (processedRoot.length > 1) {
-    throw new Error(
-      `Something went horribly wrong processing the a11y tree, we got: ${JSON.stringify(
-        processedRoot
-      )}`
-    );
-  } else if (processedRoot.length === 0) {
-    throw new EmptyA11yTreeError();
-  }
-  return new ProcessedA11yTree(processedRoot[0], outputNodeMap);
-}
-var saveNodeDetailsToCache = (node, target) => {
-  target.id = parseInt(node.id);
-  target.content = node.content;
-  target.name = node.name;
-  target.role = node.role;
-  target.numChildren = node.children.length;
-  target.serializedForm = node.serialize({
-    noID: true,
-    maxLevel: 1,
-    neighbors: 1
-    // only 1 neighbor is supported right now
-  });
-};
-var getNodeComparisonScore = (node, target) => {
-  var _a;
-  let score = 1;
-  if (node.role === target.role) {
-    score++;
-  }
-  const attrs = ["name", "content"];
-  for (const attr of attrs) {
-    if (!((_a = node[attr]) == null ? void 0 : _a.trim())) {
-      continue;
-    }
-    const fieldChangeRatio = distance(node[attr], target[attr]) / Math.min(node[attr].length, target[attr].length);
-    if (fieldChangeRatio === 0) {
-      score += 2;
-    } else if (fieldChangeRatio <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
-      score++;
-    }
-  }
-  if (target.numChildren !== void 0) {
-    if (node.children.length === target.numChildren && target.numChildren > 0) {
-      score++;
-    } else if (target.numChildren > 0 && node.children.length === 0) {
-      score--;
-    } else if (Math.abs(node.children.length - target.numChildren) > 2) {
-      score--;
-    }
-  }
-  if (target.serializedForm) {
-    const serializedNode = node.serialize({
-      noID: true,
-      maxLevel: 1,
-      neighbors: 1
-    });
-    const levenshteinRatio = distance(serializedNode, target.serializedForm) / Math.min(serializedNode.length, target.serializedForm.length);
-    if (levenshteinRatio === 0) {
-      score += 2;
-    } else if (levenshteinRatio <= MAX_LEVENSHTEIN_FIELD_CHANGE_RATIO) {
-      score++;
-    }
-  }
-  return score;
-};
-
-// ../../packages/web-agent/src/browsers/cdp.ts
-var GREEN = { r: 147, g: 196, b: 125, a: 0.55 };
-var NODE_HIGHLIGHT_CONFIG = {
-  showInfo: false,
-  showRulers: false,
-  showStyles: false,
-  showAccessibilityInfo: false,
-  showExtensionLines: false,
-  contrastAlgorithm: "aa",
-  contentColor: GREEN,
-  paddingColor: GREEN,
-  borderColor: GREEN,
-  marginColor: GREEN,
-  eventTargetColor: GREEN,
-  shapeColor: GREEN,
-  shapeMarginColor: GREEN
-};
-
-// ../../packages/web-agent/src/browsers/utils/time.ts
-var sleep = (ms = 1e3) => {
-  return new Promise((resolve) => setTimeout(() => resolve(), ms));
-};
-
-// ../../packages/web-agent/src/browsers/utils/scripts/cursor.ts
-function addCursorScript() {
-  cursor = document.createElement("img");
-  cursor.setAttribute(
-    "src",
-    "data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiIHdpZHRoPSIzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDcpIj48cGF0aCBkPSJtNi4xNDggMTguNDczIDEuODYzLTEuMDAzIDEuNjE1LS44MzktMi41NjgtNC44MTZoNC4zMzJsLTExLjM3OS0xMS40MDh2MTYuMDE1bDMuMzE2LTMuMjIxeiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Im02LjQzMSAxNyAxLjc2NS0uOTQxLTIuNzc1LTUuMjAyaDMuNjA0bC04LjAyNS04LjA0M3YxMS4xODhsMi41My0yLjQ0MnoiIGZpbGw9IiMwMDAiLz48L2c+PC9zdmc+"
-  );
-  cursor.setAttribute("id", "selenium_cursor");
-  cursor.setAttribute(
-    "style",
-    "position: absolute; z-index: 99999999999; pointer-events: none; left:0; top:0"
-  );
-  cursor.style.filter = "invert(0%) sepia(6%) saturate(24%) hue-rotate(315deg) brightness(89%) contrast(110%)";
-  document.body.appendChild(cursor);
-  document.onmousemove = function(e) {
-    e = e || window.event;
-    document.getElementById("selenium_cursor").style.left = e.pageX + "px";
-    document.getElementById("selenium_cursor").style.top = e.pageY + "px";
-  };
-}
-
-// ../../packages/web-agent/src/browsers/utils/scripts/addIDs.ts
-function addIDsScript() {
-  const allElements = document.getElementsByTagName("*");
-  let currentID = 1;
-  for (let i = 0; i < allElements.length; i++) {
-    const element = allElements[i];
-    element == null ? void 0 : element.setAttribute("data-momentic-id", currentID);
-    currentID++;
-  }
-}
-
-// ../../packages/web-agent/src/browsers/utils/playwright.ts
-var sometimesRelevantResourceTypes = /* @__PURE__ */ new Set([
-  "document",
-  "script",
-  "XMLHttpRequest",
-  "fetch",
-  "xhr"
-]);
-var alwaysRelevantResourceTypes = /* @__PURE__ */ new Set(["script", "document"]);
-var bannedDomains = [
-  "intercom.io",
-  "googletagmanager.com",
-  "google-analytics.com",
-  "www.gstatic.com",
-  "apis.google.com",
-  "sentry.io",
-  "newrelic.com",
-  "p.retool.com",
-  "m.stripe.com",
-  "m.stripe.network",
-  "js.stripe.com",
-  "assets.trybento.co",
-  "udon.trybento.co",
-  "cdn.lr-in-prod.com",
-  "r.lr-in-prod.com",
-  "content.product-usage.assembledhq.com",
-  "data.product-usage.assembledhq.com",
-  "static.zdassets.com"
-];
-function serializeRequest(request) {
-  return `${request.resourceType()} ${request.method()} ${request.url()}`;
-}
-function stripWWWPrefix(url) {
-  url = url.replace(/^www\./, "");
-  return url;
-}
-function isRequestRelevantForPageLoad(request, currentURL) {
-  if (!sometimesRelevantResourceTypes.has(request.resourceType())) {
-    return false;
-  }
-  const parsedCurrentURL = new URL(currentURL);
-  const parsedRequestURL = new URL(request.url());
-  if (bannedDomains.some((domain) => parsedRequestURL.hostname.includes(domain))) {
-    return false;
-  }
-  if (alwaysRelevantResourceTypes.has(request.resourceType())) {
-    return true;
-  }
-  if (request.method() !== "GET") {
-    return true;
-  }
-  return stripWWWPrefix(parsedRequestURL.hostname).includes(
-    stripWWWPrefix(parsedCurrentURL.hostname)
-  );
-}
-
-// ../../packages/web-agent/src/browsers/chrome.ts
-var chromiumWithExtra = addExtra(chromium);
-chromiumWithExtra.use(pluginStealth());
-function initCDPSession(cdpClient) {
-  return __async(this, null, function* () {
-    yield cdpClient.send("Accessibility.enable");
-    yield cdpClient.send("DOM.enable");
-    yield cdpClient.send("Overlay.enable");
-  });
-}
-var _ChromeBrowser = class _ChromeBrowser {
-  constructor({
-    browser,
-    context,
-    page,
-    baseURL,
-    cdpClient,
-    logger
-  }) {
-    // key is nodeId, according to the a11y tree
-    this.nodeMap = /* @__PURE__ */ new Map();
-    this.browser = browser;
-    this.context = context;
-    this.page = page;
-    this.baseURL = baseURL;
-    this.cdpClient = cdpClient;
-    this.logger = logger;
-  }
-  /**
-   * Creates a new browser and waits for navigation to the given test URL.
-   */
-  static init(_0, _1, _2) {
-    return __async(this, arguments, function* (baseURL, logger, onScreenshot, timeout = MAX_LOAD_TIMEOUT_MS) {
-      const browser = yield chromiumWithExtra.launch({
-        headless: true,
-        handleSIGTERM: false
-      });
-      const context = yield browser.newContext({
-        viewport: {
-          width: 1920,
-          height: 1080
-        },
-        // comment out the below if you are on Mac OS but you're using a monitor
-        deviceScaleFactor: process.platform === "darwin" ? RETINA_WINDOW_SCALE_FACTOR : 1,
-        userAgent: devices["Desktop Chrome"].userAgent,
-        geolocation: { latitude: 37.7749, longitude: -122.4194 },
-        // san francisco
-        locale: "en-US",
-        timezoneId: "America/Los_Angeles"
-      });
-      const page = yield context.newPage();
-      const cdpClient = yield context.newCDPSession(page);
-      const chrome = new _ChromeBrowser({
-        browser,
-        context,
-        page,
-        baseURL,
-        cdpClient,
-        logger
-      });
-      let completed = false;
-      const navigateAndInitCDP = () => __async(this, null, function* () {
-        try {
-          yield chrome.navigate(baseURL, false);
-          yield initCDPSession(cdpClient);
-        } catch (err) {
-          logger.error({ err }, "Failed to initialize chrome browser");
-        } finally {
-          completed = true;
-        }
-      });
-      void navigateAndInitCDP();
-      const sendScreenshot = () => __async(this, null, function* () {
-        if (!onScreenshot) {
-          return;
-        }
-        try {
-          onScreenshot({
-            viewport: chrome.viewport,
-            buffer: yield chrome.screenshot()
-          });
-        } catch (err) {
-          logger.error({ err }, "Failed to take screenshot");
-        }
-      });
-      void sendScreenshot();
-      const screenshotInterval = setInterval(() => {
-        void sendScreenshot();
-      }, 250);
-      const startTime = Date.now();
-      while (!completed && Date.now() - startTime < timeout) {
-        yield sleep(CHECK_INTERVAL_MS);
-      }
-      clearInterval(screenshotInterval);
-      if (!completed) {
-        logger.warn(
-          "Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?"
-        );
-      }
-      return chrome;
-    });
-  }
-  // Things to do on every page load
-  pageSetup() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(addCursorScript);
-      yield this.page.evaluate(addIDsScript);
-    });
-  }
-  wait(timeoutMs) {
-    return __async(this, null, function* () {
-      yield this.page.waitForTimeout(timeoutMs);
-    });
-  }
-  cleanup() {
-    return __async(this, null, function* () {
-      yield this.page.close();
-      yield this.context.close();
-      yield this.browser.close();
-    });
-  }
-  get closed() {
-    return this.page.isClosed() || !this.browser.isConnected();
-  }
-  html() {
-    return __async(this, null, function* () {
-      return yield this.page.content();
-    });
-  }
-  get url() {
-    return this.page.url();
-  }
-  screenshot(quality = 100, scale = "device") {
-    return __async(this, null, function* () {
-      return yield this.page.screenshot({
-        fullPage: false,
-        quality,
-        scale,
-        type: "jpeg",
-        // allow the blinking text cursor thing to remain there
-        caret: "initial"
-      });
-    });
-  }
-  get viewport() {
-    const viewport = this.page.viewportSize();
-    if (!viewport) {
-      throw new Error("failed to get viewport");
-    }
-    return viewport;
-  }
-  navigate(url, wrapPossibleNavigation = true) {
-    return __async(this, null, function* () {
-      this.logger.debug(`Navigating to ${url}`);
-      const startTime = Date.now();
-      const doNav = () => __async(this, null, function* () {
-        try {
-          yield this.page.goto(url, {
-            timeout: MAX_LOAD_TIMEOUT_MS
-          });
-          this.logger.debug(
-            { url },
-            `Got load event in ${Math.floor(Date.now() - startTime)}ms`
-          );
-        } catch (e) {
-          this.logger.warn(
-            { url, type: "navigate", err: e },
-            "Timeout elapsed waiting for page to load, continuing anyways..."
-          );
-        }
-      });
-      if (wrapPossibleNavigation) {
-        yield this.wrapPossibleNavigation(doNav);
-      } else {
-        yield doNav();
-      }
-      if (CHROME_INTERNAL_URLS.has(this.url) && process.env.NODE_ENV === "production") {
-        throw new Error(
-          `${url} took too long to load \u{1F61E}. Please ensure the site and your internet are working.`
-        );
-      }
-      yield this.pageSetup();
-      this.logger.debug({ url }, "Navigation complete");
-    });
-  }
-  fill(_0, _1) {
-    return __async(this, arguments, function* (target, text, options = {}) {
-      const element = yield this.click(target, {
-        doubleClick: false,
-        rightClick: false
-      });
-      yield this.type(text, options);
-      return element;
-    });
-  }
-  type(_0) {
-    return __async(this, arguments, function* (text, options = {}) {
-      const { clearContent = true, pressKeysSequentially = false } = options;
-      if (clearContent) {
-        if (process.platform === "darwin") {
-          yield this.page.keyboard.press("Meta+A");
-        } else {
-          yield this.page.keyboard.press("Control+A");
-        }
-        yield this.page.keyboard.press("Backspace");
-      }
-      if (pressKeysSequentially) {
-        yield this.page.keyboard.type(text);
-      } else {
-        yield this.page.keyboard.insertText(text);
-      }
-    });
-  }
-  clickByA11yID(_0) {
-    return __async(this, arguments, function* (index, options = {}) {
-      const node = this.nodeMap.get(`${index}`);
-      if (!node) {
-        throw new Error(`Could not find DOM node during click: ${index}`);
-      }
-      const nodeClicked = yield this.clickUsingCDP(node, options);
-      yield this.highlightNode(nodeClicked);
-      return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    });
-  }
-  selectOptionByA11yID(index, option) {
-    return __async(this, null, function* () {
-      const node = this.nodeMap.get(`${index}`);
-      if (!node) {
-        throw new Error(
-          `Could not find DOM node while selecting option: ${index}`
-        );
-      }
-      if (!node.backendNodeID) {
-        throw new Error(
-          `Select target missing backend node id: ${node.getLogForm()}`
-        );
-      }
-      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
-      yield locator.selectOption(option, {
-        timeout: COMPLICATED_BROWSER_ACTION_TIMEOUT_MS
-      });
-      yield this.highlightNode(node);
-      return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    });
-  }
-  scrollIntoView(target) {
-    return __async(this, null, function* () {
-      const id = yield this.resolveCachedTargetToID(target);
-      const node = this.nodeMap.get(`${id}`);
-      if (!node) {
-        throw new Error(`Could not find node in DOM with a11y id: ${id}`);
-      }
-      if (!node.backendNodeID) {
-        throw new Error(
-          `Focus target missing backend node id: ${node.getLogForm()}`
-        );
-      }
-      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
-      yield locator.scrollIntoViewIfNeeded({
-        timeout: BROWSER_ACTION_TIMEOUT_MS
-      });
-    });
-  }
-  highlight(target) {
-    return __async(this, null, function* () {
-      try {
-        const id = yield this.resolveCachedTargetToID(target);
-        const node = this.nodeMap.get(`${id}`);
-        if (!node) {
-          throw new Error(`Could not find DOM node during highlight: ${id}`);
-        }
-        if (!node.backendNodeID) {
-          throw new Error(
-            `Select target missing backend node id: ${node.getLogForm()}`
-          );
-        }
-        yield this.highlightNode(node);
-      } catch (err) {
-        this.logger.warn({ err, target }, "Failed to highlight target");
-      }
-    });
-  }
-  highlightNode(node) {
-    return __async(this, null, function* () {
-      try {
-        yield this.cdpClient.send("Overlay.highlightNode", {
-          highlightConfig: NODE_HIGHLIGHT_CONFIG,
-          backendNodeId: node.backendNodeID
-        });
-      } catch (err) {
-        this.logger.warn(
-          "Failed to add node highlight, a page navigation likely occurred. This is non-fatal for tests."
-        );
-      }
-      const hideHighlight = () => __async(this, null, function* () {
-        try {
-          yield this.cdpClient.send("Overlay.hideHighlight", {
-            backendNodeId: node.backendNodeID
-          });
-        } catch (err) {
-          this.logger.debug({ err }, "Failed to remove node highlight");
-        }
-      });
-      setTimeout(() => {
-        void hideHighlight();
-      }, HIGHLIGHT_DURATION_MS);
-    });
-  }
-  wrapPossibleNavigation(_0) {
-    return __async(this, arguments, function* (fn, timeoutMS = MAX_LOAD_TIMEOUT_MS) {
-      const startTime = Date.now();
-      const startURL = this.url;
-      let lastRequestReceived = Date.now();
-      const firedRequests = /* @__PURE__ */ new Map();
-      const finishedRequests = /* @__PURE__ */ new Map();
-      const requestFinishedListener = (request) => {
-        var _a;
-        const key = serializeRequest(request);
-        finishedRequests.set(key, ((_a = finishedRequests.get(key)) != null ? _a : 0) + 1);
-      };
-      const requestFiredListener = (request) => {
-        var _a;
-        if (!isRequestRelevantForPageLoad(request, this.url)) {
-          return;
-        }
-        const key = serializeRequest(request);
-        firedRequests.set(key, ((_a = firedRequests.get(key)) != null ? _a : 0) + 1);
-        lastRequestReceived = Date.now();
-      };
-      this.page.on("requestfinished", requestFinishedListener);
-      this.page.on("request", requestFiredListener);
-      let rejected = false;
-      const retPromise = fn().catch((e) => {
-        rejected = true;
-        if (e instanceof Error)
-          return e;
-        return new Error(`${e}`);
-      });
-      yield sleep(CHECK_INTERVAL_MS);
-      const unwrapAndThrowError = (p) => __async(this, null, function* () {
-        const v = yield p;
-        if (v instanceof Error) {
-          throw v;
-        }
-        return v;
-      });
-      let unfinishedRequests = /* @__PURE__ */ new Set();
-      const waitForNetworkIdle = () => __async(this, null, function* () {
-        while (!rejected && Date.now() - startTime < timeoutMS) {
-          unfinishedRequests = /* @__PURE__ */ new Set();
-          yield sleep(CHECK_INTERVAL_MS);
-          if (Date.now() - lastRequestReceived <= NETWORK_STABLE_DURATION_MS) {
-            continue;
-          }
-          let anyDifference = false;
-          for (const key of firedRequests.keys()) {
-            if (firedRequests.get(key) !== finishedRequests.get(key)) {
-              anyDifference = true;
-              unfinishedRequests.add(key);
-            }
-          }
-          if (!anyDifference) {
-            this.logger.debug(
-              {
-                url: this.url,
-                requests: JSON.stringify(Array.from(firedRequests.entries()))
-              },
-              `Network idle in ${Math.floor(Date.now() - startTime)}ms`
-            );
-            return true;
-          }
-        }
-        if (!rejected && unfinishedRequests.size > 0) {
-          this.logger.warn(
-            {
-              url: this.url,
-              unfinishedRequests: JSON.stringify(
-                Array.from(unfinishedRequests.entries())
-              )
-            },
-            "Timeout elapsed waiting for network idle, continuing anyways..."
-          );
-        }
-        return false;
-      });
-      const waitResult = yield waitForNetworkIdle();
-      this.page.off("requestfinished", requestFinishedListener);
-      this.page.off("request", requestFiredListener);
-      if (!waitResult) {
-        return unwrapAndThrowError(retPromise);
-      }
-      if (!rejected && urlChanged(this.url, startURL)) {
-        this.logger.debug(
-          { startURL, newURL: this.url },
-          `Detected url change in wrapPossibleNavigation, waiting for load state`
-        );
-        const remainingTimeout = Math.max(
-          timeoutMS - (Date.now() - startTime),
-          0
-        );
-        if (remainingTimeout > 0) {
-          try {
-            yield this.page.waitForLoadState("load", {
-              timeout: remainingTimeout
-            });
-          } catch (e) {
-            this.logger.warn(
-              { url: this.url },
-              "Timeout elapsed waiting for load state to fire, continuing anyways..."
-            );
-          }
-        }
-      }
-      return unwrapAndThrowError(retPromise);
-    });
-  }
-  /**
-   * Given a potentially cached a11y ID, resolve it to an actual ID, checking that it is still valid.
-   * If the ID is no longer valid, try to auto-heal with heuristics.
-   * Throws if no auto-healing is possible.
-   */
-  resolveCachedTargetToID(target) {
-    return __async(this, null, function* () {
-      if (!target.name && !target.role && !target.content) {
-        const node = this.nodeMap.get(`${target.id}`);
-        if (!node) {
-          throw new Error(
-            `Resolving target failed, fresh value did not exist in node map: ${target.id}`
-          );
-        }
-        saveNodeDetailsToCache(node, target);
-        return target.id;
-      }
-      yield this.getA11yTree();
-      const proposedNode = this.nodeMap.get(`${target.id}`);
-      if (proposedNode) {
-        const comparisonScore = getNodeComparisonScore(proposedNode, target);
-        if (comparisonScore >= MIN_SIMILARITY_SCORE_TO_REUSE) {
-          this.logger.debug(
-            { target, proposedNode: proposedNode.getLogForm(), comparisonScore },
-            "Resolved cached a11y target to node with exact same id"
-          );
-          saveNodeDetailsToCache(proposedNode, target);
-          return target.id;
-        }
-      }
-      let closestLevenshteinDistance = Infinity;
-      let smallestLevenshteinRatio = Infinity;
-      let closestNode;
-      for (const node of this.nodeMap.values()) {
-        const comparisonScore = getNodeComparisonScore(node, target);
-        if (comparisonScore >= MIN_SIMILARITY_SCORE_TO_REUSE) {
-          this.logger.debug(
-            { newNode: node.getLogForm(), target, comparisonScore },
-            "Resolved cached a11y target to new node with field comparison"
-          );
-          saveNodeDetailsToCache(node, target);
-          return parseInt(node.id);
-        }
-        if (target.serializedForm) {
-          const serializedNode = node.serialize({
-            noID: true,
-            maxLevel: 1,
-            neighbors: 1
-          });
-          if (Math.abs(serializedNode.length - target.serializedForm.length) > MAX_LEVENSHTEIN_DISTANCE) {
-            continue;
-          }
-          const levenshteinDistance = distance2(
-            target.serializedForm,
-            serializedNode
-          );
-          const ratio = levenshteinDistance / Math.min(target.serializedForm.length, serializedNode.length);
-          if (levenshteinDistance < closestLevenshteinDistance && ratio < MAX_LEVENSHTEIN_CHANGE_RATIO) {
-            closestLevenshteinDistance = levenshteinDistance;
-            smallestLevenshteinRatio = ratio;
-            closestNode = node;
-          }
-        }
-      }
-      if (closestNode && closestLevenshteinDistance < MAX_LEVENSHTEIN_DISTANCE) {
-        this.logger.debug(
-          {
-            newNode: closestNode.getLogForm(),
-            target,
-            distance: closestLevenshteinDistance,
-            ratio: smallestLevenshteinRatio
-          },
-          "Resolved cached a11y target to new node with pure levenshtein distance"
-        );
-        saveNodeDetailsToCache(closestNode, target);
-        return parseInt(closestNode.id);
-      }
-      throw new Error(
-        `Could not find any relevant node given cached target: ${JSON.stringify(
-          target
-        )}`
-      );
-    });
-  }
-  click(_0) {
-    return __async(this, arguments, function* (target, options = {}) {
-      const id = yield this.resolveCachedTargetToID(target);
-      const elementInteracted = yield this.wrapPossibleNavigation(
-        () => this.clickByA11yID(id, options)
-      );
-      return elementInteracted;
-    });
-  }
-  hover(target) {
-    return __async(this, null, function* () {
-      const nodeId = yield this.resolveCachedTargetToID(target);
-      const node = this.nodeMap.get(`${nodeId}`);
-      if (!node) {
-        throw new Error(`Could not find DOM node for hover: ${nodeId}`);
-      }
-      if (!node.backendNodeID) {
-        throw new Error(
-          `Hover target missing backend node id: ${node.getLogForm()}`
-        );
-      }
-      const locator = yield this.getLocatorFromBackendID(node.backendNodeID);
-      yield locator.hover({
-        timeout: BROWSER_ACTION_TIMEOUT_MS
-      });
-      yield this.highlightNode(node);
-      return node.serialize({ noChildren: true, noProperties: true, noID: true });
-    });
-  }
-  selectOption(target, option) {
-    return __async(this, null, function* () {
-      const id = yield this.resolveCachedTargetToID(target);
-      return this.selectOptionByA11yID(id, option);
-    });
-  }
-  press(key) {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(() => this.page.keyboard.press(key));
-    });
-  }
-  refresh() {
-    return __async(this, null, function* () {
-      yield this.page.reload();
-      yield this.pageSetup();
-    });
-  }
-  getA11yTree() {
-    return __async(this, null, function* () {
-      let processedTree = null;
-      let attempt = 0;
-      const url = this.url;
-      while (!processedTree) {
-        try {
-          this.logger.debug(`Getting a11y tree at ${url}`);
-          const graph = yield this.getRawA11yTree();
-          if (!graph.root || graph.allNodes.length === 0) {
-            throw new Error("No a11y tree found on page");
-          }
-          processedTree = processA11yTree(graph);
-        } catch (e) {
-          this.logger.error({ err: e, url }, "Error fetching a11y tree");
-          if (attempt === 0) {
-            yield sleep(1e3);
-            attempt++;
-          } else {
-            throw new Error(`Max retries exceeded fetching a11y tree: ${e}`);
-          }
-        }
-      }
-      if (!processedTree.root) {
-        this.logger.warn("A11y tree was pruned entirely");
-      }
-      this.nodeMap = processedTree.nodeMap;
-      return processedTree;
-    });
-  }
-  getRawA11yTree() {
-    return __async(this, null, function* () {
-      const url = this.page.url();
-      let lastTreeUpdateTimestamp = Date.now();
-      const treeUpdateListener = () => {
-        lastTreeUpdateTimestamp = Date.now();
-      };
-      this.cdpClient.addListener(
-        "Accessibility.nodesUpdated",
-        treeUpdateListener
-      );
-      let accessibilityTreeLoadFired = false;
-      const accessibilityLoadListener = () => {
-        this.logger.info({ url }, `Load event fired on page`);
-        accessibilityTreeLoadFired = true;
-      };
-      this.cdpClient.addListener(
-        "Accessibility.loadComplete",
-        accessibilityLoadListener
-      );
-      const a11yLoadStart = Date.now();
-      let timeoutTriggered = true;
-      while (Date.now() - a11yLoadStart < A11Y_STABLE_TIMEOUT_MS) {
-        yield sleep(CHECK_INTERVAL_MS);
-        if (!accessibilityTreeLoadFired && Date.now() - a11yLoadStart < A11Y_LOAD_TIMEOUT_MS && process.env.NODE_ENV !== "production") {
-          this.logger.debug({ url }, `A11y tree not loaded yet, waiting...`);
-          continue;
-        }
-        if (Date.now() - lastTreeUpdateTimestamp >= A11Y_STABLE_DURATION_MS) {
-          this.logger.debug({ url }, `A11y tree not stable yet, waiting...`);
-          continue;
-        }
-        timeoutTriggered = false;
-        break;
-      }
-      this.logger.debug(
-        {
-          duration: Date.now() - a11yLoadStart,
-          eventReceived: accessibilityTreeLoadFired,
-          timeoutTriggered
-        },
-        "A11y wait phase completed"
-      );
-      const { node: root } = yield this.cdpClient.send(
-        "Accessibility.getRootAXNode"
-      );
-      const { nodes } = yield this.cdpClient.send("Accessibility.queryAXTree", {
-        backendNodeId: root.backendDOMNodeId
-      });
-      this.cdpClient.removeListener(
-        "Accessibility.loadComplete",
-        accessibilityLoadListener
-      );
-      this.cdpClient.removeListener(
-        "Accessibility.nodesUpdated",
-        treeUpdateListener
-      );
-      return {
-        root,
-        allNodes: nodes
-      };
-    });
-  }
-  clickUsingVisualCoordinates(backendNodeId) {
-    return __async(this, null, function* () {
-      const location = yield this.getElementLocation(backendNodeId);
-      if (!location) {
-        throw new Error(
-          `Could not find element location with backend node id: ${backendNodeId}`
-        );
-      }
-      this.logger.debug({ location }, "Executing mouse click");
-      yield this.page.mouse.click(location.centerX, location.centerY);
-    });
-  }
-  // Get the "id" attribute value from an HTML element.
-  getIDAttributeUsingCDP(objectId) {
-    return __async(this, null, function* () {
-      yield this.cdpClient.send("DOM.getDocument", { depth: 0 });
-      const cdpNodeResult = yield this.cdpClient.send("DOM.requestNode", {
-        objectId
-      });
-      const attrResult = yield this.cdpClient.send("DOM.getAttributes", {
-        nodeId: cdpNodeResult.nodeId
-      });
-      const attributes = attrResult.attributes;
-      const indexAttr = attributes.findIndex((s) => s === "data-momentic-id");
-      if (indexAttr === -1) {
-        return "";
-      }
-      return attributes[indexAttr + 1] || "";
-    });
-  }
-  getLocatorFromBackendID(backendNodeId) {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(addIDsScript);
-      const cdpResolveResult = yield this.cdpClient.send("DOM.resolveNode", {
-        backendNodeId
-      });
-      if (!cdpResolveResult || !cdpResolveResult.object.objectId) {
-        throw new Error(`Could not resolve backend node ${backendNodeId}`);
-      }
-      try {
-        const id = yield this.getIDAttributeUsingCDP(
-          cdpResolveResult.object.objectId
-        );
-        if (!id) {
-          throw new Error("Failed getting data-momentic-id attribute using CDP");
-        }
-        return this.page.locator(`[data-momentic-id="${id}"]`);
-      } catch (err) {
-        this.logger.error(
-          {
-            err
-          },
-          "Failed to get ID attribute"
-        );
-        throw err;
-      }
-    });
-  }
-  clickUsingCDP(_0) {
-    return __async(this, arguments, function* (originalNode, options = {}) {
-      let clickAttempts = 0;
-      let candidateNode = originalNode;
-      while (clickAttempts < MAX_BROWSER_ACTION_ATTEMPTS) {
-        if (!candidateNode || candidateNode.role === "RootWebArea") {
-          throw new Error(
-            `Attempted to click node with no clickable surrounding elements: ${originalNode.getLogForm()}`
-          );
-        }
-        if (candidateNode.role === "StaticText") {
-          candidateNode = candidateNode.parent;
-          continue;
-        }
-        const candidateNodeID = candidateNode.backendNodeID;
-        if (!candidateNodeID) {
-          this.logger.warn(
-            { node: candidateNode.getLogForm() },
-            "Click candidate had no backend node ID"
-          );
-          candidateNode = candidateNode.parent;
-          continue;
-        }
-        try {
-          const locator = yield this.getLocatorFromBackendID(candidateNodeID);
-          if (options.doubleClick) {
-            yield locator.dblclick({
-              timeout: BROWSER_ACTION_TIMEOUT_MS
-            });
-          } else {
-            yield locator.click({
-              timeout: BROWSER_ACTION_TIMEOUT_MS,
-              button: options.rightClick ? "right" : "left"
-            });
-          }
-          if (candidateNode.id !== originalNode.id) {
-            this.logger.info(
-              {
-                oldNode: originalNode.getLogForm(),
-                newNode: candidateNode.getLogForm()
-              },
-              `Redirected click successfully to new element`
-            );
-          }
-          return candidateNode;
-        } catch (err) {
-          this.logger.error(
-            { err, node: candidateNode.getLogForm() },
-            "Failed click or click timed out"
-          );
-          clickAttempts++;
-          candidateNode = candidateNode.parent;
-        }
-      }
-      throw new Error(
-        `Max click redirection attempts exhausted on original element: ${originalNode.getLogForm()}`
-      );
-    });
-  }
-  /**
-   * Currently unused, but could be useful for vision model integration.
-   * Gets x/y position of an a11y node.
-   */
-  getElementLocation(backendNodeId) {
-    return __async(this, null, function* () {
-      const tree = yield this.cdpClient.send("DOMSnapshot.captureSnapshot", {
-        computedStyles: [],
-        includeDOMRects: true,
-        includePaintOrder: true
-      });
-      let devicePixelRatio = yield this.page.evaluate(
-        () => window.devicePixelRatio
-      );
-      if (process.platform === "darwin" && devicePixelRatio === 1) {
-        devicePixelRatio = RETINA_WINDOW_SCALE_FACTOR;
-      }
-      const document2 = tree["documents"][0];
-      const layout = document2["layout"];
-      const nodes = document2["nodes"];
-      const nodeNames = nodes["nodeName"] || [];
-      const backendNodeIds = nodes["backendNodeId"] || [];
-      const layoutNodeIndex = layout["nodeIndex"];
-      const bounds = layout["bounds"];
-      let cursor2 = -1;
-      for (let i = 0; i < nodeNames.length; i++) {
-        if (backendNodeIds[i] === backendNodeId) {
-          cursor2 = layoutNodeIndex.indexOf(i);
-          break;
-        }
-      }
-      if (cursor2 === -1) {
-        throw new Error(
-          `Could not find any backend node with ID ${backendNodeId}`
-        );
-      }
-      let [x = 0, y = 0, width = 0, height = 0] = bounds[cursor2];
-      x /= devicePixelRatio;
-      y /= devicePixelRatio;
-      width /= devicePixelRatio;
-      height /= devicePixelRatio;
-      const centerX = x + width / 2;
-      const centerY = y + height / 2;
-      return { centerX, centerY };
-    });
-  }
-  scrollUp() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop - window.innerHeight;
-      });
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
-      });
-    });
-  }
-  scrollDown() {
-    return __async(this, null, function* () {
-      yield this.page.evaluate(() => {
-        (document.scrollingElement || document.body).scrollTop = (document.scrollingElement || document.body).scrollTop + window.innerHeight;
-      });
-    });
-  }
-  goForward() {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(
-        () => this.page.goForward({ timeout: MAX_LOAD_TIMEOUT_MS })
-      );
-      yield this.pageSetup();
-    });
-  }
-  goBack() {
-    return __async(this, null, function* () {
-      yield this.wrapPossibleNavigation(
-        () => this.page.goBack({ timeout: MAX_LOAD_TIMEOUT_MS })
-      );
-      yield this.pageSetup();
-    });
-  }
-  switchToPage(urlSubstring) {
-    return __async(this, null, function* () {
-      const allPages = yield this.context.pages();
-      for (let i = 0; i < allPages.length; i++) {
-        const page = allPages[i];
-        if (page.url().includes(urlSubstring)) {
-          this.page = page;
-          yield page.waitForLoadState("load", {
-            timeout: MAX_LOAD_TIMEOUT_MS
-          });
-          yield this.pageSetup();
-          this.cdpClient = yield this.context.newCDPSession(page);
-          yield initCDPSession(this.cdpClient);
-          this.logger.info(`Switching to tab ${i} with url ${page.url()}`);
-          return;
-        }
-      }
-      throw new Error(`Could not find page with url containing ${urlSubstring}`);
-    });
-  }
-  setCookie(cookie) {
-    return __async(this, null, function* () {
-      const cookieSettings = parseCookieString(cookie);
-      yield this.context.addCookies([cookieSettings]);
-    });
-  }
-};
-_ChromeBrowser.USER_AGENT = devices["Desktop Chrome"].userAgent;
-var ChromeBrowser = _ChromeBrowser;
-
-// ../../packages/web-agent/src/configs/controller.ts
-var A11Y_CONTROLLER_CONFIG = {
-  type: "a11y",
-  version: "1.0.0",
-  useHistory: "diff",
-  useGoalSplitter: true
-};
-var DEFAULT_CONTROLLER_CONFIG = A11Y_CONTROLLER_CONFIG;
-
-// ../../packages/web-agent/src/controller.ts
-import dedent2 from "dedent";
-import diffLines from "diff-lines";
-var MAX_HISTORY_CHAR_LENGTH = 1e4;
-var AgentController = class {
-  constructor({ browser, config, generator, logger }) {
-    this.browser = browser;
-    this.generator = generator;
-    this.config = config;
-    this.logger = logger;
-    this.pendingInstructions = [];
-    this.commandHistory = [];
-  }
-  /**
-   * Get copy of executed commands in human readable form. Most recent is last.
-   * Only commands that have completed execution are returned.
-   */
-  get history() {
-    return this.commandHistory.filter((cmd) => cmd.state === "DONE");
-  }
-  get lastExecutedCommand() {
-    const history = this.history;
-    if (history.length === 0)
-      return null;
-    const lastEntry = history[history.length - 1];
-    return lastEntry;
-  }
-  /**
-   * Reset the command history provided to agents.
-   * Should be called due to a logical break between commands
-   * such as a SUCCESS being issued.
-   */
-  resetHistory() {
-    this.commandHistory = [];
-    this.pendingInstructions = [];
-  }
-  /**
-   * Reset controller and browser state.
-   */
-  resetState() {
-    return __async(this, null, function* () {
-      this.resetHistory();
-      yield this.browser.navigate(this.browser.baseURL);
-    });
-  }
-  /**
-   * Get the browser state as a string
-   */
-  getBrowserState() {
-    return __async(this, null, function* () {
-      const a11yTree = yield this.browser.getA11yTree();
-      return a11yTree.serialize();
-    });
-  }
-  getSerializedHistory(url, currentBrowserState) {
-    let history;
-    if (this.config.useHistory === "diff") {
-      history = this.getDiffHistory(url, currentBrowserState);
-    } else {
-      history = this.getListHistory();
-    }
-    return history;
-  }
-  splitUserGoal(type, goal, disableCache) {
-    return __async(this, null, function* () {
-      if (type === "AI_ACTION" /* AI_ACTION */ && goal.match(/[,!;.]|(?:and)|(?:then)/) && this.config.useGoalSplitter) {
-        const granularInstructions = yield this.generator.getGranularGoals(
-          { goal, url: this.browser.url },
-          disableCache
-        );
-        this.pendingInstructions = granularInstructions.reverse();
-      } else {
-        this.pendingInstructions = [goal];
-      }
-    });
-  }
-  /**
-   * Given previously executed commands, generate command for the current prompt.
-   * Should only be used for AI action.
-   */
-  promptToCommand(type, goal, disableCache) {
-    return __async(this, null, function* () {
-      if (this.pendingInstructions.length === 0) {
-        yield this.splitUserGoal(type, goal, disableCache);
-      }
-      const currInstruction = this.pendingInstructions[this.pendingInstructions.length - 1];
-      this.logger.info({ goal: currInstruction }, "Starting prompt translation");
-      const getBrowserStateStart = Date.now();
-      const url = this.browser.url;
-      const browserState = yield this.getBrowserState();
-      this.logger.info(
-        {
-          duration: Date.now() - getBrowserStateStart,
-          url
-        },
-        "Got browser state"
-      );
-      const numPrevious = this.commandHistory.length;
-      this.commandHistory.push({
-        state: "PENDING",
-        browserStateBeforeCommand: browserState,
-        urlBeforeCommand: url,
-        type
-      });
-      const history = this.getSerializedHistory(url, browserState);
-      const getCommandProposalStart = Date.now();
-      const proposedCommand = yield this.generator.getProposedCommand(
-        {
-          url,
-          numPrevious,
-          browserState,
-          history,
-          goal: currInstruction,
-          lastCommand: this.lastExecutedCommand
-        },
-        disableCache
-      );
-      this.logger.info(
-        { duration: Date.now() - getCommandProposalStart },
-        "Got proposed command"
-      );
-      if (proposedCommand.type === "SUCCESS" /* SUCCESS */) {
-        const finishedInstruction = this.pendingInstructions.pop();
-        this.logger.info(
-          {
-            finishedInstruction,
-            remainingInstructions: this.pendingInstructions
-          },
-          "Removing pending instruction due to SUCCESS"
-        );
-        if (this.pendingInstructions.length !== 0) {
-          this.commandHistory.pop();
-          return this.promptToCommand(type, "", disableCache);
-        }
-      } else if (
-        // on failure, we don't continue to execute
-        proposedCommand.type === "FAILURE"
-      ) {
-        this.logger.info(
-          {
-            remainingInstructions: this.pendingInstructions
-          },
-          "Removing pending instructions due to FAILURE"
-        );
-        this.pendingInstructions = [];
-      }
-      return proposedCommand;
-    });
-  }
-  locateElement(description, disableCache) {
-    return __async(this, null, function* () {
-      if (!description) {
-        throw new Error("Cannot locate element with empty description");
-      }
-      const locator = yield this.generator.getElementLocation(
-        { browserState: yield this.getBrowserState(), goal: description },
-        disableCache
-      );
-      if (locator.id < 0) {
-        throw new Error(
-          `Unable to locate element with description: ${description}`
-        );
-      }
-      return locator;
-    });
-  }
-  /**
-   * Construct a detailed history that can be passed to the LLM.
-   * History includes commands executed as well as browser state changes that occurred
-   * at each step.
-   */
-  getDiffHistory(currentURL, currentPageState) {
-    const doneCommands = this.history.filter(
-      (h) => h.type === "AI_ACTION" /* AI_ACTION */
-    );
-    if (doneCommands.length === 0)
-      return "<NONE/>";
-    const historyLines = [
-      "\nYou have already executed the following commands successfully (most recent listed first)",
-      "-".repeat(10)
-    ];
-    doneCommands.reverse().forEach((log, i) => {
-      historyLines.push(
-        `COMMAND ${doneCommands.length - i}${i === 0 ? " (command just executed)" : ""}: ${log.serializedCommand}`
-      );
-      if (i === 0) {
-        if (urlChanged(log.urlBeforeCommand, currentURL)) {
-          historyLines.push(
-            `  URL CHANGE: '${log.urlBeforeCommand}' -> '${currentURL}'`
-          );
-        } else {
-          const browserStateDiff = diffLines(
-            log.browserStateBeforeCommand,
-            currentPageState,
-            {
-              n_surrounding: 1
-            }
-          );
-          if (!browserStateDiff) {
-            historyLines.push("PAGE CONTENT CHANGE: <NONE/>");
-          } else if (browserStateDiff.length < MAX_HISTORY_CHAR_LENGTH) {
-            historyLines.push("PAGE CONTENT CHANGE:");
-            browserStateDiff.split("\n").forEach((l) => historyLines.push(`  ${l}`));
-          } else {
-            historyLines.push("PAGE CONTENT CHANGE: <TOO_LONG_TO_DISPLAY/>");
-          }
-        }
-      }
-      historyLines.push("-".repeat(10));
-    });
-    historyLines.push(`STARTING URL: ${this.browser.baseURL}`);
-    return historyLines.join("\n");
-  }
-  getListHistory() {
-    return dedent2`Here are the commands that you have successfully executed:
-    ${this.commandHistory.filter((cmd) => cmd.type === "AI_ACTION" /* AI_ACTION */).map((cmd) => `- ${cmd.serializedCommand}`).join("\n")}`;
-  }
-  /**
-   * Given a command, interact with the chromium browser to actually execute the actions
-   * @param [stateless=false] Execute this command in a stateless fashion, without modifying any controller state such as
-   * pending instructions. Useful when executing cached instructions.
-   */
-  executeCommand(command, disableCache, stateless = false) {
-    return __async(this, null, function* () {
-      const pendingHistory = this.commandHistory[this.commandHistory.length - 1];
-      if (!stateless) {
-        if (!pendingHistory || pendingHistory.state !== "PENDING") {
-          throw new Error(
-            "Executing command but there is no pending entry in the history"
-          );
-        }
-      } else {
-        yield this.browser.getA11yTree();
-      }
-      let result;
-      try {
-        const executionStart = Date.now();
-        result = yield this.executePresetStep(
-          command,
-          disableCache
-        );
-        const duration = Date.now() - executionStart;
-        this.logger.debug({ result, duration }, "Got execution result");
-      } catch (e) {
-        if (e instanceof Error) {
-          throw new BrowserExecutionError(`Failed to execute command: ${e}`, {
-            cause: e
-          });
-        }
-        throw new BrowserExecutionError(
-          `Unexpected throw from executing command`,
-          {
-            cause: new Error(`${e}`)
-          }
-        );
-      }
-      if (result.succeedImmediately && !stateless) {
-        this.pendingInstructions.pop();
-        if (this.pendingInstructions.length > 0) {
-          result.succeedImmediately = false;
-        }
-      }
-      if (result.elementInteracted && "target" in command && !command.target.elementDescriptor) {
-        command.target.elementDescriptor = result.elementInteracted.trim();
-      }
-      if (!stateless) {
-        pendingHistory.generatedStep = command;
-        pendingHistory.serializedCommand = serializeCommand(command);
-        pendingHistory.state = "DONE";
-      }
-      return result;
-    });
-  }
-  executeAssertion(urlBeforeCommand, command) {
-    return __async(this, null, function* () {
-      let params;
-      if (command.useVision) {
-        params = {
-          goal: command.assertion,
-          url: urlBeforeCommand,
-          // used for vision only
-          screenshot: yield this.browser.screenshot(),
-          // unused for visual assertion
-          browserState: "",
-          history: "",
-          numPrevious: -1,
-          lastCommand: null
-        };
-      } else {
-        const browserState = yield this.getBrowserState();
-        const history = this.getSerializedHistory(urlBeforeCommand, browserState);
-        params = {
-          goal: command.assertion,
-          url: urlBeforeCommand,
-          // used for text only
-          browserState,
-          history,
-          lastCommand: this.lastExecutedCommand,
-          numPrevious: this.commandHistory.length
-        };
-      }
-      const assertionEval = yield this.generator.getAssertionResult(
-        params,
-        command.useVision,
-        command.disableCache
-      );
-      if (assertionEval.relevantElements) {
-        void Promise.all(
-          assertionEval.relevantElements.map(
-            (id) => this.browser.highlight({ id })
-          )
-        );
-      }
-      if (!assertionEval.result) {
-        throw new Error(assertionEval.thoughts);
-      }
-      return {
-        succeedImmediately: false,
-        thoughts: assertionEval.thoughts,
-        urlAfterCommand: urlBeforeCommand
-      };
-    });
-  }
-  wrapElementTargetingCommand(target, disableCache, action, newlyGenerated = false) {
-    return __async(this, null, function* () {
-      if (!target.a11yData) {
-        target.a11yData = A11yTargetWithCacheSchema.parse(
-          yield this.locateElement(target.elementDescriptor, disableCache)
-        );
-        newlyGenerated = true;
-      }
-      try {
-        const result = yield action(target.a11yData);
-        this.logger.debug(
-          { target },
-          "Successfully used cached target to perform action"
-        );
-        return result;
-      } catch (err) {
-        if (!newlyGenerated) {
-          this.logger.warn(
-            { err, target },
-            "Failed to execute action with cached target, retrying with AI"
-          );
-          target.a11yData = void 0;
-          return this.wrapElementTargetingCommand(
-            target,
-            disableCache,
-            action,
-            true
-          );
-        }
-        this.logger.error(
-          { err, target },
-          "Failed to target element even after all auto-healing"
-        );
-        throw new Error(
-          `Failed to find element with description: ${target.elementDescriptor}. Has your website changed significantly?`
-        );
-      }
-    });
-  }
-  /**
-   * Executes a preset command.
-   * For most cases, the execution result contains metadata about the command executed.
-   * For assertions, an AssertionResult with thoughts is returned.
-   * Throws on failure.
-   */
-  executePresetStep(command, disableCache) {
-    return __async(this, null, function* () {
-      var _a;
-      const urlBeforeCommand = this.browser.url;
-      switch (command.type) {
-        case "SUCCESS" /* SUCCESS */:
-          if ((_a = command.condition) == null ? void 0 : _a.assertion.trim()) {
-            return this.executeAssertion(urlBeforeCommand, command.condition);
-          }
-          return {
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url
-          };
-        case "AI_ASSERTION" /* AI_ASSERTION */: {
-          return this.executeAssertion(urlBeforeCommand, command);
-        }
-        case "NAVIGATE" /* NAVIGATE */:
-          yield this.browser.navigate(command.url);
-          break;
-        case "GO_BACK" /* GO_BACK */:
-          yield this.browser.goBack();
-          break;
-        case "GO_FORWARD" /* GO_FORWARD */:
-          yield this.browser.goForward();
-          break;
-        case "SCROLL_DOWN" /* SCROLL_DOWN */:
-          yield this.browser.scrollDown();
-          break;
-        case "SCROLL_UP" /* SCROLL_UP */:
-          yield this.browser.scrollUp();
-          break;
-        case "WAIT" /* WAIT */:
-          yield this.browser.wait(command.delay * 1e3);
-          break;
-        case "REFRESH" /* REFRESH */:
-          yield this.browser.refresh();
-          break;
-        case "CLICK" /* CLICK */: {
-          const elementInteracted = yield this.wrapElementTargetingCommand(
-            command.target,
-            disableCache,
-            (target) => this.browser.click(target, {
-              doubleClick: command.doubleClick,
-              rightClick: command.rightClick
-            })
-          );
-          const result2 = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false,
-            elementInteracted
-          };
-          if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
-            result2.succeedImmediately = true;
-            result2.succeedImmediatelyReason = "URL changed";
-          }
-          return result2;
-        }
-        case "SELECT_OPTION" /* SELECT_OPTION */: {
-          const elementInteracted = yield this.wrapElementTargetingCommand(
-            command.target,
-            disableCache,
-            (targetWithA11yData) => this.browser.selectOption(targetWithA11yData, command.option)
-          );
-          return {
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url,
-            elementInteracted
-          };
-        }
-        case "TAB" /* TAB */:
-          yield this.browser.switchToPage(command.url);
-          break;
-        case "COOKIE" /* COOKIE */:
-          if (!command.value) {
-            break;
-          }
-          yield this.browser.setCookie(command.value);
-          break;
-        case "TYPE" /* TYPE */: {
-          const elementInteracted = yield this.wrapElementTargetingCommand(
-            command.target,
-            disableCache,
-            (target) => this.browser.click(target)
-          );
-          yield this.browser.type(command.value, {
-            clearContent: command.clearContent,
-            pressKeysSequentially: command.pressKeysSequentially
-          });
-          if (command.pressEnter) {
-            yield this.browser.press("Enter");
-          }
-          const result2 = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false,
-            elementInteracted
-          };
-          if (urlChanged(urlBeforeCommand, result2.urlAfterCommand)) {
-            result2.succeedImmediately = true;
-            result2.succeedImmediatelyReason = "URL changed";
-          }
-          return result2;
-        }
-        case "HOVER" /* HOVER */: {
-          const elementInteracted = yield this.wrapElementTargetingCommand(
-            command.target,
-            disableCache,
-            (target) => this.browser.hover(target)
-          );
-          return {
-            succeedImmediately: false,
-            urlAfterCommand: this.browser.url,
-            elementInteracted
-          };
-        }
-        case "PRESS" /* PRESS */:
-          yield this.browser.press(command.value);
-          const result = {
-            urlAfterCommand: this.browser.url,
-            succeedImmediately: false
-          };
-          if (urlChanged(urlBeforeCommand, result.urlAfterCommand)) {
-            result.succeedImmediately = true;
-            result.succeedImmediatelyReason = "URL changed";
-          }
-          return result;
-        default:
-          const assertUnreachable = (_x) => {
-            throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-          };
-          return assertUnreachable(command);
-      }
-      return {
-        succeedImmediately: false,
-        urlAfterCommand: this.browser.url
-      };
-    });
-  }
-};
-
-// ../../packages/web-agent/src/generators/api-generator.ts
-import fetchRetry from "fetch-retry";
-var fetch2 = fetchRetry(global.fetch);
-var API_VERSION2 = "v1";
-var APIGenerator = class {
-  constructor(params) {
-    this.baseURL = params.baseURL;
-    this.apiKey = params.apiKey;
-  }
-  getElementLocation(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION2}/web-agent/locate-element`,
-        {
-          browserState: context.browserState,
-          goal: context.goal,
-          disableCache
-        }
-      );
-      return LocateResponseSchema.parse(result);
-    });
-  }
-  getAssertionResult(context, useVision, disableCache) {
-    return __async(this, null, function* () {
-      var _a;
-      if (useVision) {
-        const result2 = yield this.sendRequest(
-          `/${API_VERSION2}/web-agent/assertion`,
-          {
-            url: context.url,
-            goal: context.goal,
-            screenshot: (_a = context.screenshot) == null ? void 0 : _a.toString("base64"),
-            disableCache,
-            vision: true
-          }
-        );
-        return GetAssertionResponseSchema.parse(result2);
-      }
-      const result = yield this.sendRequest(
-        `/${API_VERSION2}/web-agent/assertion`,
-        {
-          url: context.url,
-          browserState: context.browserState,
-          goal: context.goal,
-          history: context.history,
-          numPrevious: context.numPrevious,
-          lastCommand: context.lastCommand,
-          disableCache,
-          vision: false
-        }
-      );
-      return GetAssertionResponseSchema.parse(result);
-    });
-  }
-  getProposedCommand(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION2}/web-agent/next-command`,
-        {
-          url: context.url,
-          browserState: context.browserState,
-          goal: context.goal,
-          history: context.history,
-          numPrevious: context.numPrevious,
-          lastCommand: context.lastCommand,
-          disableCache
-        }
-      );
-      return GetNextCommandResponseSchema.parse(result);
-    });
-  }
-  getGranularGoals(context, disableCache) {
-    return __async(this, null, function* () {
-      const result = yield this.sendRequest(
-        `/${API_VERSION2}/web-agent/split-goal`,
-        {
-          url: context.url,
-          goal: context.goal,
-          disableCache
-        }
-      );
-      return SplitGoalResponseSchema.parse(result);
-    });
-  }
-  sendRequest(path3, body) {
-    return __async(this, null, function* () {
-      const response = yield fetch2(`${this.baseURL}${path3}`, {
-        retries: 1,
-        retryDelay: 1e3,
-        method: "POST",
-        body: JSON.stringify(body),
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${this.apiKey}`
-        }
-      });
-      if (!response.ok) {
-        throw new Error(
-          `Request to ${path3} failed with status ${response.status}: ${yield response.text()}`
-        );
-      }
-      return response.json();
-    });
-  }
-};
-
-// src/get-tests.ts
-import fs from "fs";
-import path2 from "path";
-var bannedDirs = /* @__PURE__ */ new Set([
-  "modules",
-  // this is reserved directory
-  "node_modules",
-  "dist",
-  "bin",
-  ".git",
-  "logs",
-  ".npm",
-  ".next",
-  "out",
-  ".yarn",
-  "__pycache__",
-  "build",
-  ".env",
-  ".venv",
-  "venv",
-  "env",
-  "wheels"
-]);
-function getTestFilesRecursively(dir) {
-  var _a;
-  const dirName = (_a = dir.split(path2.sep).pop()) != null ? _a : "";
-  if (bannedDirs.has(dirName)) {
-    if (dirName !== "modules") {
-      consoleLogger.warn(
-        `Skipping directory '${dir}' because it is likely an artifact folder.`
-      );
-    }
-    return [];
-  }
-  const files = fs.readdirSync(dir);
-  let filePathList = [];
-  files.forEach((file) => {
-    const filepath = path2.join(dir, file);
-    if (fs.statSync(filepath).isDirectory()) {
-      filePathList = filePathList.concat(getTestFilesRecursively(filepath));
-    } else if (file.endsWith(".yaml")) {
-      const contents = fs.readFileSync(filepath, "utf-8");
-      if (contents.includes("momentic/test" /* TEST */)) {
-        filePathList.push(filepath);
-      } else {
-        consoleLogger.warn(
-          `Skipping file '${filepath}' because it does not appear to be a valid Momentic test.`
-        );
-      }
-    }
-  });
-  return filePathList;
-}
-
-// ../../packages/execute/src/constants.ts
-var MAX_COMMANDS_PER_STEP = 20;
-
-// ../../packages/execute/src/steps/ai.ts
-var executeAIStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    logger,
-    advanced
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "logger",
-    "advanced"
-  ]);
-  var _a2, _b2, _c, _d, _e, _f, _g;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
-  controller.resetHistory();
-  const result = __spreadProps(__spreadValues({}, step), {
-    startedAt: /* @__PURE__ */ new Date(),
-    userAgent: ChromeBrowser.USER_AGENT,
-    // placeholder values
-    finishedAt: /* @__PURE__ */ new Date(),
-    results: [],
-    status: "SUCCESS" /* SUCCESS */
-  });
-  try {
-    let commandIndex = 0;
-    let useSavedCommands = step.commands && step.commands.length > 0;
-    while (true) {
-      if (commandIndex > MAX_COMMANDS_PER_STEP) {
-        throw new Error(
-          `Exceeded max number of commands per step (${MAX_COMMANDS_PER_STEP})`
-        );
-      }
-      let command;
-      const startedAt = /* @__PURE__ */ new Date();
-      const beforeScreenshotBuffer = yield controller.browser.screenshot();
-      const beforeScreenshot = yield callbacks.onSaveScreenshot(
-        beforeScreenshotBuffer
-      );
-      if (useSavedCommands) {
-        command = step.commands[commandIndex];
-        if (!command) {
-          throw new Error(
-            `Saved command at index ${commandIndex} is undefined.`
-          );
-        }
-      } else {
-        command = yield controller.promptToCommand(
-          step.type,
-          step.text,
-          advanced.disableAICaching
-        );
-      }
-      if (command.type === "FAILURE") {
-        result.finishedAt = /* @__PURE__ */ new Date();
-        result.status = "FAILED" /* FAILED */;
-        result.message = command.thoughts;
-        break;
-      }
-      (_b2 = callbacks.onCommandGenerated) == null ? void 0 : _b2.call(callbacks, {
-        commandIndex,
-        message: CARD_DISPLAY_NAMES[command.type] || `Unknown command (${command.type})`
-      });
-      const cmdResult = {
-        beforeScreenshot,
-        beforeUrl: controller.browser.url,
-        startedAt,
-        viewport: controller.browser.viewport,
-        // placeholder values
-        finishedAt: /* @__PURE__ */ new Date(),
-        status: "SUCCESS" /* SUCCESS */
-      };
-      logger.info(
-        `Starting sub-command ${commandIndex} within AI step: ${serializeCommand(
-          command
-        )}`
-      );
-      try {
-        const executionResult = yield controller.executeCommand(
-          command,
-          advanced.disableAICaching,
-          useSavedCommands
-        );
-        logger.info(`AI sub-command ${commandIndex} completed successfully`);
-        cmdResult.elementInteracted = executionResult.elementInteracted;
-        (_c = callbacks.onCommandExecuted) == null ? void 0 : _c.call(callbacks, {
-          commandIndex,
-          message: serializeCommand(command),
-          command
-        });
-        const afterScreenshotBuffer = yield controller.browser.screenshot();
-        const afterScreenshot = yield callbacks.onSaveScreenshot(
-          afterScreenshotBuffer
-        );
-        cmdResult.afterScreenshot = afterScreenshot;
-        cmdResult.afterUrl = controller.browser.url;
-        cmdResult.finishedAt = /* @__PURE__ */ new Date();
-        const presetActionResult = {
-          status: "SUCCESS" /* SUCCESS */,
-          startedAt: cmdResult.startedAt,
-          finishedAt: cmdResult.finishedAt,
-          type: "PRESET_ACTION" /* PRESET_ACTION */,
-          command,
-          results: [cmdResult]
-        };
-        result.results.push(presetActionResult);
-        if (command.type === "SUCCESS" /* SUCCESS */) {
-          result.finishedAt = /* @__PURE__ */ new Date();
-          result.status = "SUCCESS" /* SUCCESS */;
-          result.message = (_d = executionResult.thoughts) != null ? _d : "All commands completed.";
-          break;
-        }
-        if (executionResult.succeedImmediately && !useSavedCommands) {
-          result.finishedAt = /* @__PURE__ */ new Date();
-          result.status = "SUCCESS" /* SUCCESS */;
-          result.message = executionResult.succeedImmediatelyReason;
-          command = {
-            type: "SUCCESS" /* SUCCESS */
-          };
-          (_e = callbacks.onCommandExecuted) == null ? void 0 : _e.call(callbacks, {
-            commandIndex: commandIndex + 1,
-            message: serializeCommand(command),
-            command
-          });
-          result.results.push(__spreadProps(__spreadValues({}, presetActionResult), {
-            command
-          }));
-          break;
-        }
-      } catch (err) {
-        if (useSavedCommands) {
-          useSavedCommands = false;
-          commandIndex = 0;
-          result.results = [];
-          continue;
-        }
-        cmdResult.status = "FAILED" /* FAILED */;
-        cmdResult.message = `${err}`;
-        cmdResult.finishedAt = /* @__PURE__ */ new Date();
-        cmdResult.afterScreenshot = void 0;
-        cmdResult.afterUrl = controller.browser.url;
-        result.results.push({
-          status: "FAILED" /* FAILED */,
-          startedAt: cmdResult.startedAt,
-          finishedAt: cmdResult.finishedAt,
-          type: "PRESET_ACTION" /* PRESET_ACTION */,
-          command,
-          results: [cmdResult],
-          message: `${err}`
-        });
-        result.status = "FAILED" /* FAILED */;
-        result.finishedAt = /* @__PURE__ */ new Date();
-        result.message = `${err}`;
-        break;
-      }
-      commandIndex++;
-    }
-  } catch (err) {
-    result.message = `${err}`;
-    result.finishedAt = /* @__PURE__ */ new Date();
-    result.status = "FAILED" /* FAILED */;
-  }
-  if (result.status === "SUCCESS" /* SUCCESS */) {
-    (_f = callbacks.onSuccess) == null ? void 0 : _f.call(callbacks, {
-      message: result.message || "AI step succeeded.",
-      startedAt: result.startedAt.getTime(),
-      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
-    });
-  } else {
-    (_g = callbacks.onFailure) == null ? void 0 : _g.call(callbacks, {
-      message: result.message || "AI step errored.",
-      startedAt: result.startedAt.getTime(),
-      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
-    });
-  }
-  return result;
-});
-
-// ../../packages/execute/src/steps/preset.ts
-var executePresetStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    advanced
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "advanced"
-  ]);
-  var _a2, _b2, _c;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
-  const startedAt = /* @__PURE__ */ new Date();
-  const beforeUrl = controller.browser.url;
-  const beforeScreenshotBuffer = yield controller.browser.screenshot();
-  const beforeScreenshot = yield callbacks.onSaveScreenshot(
-    beforeScreenshotBuffer
-  );
-  try {
-    const execResult = yield controller.executePresetStep(
-      step.command,
-      advanced.disableAICaching
-    );
-    const afterScreenshotBuffer = yield controller.browser.screenshot();
-    const afterScreenshot = yield callbacks.onSaveScreenshot(
-      afterScreenshotBuffer
-    );
-    const finishedAt = /* @__PURE__ */ new Date();
-    const result = __spreadProps(__spreadValues({}, step), {
-      startedAt,
-      finishedAt,
-      // placeholder values
-      status: "SUCCESS" /* SUCCESS */,
-      results: []
-    });
-    let message = "Successfully executed preset action.";
-    if (step.command.type === "AI_ASSERTION" /* AI_ASSERTION */) {
-      message = execResult.thoughts || "Assertion passed.";
-    }
-    const cmdMetadata = {
-      beforeUrl,
-      beforeScreenshot,
-      afterUrl: controller.browser.url,
-      afterScreenshot,
-      startedAt,
-      finishedAt,
-      viewport: controller.browser.viewport,
-      status: "SUCCESS" /* SUCCESS */
-    };
-    result.status = "SUCCESS" /* SUCCESS */;
-    result.results = [cmdMetadata];
-    result.message = message;
-    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
-      message,
-      startedAt: startedAt.getTime(),
-      durationMs: finishedAt.getTime() - startedAt.getTime(),
-      command: step.command
-    });
-    return result;
-  } catch (err) {
-    const finishedAt = /* @__PURE__ */ new Date();
-    const result = __spreadProps(__spreadValues({}, step), {
-      startedAt,
-      finishedAt,
-      status: "FAILED" /* FAILED */,
-      message: `${err}`,
-      results: [
-        {
-          beforeUrl,
-          beforeScreenshot,
-          afterUrl: controller.browser.url,
-          afterScreenshot: void 0,
-          startedAt,
-          finishedAt,
-          viewport: controller.browser.viewport,
-          status: "FAILED" /* FAILED */,
-          message: `${err}`
-        }
-      ]
-    });
-    (_c = callbacks.onFailure) == null ? void 0 : _c.call(callbacks, {
-      message: `${err}`,
-      startedAt: startedAt.getTime(),
-      durationMs: finishedAt.getTime() - startedAt.getTime()
-    });
-    return result;
-  }
-});
-
-// ../../packages/execute/src/steps/module.ts
-var executeModuleStep = (_a) => __async(void 0, null, function* () {
-  var _b = _a, {
-    controller,
-    step,
-    advanced,
-    logger
-  } = _b, callbacks = __objRest(_b, [
-    "controller",
-    "step",
-    "advanced",
-    "logger"
-  ]);
-  var _a2, _b2, _c;
-  (_a2 = callbacks.onStarted) == null ? void 0 : _a2.call(callbacks);
-  const result = {
-    type: "MODULE" /* MODULE */,
-    moduleId: step.moduleId,
-    startedAt: /* @__PURE__ */ new Date(),
-    userAgent: ChromeBrowser.USER_AGENT,
-    // placeholder values
-    results: [],
-    finishedAt: /* @__PURE__ */ new Date(),
-    status: "SUCCESS" /* SUCCESS */
-  };
-  for (let i = 0; i < step.steps.length; i++) {
-    const moduleStep = step.steps[i];
-    logger.debug({ i, moduleStep }, `Starting module step`);
-    logger.info(
-      `Starting module sub-step ${i + 1}/${step.steps.length}: ${serializeStep(
-        moduleStep
-      )}`
-    );
-    let moduleStepResult;
-    switch (moduleStep.type) {
-      case "PRESET_ACTION" /* PRESET_ACTION */:
-        moduleStepResult = yield executePresetStep({
-          controller,
-          step: moduleStep,
-          advanced,
-          logger,
-          onSaveScreenshot: callbacks.onSaveScreenshot,
-          onStarted() {
-            var _a3;
-            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
-          },
-          onSuccess({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
-              index: i,
-              message,
-              startedAt,
-              durationMs
-            });
-          },
-          onFailure({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
-              index: i,
-              message,
-              startedAt,
-              durationMs
-            });
-          }
-        });
-        break;
-      case "AI_ACTION" /* AI_ACTION */:
-        moduleStepResult = yield executeAIStep({
-          controller,
-          step: moduleStep,
-          advanced,
-          logger,
-          onSaveScreenshot: callbacks.onSaveScreenshot,
-          onStarted() {
-            var _a3;
-            (_a3 = callbacks.onStepStarted) == null ? void 0 : _a3.call(callbacks, { index: i });
-          },
-          onSuccess({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepSuccess) == null ? void 0 : _a3.call(callbacks, {
-              index: i,
-              message,
-              startedAt,
-              durationMs
-            });
-          },
-          onFailure({ message, startedAt, durationMs }) {
-            var _a3;
-            (_a3 = callbacks.onStepFailure) == null ? void 0 : _a3.call(callbacks, {
-              index: i,
-              message,
-              startedAt,
-              durationMs
-            });
-          },
-          onCommandGenerated({ commandIndex, message }) {
-            var _a3;
-            (_a3 = callbacks.onCommandGenerated) == null ? void 0 : _a3.call(callbacks, { index: i, commandIndex, message });
-          },
-          onCommandExecuted({ commandIndex, message, command }) {
-            var _a3;
-            (_a3 = callbacks.onCommandExecuted) == null ? void 0 : _a3.call(callbacks, {
-              index: i,
-              commandIndex,
-              message,
-              command
-            });
-          }
-        });
-        break;
-      default:
-        const assertUnreachable = (_x) => {
-          throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-        };
-        return assertUnreachable(moduleStep);
-    }
-    result.results.push(moduleStepResult);
-    if (moduleStepResult.status === "FAILED" /* FAILED */) {
-      result.status = "FAILED" /* FAILED */;
-      result.finishedAt = /* @__PURE__ */ new Date();
-      for (let j = i + 1; j < step.steps.length; j++) {
-        const skippedStep = step.steps[j];
-        const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
-          status: "CANCELLED" /* CANCELLED */,
-          startedAt: /* @__PURE__ */ new Date(),
-          finishedAt: /* @__PURE__ */ new Date(),
-          userAgent: ChromeBrowser.USER_AGENT,
-          results: [],
-          message: "Cancelled due to previous failure."
-        });
-        result.results.push(skippedResult);
-      }
-      break;
-    }
-  }
-  if (result.status === "SUCCESS" /* SUCCESS */) {
-    (_b2 = callbacks.onSuccess) == null ? void 0 : _b2.call(callbacks, {
-      message: "Executed module step.",
-      startedAt: result.startedAt.getTime(),
-      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
-    });
-  } else {
-    (_c = callbacks.onFailure) == null ? void 0 : _c.call(callbacks, {
-      message: "Failed to execute module step.",
-      startedAt: result.startedAt.getTime(),
-      durationMs: result.finishedAt.getTime() - result.startedAt.getTime()
-    });
-  }
-  return result;
-});
-
-// ../../packages/execute/src/test.ts
-var executeTest = (_0) => __async(void 0, [_0], function* ({
-  test,
-  runId,
-  controller,
-  logger,
-  onUpdateRun,
-  onSaveScreenshot
-}) {
-  var _a;
-  const advanced = TestAdvancedSettingsSchema.parse(test.advanced);
-  logger.info(`Starting run ${runId} for test ${test.id}`);
-  yield onUpdateRun({
-    status: "RUNNING",
-    startedAt: /* @__PURE__ */ new Date()
-  });
-  let failed = false;
-  const results = [];
-  const runLogger = logger.child({ runId, testId: test.id });
-  for (let i = 0; i < test.steps.length; i++) {
-    const step = test.steps[i];
-    runLogger.info(
-      `Starting step ${i + 1}/${test.steps.length}: ${serializeStep(step)}`
-    );
-    let result;
-    switch (step.type) {
-      case "PRESET_ACTION" /* PRESET_ACTION */:
-        result = yield executePresetStep({
-          controller,
-          step,
-          advanced,
-          logger: runLogger,
-          onSaveScreenshot
-        });
-        break;
-      case "AI_ACTION" /* AI_ACTION */:
-        result = yield executeAIStep({
-          controller,
-          step,
-          advanced,
-          logger: runLogger,
-          onSaveScreenshot
-        });
-        break;
-      case "RESOLVED_MODULE":
-        result = yield executeModuleStep({
-          controller,
-          step,
-          advanced,
-          logger: runLogger,
-          onSaveScreenshot
-        });
-        break;
-      default:
-        const assertUnreachable = (_x) => {
-          throw "If Typescript complains about the line below, you missed a case or break in the switch above";
-        };
-        return assertUnreachable(step);
-    }
-    results.push(result);
-    yield onUpdateRun({
-      results
-    });
-    if (result.status === "FAILED" /* FAILED */) {
-      runLogger.error(`Step ${i + 1}/${test.steps.length} failed`);
-      runLogger.error(
-        {
-          message: (_a = results[results.length - 1]) == null ? void 0 : _a.message
-        },
-        `Last result:`
-      );
-      failed = true;
-      for (let j = i + 1; j < test.steps.length; j++) {
-        const skippedStep = test.steps[j];
-        if (skippedStep.type === "RESOLVED_MODULE") {
-          const skippedResult = {
-            type: "MODULE" /* MODULE */,
-            moduleId: skippedStep.moduleId,
-            startedAt: /* @__PURE__ */ new Date(),
-            userAgent: ChromeBrowser.USER_AGENT,
-            results: skippedStep.steps.map((s) => {
-              return __spreadProps(__spreadValues({}, s), {
-                status: "CANCELLED" /* CANCELLED */,
-                startedAt: /* @__PURE__ */ new Date(),
-                finishedAt: /* @__PURE__ */ new Date(),
-                userAgent: ChromeBrowser.USER_AGENT,
-                results: []
-              });
-            }),
-            finishedAt: /* @__PURE__ */ new Date(),
-            status: "CANCELLED" /* CANCELLED */
-          };
-          results.push(skippedResult);
-        } else {
-          const skippedResult = __spreadProps(__spreadValues({}, skippedStep), {
-            status: "CANCELLED" /* CANCELLED */,
-            startedAt: /* @__PURE__ */ new Date(),
-            finishedAt: /* @__PURE__ */ new Date(),
-            userAgent: ChromeBrowser.USER_AGENT,
-            results: []
-          });
-          results.push(skippedResult);
-        }
-      }
-    } else {
-      runLogger.info(`Step ${i + 1}/${test.steps.length} succeeded`);
-    }
-    if (failed) {
-      break;
-    }
-  }
-  yield onUpdateRun({
-    status: failed ? "FAILED" : "PASSED",
-    finishedAt: /* @__PURE__ */ new Date(),
-    results
-  });
-  yield controller.browser.cleanup();
-  return failed;
-});
-
-// ../../packages/test-migrations/src/index.ts
-import diffLines2 from "diff-lines";
-import semver from "semver";
-
-// ../../packages/test-migrations/src/2023-12-28-1.0.5-migrate-to-ai-step-v2.ts
-var migrateToAIStepV2 = {
-  name: "Migrate to ai step v2",
-  fromVersion: "1.0.4",
-  toVersion: "1.0.5",
-  recursiveKeys: /* @__PURE__ */ new Set(["results", "commands"]),
-  stopOnFailure: true,
-  execute: (steps) => __async(void 0, null, function* () {
-    steps = steps.filter(
-      (step) => !(step.status !== void 0 && step.type === "AI_ACTION")
-    );
-    steps = steps.map((step) => {
-      var _a, _b;
-      if (step.status === void 0) {
-        return step;
-      }
-      if (step.type === "PRESET_ACTION") {
-        step.results = (_b = (_a = step.commands) != null ? _a : step.results) != null ? _b : [];
-      }
-      return step;
-    });
-    return steps;
-  })
-};
-
-// ../../packages/test-migrations/src/2024-01-05-1.0.6-ensure-ai-step-has-done.ts
-var ensureAIStepHasDone = {
-  name: "Make sure ai step v2 has done command",
-  fromVersion: "1.0.5",
-  toVersion: "1.0.6",
-  recursiveKeys: /* @__PURE__ */ new Set(["results", "commands"]),
-  stopOnFailure: true,
-  execute: (steps) => __async(void 0, null, function* () {
-    return steps.map((step) => {
-      if (step.type !== "AI_ACTION") {
-        return step;
-      }
-      if (step.status !== void 0) {
-        return step;
-      }
-      if (!step.commands || !step.commands.length) {
-        return step;
-      }
-      const commands = step.commands;
-      const lastCommand = commands[commands.length - 1];
-      if (lastCommand && lastCommand["type"] !== "SUCCESS") {
-        commands.push({
-          type: "SUCCESS"
-        });
-      }
-      return step;
-    });
-  })
-};
-
-// ../../packages/test-migrations/src/migrate-assertions-to-preset.ts
-var migrateAssertionsToPresetActions = {
-  name: "Migrate AI assertions to preset actions",
-  fromVersion: "1.0.0",
-  toVersion: "1.0.1",
-  recursiveKeys: /* @__PURE__ */ new Set(),
-  execute: (steps) => __async(void 0, null, function* () {
-    return steps.map((record2) => {
-      if (record2["type"] !== "AI_ASSERTION") {
-        return record2;
-      }
-      const assertion = record2["text"];
-      const newPresetStep = {
-        type: "PRESET_ACTION",
-        command: {
-          type: "AI_ASSERTION",
-          assertion,
-          useVision: false,
-          disableCache: true
-        }
-      };
-      const migratedStep = __spreadValues(__spreadValues({}, record2), newPresetStep);
-      delete migratedStep["text"];
-      return migratedStep;
-    });
-  }),
-  stopOnFailure: true
-};
-
-// ../../packages/test-migrations/src/migrate-element-descriptor-to-target.ts
-var targetRequiredCommands = /* @__PURE__ */ new Set([
-  "CLICK",
-  "TYPE",
-  "SELECT_OPTION"
-]);
-var migrateElementDescriptorToTarget = {
-  name: "Migrate element descriptor to live in a target object",
-  fromVersion: "1.0.3",
-  toVersion: "1.0.4",
-  recursiveKeys: /* @__PURE__ */ new Set(),
-  execute: (steps) => __async(void 0, null, function* () {
-    return steps.map((step) => {
-      const command = step["command"];
-      const commandType = command == null ? void 0 : command["type"];
-      const elementDescriptor = command == null ? void 0 : command["elementDescriptor"];
-      if (elementDescriptor !== void 0 || targetRequiredCommands.has(commandType)) {
-        command["target"] = {
-          elementDescriptor: elementDescriptor != null ? elementDescriptor : ""
-        };
-      }
-      if (step["commands"] && Array.isArray(step["commands"])) {
-        const commands = step["commands"];
-        commands.forEach((command2) => {
-          const elementDescriptor2 = command2 == null ? void 0 : command2["elementDescriptor"];
-          const commandType2 = command2 == null ? void 0 : command2["type"];
-          if (elementDescriptor2 !== void 0 || targetRequiredCommands.has(commandType2)) {
-            command2["target"] = {
-              elementDescriptor: elementDescriptor2 != null ? elementDescriptor2 : ""
-            };
-          }
-        });
-      }
-      if (step["results"] && Array.isArray(step["results"])) {
-        const commandResults = step["results"];
-        commandResults.forEach((commandResult) => {
-          const command2 = commandResult["command"];
-          const elementDescriptor2 = command2 == null ? void 0 : command2["elementDescriptor"];
-          const commandType2 = command2 == null ? void 0 : command2["type"];
-          if (elementDescriptor2 !== void 0 || targetRequiredCommands.has(commandType2)) {
-            command2["target"] = {
-              elementDescriptor: elementDescriptor2 != null ? elementDescriptor2 : ""
-            };
-          }
-          if (commandResult["commands"] && Array.isArray(commandResult["commands"])) {
-            const commands = commandResult["commands"];
-            commands.forEach((command3) => {
-              const elementDescriptor3 = command3 == null ? void 0 : command3["elementDescriptor"];
-              const commandType3 = command3 == null ? void 0 : command3["type"];
-              if (elementDescriptor3 !== void 0 || targetRequiredCommands.has(commandType3)) {
-                command3["target"] = {
-                  elementDescriptor: elementDescriptor3 != null ? elementDescriptor3 : ""
-                };
-              }
-            });
-          }
-        });
-      }
-      return step;
-    });
-  }),
-  stopOnFailure: true
-};
-
-// ../../packages/test-migrations/src/migrate-failure-to-failed.ts
-var migrateFailureToFailed = {
-  name: "Migrate FAILURE status to FAILED",
-  fromVersion: "1.0.1",
-  toVersion: "1.0.2",
-  recursiveKeys: /* @__PURE__ */ new Set(),
-  execute: (steps) => __async(void 0, null, function* () {
-    return steps.map((step) => {
-      const record2 = step;
-      if (record2["status"] === "FAILURE") {
-        record2["status"] = "FAILED";
-      }
-      if (typeof record2.commands === "object" && Array.isArray(record2.commands)) {
-        record2.commands.forEach((command) => {
-          if (command && typeof command === "object") {
-            const commandObject = command;
-            if ((commandObject == null ? void 0 : commandObject.status) === "FAILURE") {
-              commandObject.status = "FAILED";
-            }
-          }
-        });
-      }
-      return record2;
-    });
-  }),
-  stopOnFailure: true
-};
-
-// ../../packages/test-migrations/src/migrate-preset-step-type.ts
-var migratePresetStepTypeToDropPrefix = {
-  name: "Migrate preset step types to use the same",
-  fromVersion: "1.0.2",
-  toVersion: "1.0.3",
-  recursiveKeys: /* @__PURE__ */ new Set(),
-  execute: (steps) => __async(void 0, null, function* () {
-    return steps.map((step) => {
-      const command = step["command"];
-      const commandType = command == null ? void 0 : command["type"];
-      if (commandType == null ? void 0 : commandType.startsWith("PRESET_")) {
-        command["type"] = commandType.slice(7);
-      }
-      if (step["commands"] && Array.isArray(step["commands"])) {
-        const commands = step["commands"];
-        commands.forEach((command2) => {
-          const commandType2 = command2["type"];
-          if (commandType2 == null ? void 0 : commandType2.startsWith("PRESET_")) {
-            command2["type"] = commandType2.slice(7);
-          }
-        });
-      }
-      if (step["results"] && Array.isArray(step["results"])) {
-        const commandResults = step["results"];
-        commandResults.forEach((commandResult) => {
-          const command2 = commandResult["command"];
-          const commandType2 = command2 == null ? void 0 : command2["type"];
-          if (commandType2 == null ? void 0 : commandType2.startsWith("PRESET_")) {
-            command2["type"] = commandType2.slice(7);
-          }
-          if (commandResult["commands"] && Array.isArray(commandResult["commands"])) {
-            const commands = commandResult["commands"];
-            commands.forEach((command3) => {
-              const commandType3 = command3["type"];
-              if (commandType3 == null ? void 0 : commandType3.startsWith("PRESET_")) {
-                command3["type"] = commandType3.slice(7);
-              }
-            });
-          }
-        });
-      }
-      return step;
-    });
-  }),
-  stopOnFailure: true
-};
-
-// ../../packages/test-migrations/src/index.ts
-var testMigrations = [
-  migrateAssertionsToPresetActions,
-  migrateFailureToFailed,
-  migratePresetStepTypeToDropPrefix,
-  migrateElementDescriptorToTarget,
-  migrateToAIStepV2,
-  ensureAIStepHasDone
-  // add new migrations here!
-];
-if (LATEST_VERSION !== testMigrations[testMigrations.length - 1].toVersion) {
-  throw new Error(
-    `Please bump LATEST_VERSION in types package after adding a migration`
-  );
-}
-testMigrations.forEach((migration, index) => {
-  if (!semver.valid(migration.toVersion) || !semver.valid(migration.fromVersion)) {
-    throw new Error(`Migration '${migration.name}' has invalid version`);
-  }
-  if (!semver.gt(migration.toVersion, migration.fromVersion)) {
-    throw new Error(
-      `Migration '${migration.name}' has toVersion <= fromVersion`
-    );
-  }
-  if (index === 0)
-    return;
-  const previousMigration = testMigrations[index - 1];
-  if (previousMigration.toVersion !== migration.fromVersion) {
-    throw new Error(
-      `Migration '${migration.name}' at index ${index} is not contiguous with previous migration`
-    );
-  }
-});
-function isArrayOfStepObjects(val) {
-  return val.every((v) => v && typeof v === "object" && !Array.isArray(v));
-}
-var runStepMigrations = (_0) => __async(void 0, [_0], function* ({
-  metadata,
-  steps: inputSteps,
-  logger
-}) {
-  let steps = inputSteps;
-  const { schemaVersion: currentVersion, id } = metadata;
-  const migrationIndex = testMigrations.findIndex(
-    (migration) => semver.gt(migration.toVersion, currentVersion)
-  );
-  if (migrationIndex === -1) {
-    logger.debug({ id }, "Step migrations up to date");
-    return { steps, newVersion: currentVersion };
-  }
-  let newVersion = currentVersion;
-  for (let i = migrationIndex; i < testMigrations.length; i++) {
-    const migration = testMigrations[i];
-    const logIdentifiers = {
-      id,
-      migration: migration.name,
-      toVersion: migration.toVersion
-    };
-    logger.debug(logIdentifiers, "Starting migration");
-    try {
-      steps = yield migrateStepLikeArrayRecursively(steps, migration);
-      newVersion = migration.toVersion;
-    } catch (err) {
-      logger.error(__spreadValues({ err }, logIdentifiers), "Migration failed");
-      throw new Error(`Step migration ${migration.name} failed: ${err}`);
-    }
-  }
-  const diffs = diffLines2(
-    JSON.stringify(inputSteps, void 0, 2),
-    JSON.stringify(steps, void 0, 2),
-    { n_surrounding: 1 }
-  );
-  logger.debug({ diffs, id }, "Migration diffs");
-  return {
-    newVersion,
-    steps
-  };
-});
-function migrateStepLikeArrayRecursively(inputSteps, migration) {
-  return __async(this, null, function* () {
-    const steps = yield migration.execute(inputSteps);
-    for (const step of steps) {
-      for (const key of Object.keys(step)) {
-        if (!migration.recursiveKeys.has(key)) {
-          continue;
-        }
-        const val = step[key];
-        if (!val || !Array.isArray(val)) {
-          continue;
-        }
-        if (!isArrayOfStepObjects(val)) {
-          continue;
-        }
-        step[key] = yield migrateStepLikeArrayRecursively(val, migration);
-      }
-    }
-    return steps;
-  });
-}
-
-// src/run-test.ts
-import { parse } from "yaml";
-function runTest(_0) {
-  return __async(this, arguments, function* ({
-    path: path3,
-    apiClient,
-    generator,
-    newBaseURL,
-    useLocalFiles
-  }) {
-    let test;
-    if (useLocalFiles) {
-      consoleLogger.info(`Reading ${path3} from local filesystem`);
-      test = yield resolveLocalTest(path3);
-    } else {
-      consoleLogger.info(
-        `Fetching ${path3} from Momentic server (${apiClient.baseURL})`
-      );
-      test = yield apiClient.getTest(path3);
-    }
-    if (test.schemaVersion > LATEST_VERSION) {
-      consoleLogger.warn(
-        `Test ${path3} has schema version ${test.schemaVersion}, which is greater than what is currently supported by this SDK. Please update your momentic package version to avoid unexpected behavior.`
-      );
-    }
-    const originalURL = new URL(test.baseUrl);
-    if (newBaseURL) {
-      const newURL = new URL(newBaseURL);
-      originalURL.hostname = newURL.hostname;
-      originalURL.protocol = newURL.protocol;
-      originalURL.port = newURL.port;
-    }
-    const browser = yield ChromeBrowser.init(
-      originalURL.toString(),
-      consoleLogger
-    );
-    const controller = new AgentController({
-      browser,
-      generator,
-      config: DEFAULT_CONTROLLER_CONFIG,
-      logger: consoleLogger
-    });
-    let run;
-    try {
-      run = yield apiClient.createRun({
-        testId: test.id,
-        trigger: "CLI"
-      });
-    } catch (err) {
-      consoleLogger.info(err);
-      throw new Error(`Are you sure test ${test.name} exists on the server?`);
-    }
-    let failed = true;
-    try {
-      failed = yield executeTest({
-        test,
-        runId: run.id,
-        controller,
-        logger: consoleLogger,
-        onSaveScreenshot: (buffer) => __async(this, null, function* () {
-          const { key } = yield apiClient.uploadScreenshot({
-            screenshot: buffer.toString("base64")
-          });
-          return key;
-        }),
-        onUpdateRun: (data) => __async(this, null, function* () {
-          yield apiClient.updateRun(run.id, data);
-        })
-      });
-    } catch (err) {
-      consoleLogger.error(err);
-      yield apiClient.updateRun(run.id, {
-        status: "FAILED",
-        finishedAt: /* @__PURE__ */ new Date()
-      });
-    }
-    return failed;
-  });
-}
-function resolveLocalTest(filePath) {
-  return __async(this, null, function* () {
-    const { test, modules: unmigratedModules } = readTestWithModules(filePath);
-    const unmigratedTest = parse(test);
-    if (!unmigratedTest.steps || !Array.isArray(unmigratedTest.steps)) {
-      throw new Error(`Test ${filePath} is missing steps`);
-    }
-    if (!unmigratedTest.schemaVersion || !unmigratedTest.id) {
-      throw new Error(`Test ${filePath} is missing an ID or schema version`);
-    }
-    let steps;
-    if (unmigratedTest.schemaVersion < LATEST_VERSION) {
-      consoleLogger.warn(
-        `Test ${filePath} has schema version ${unmigratedTest.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your test will be migrated to the latest version before execution.`
-      );
-      const { steps: migratedSteps } = yield runStepMigrations({
-        metadata: unmigratedTest,
-        steps: unmigratedTest.steps,
-        logger: consoleLogger
-      });
-      steps = StepSchema.array().parse(migratedSteps);
-    } else {
-      steps = StepSchema.array().parse(unmigratedTest.steps);
-    }
-    const migratedModules = {};
-    for (const [moduleId, unmigratedModuleYAML] of Object.entries(
-      unmigratedModules
-    )) {
-      const unmigratedModule = parse(unmigratedModuleYAML);
-      if (!unmigratedModule.schemaVersion || !unmigratedModule.moduleId) {
-        throw new Error(`Module ${moduleId} is missing an ID or schema version`);
-      }
-      if (!unmigratedModule.steps || !Array.isArray(unmigratedModule.steps)) {
-        throw new Error(`Module ${moduleId} is missing steps`);
-      }
-      if (unmigratedModule.schemaVersion < LATEST_VERSION) {
-        consoleLogger.warn(
-          `Module ${moduleId} has schema version ${unmigratedModule.schemaVersion}, which is lower than the version used by this SDK, ${LATEST_VERSION}. Your module will be migrated to the latest version before execution.`
-        );
-        const { steps: migratedSteps } = yield runStepMigrations({
-          metadata: {
-            id: unmigratedModule.moduleId,
-            schemaVersion: unmigratedModule.schemaVersion
-          },
-          steps: unmigratedModule.steps,
-          logger: consoleLogger
-        });
-        migratedModules[moduleId] = __spreadProps(__spreadValues({}, unmigratedModule), {
-          steps: AllowedModuleStepSchema.array().parse(migratedSteps)
-        });
-      } else {
-        migratedModules[moduleId] = unmigratedModule;
-      }
-    }
-    const resolvedTestSteps = steps.map((step) => {
-      if (step.type !== "MODULE" /* MODULE */) {
-        return step;
-      }
-      const resolvedModule = migratedModules[step.moduleId];
-      if (!resolvedModule) {
-        throw new Error(
-          `Could not resolve module ${step.moduleId} required in test ${filePath}`
-        );
-      }
-      const moduleStep = {
-        type: "RESOLVED_MODULE",
-        moduleId: step.moduleId,
-        name: resolvedModule.name,
-        steps: resolvedModule.steps
-      };
-      return moduleStep;
-    });
-    return MinimalRunnableResolvedTestSchema.parse(__spreadProps(__spreadValues({}, unmigratedTest), {
-      steps: resolvedTestSteps
-    }));
-  });
-}
-
-// src/run-tests-locally.ts
-function runTestsLocally(_0) {
-  return __async(this, arguments, function* ({
-    tests,
-    start,
-    waitOn,
-    waitOnTimeout,
-    client,
-    all,
-    parallelization = 1
-  }) {
-    if (start) {
-      consoleLogger.info(`Running start command: ${start}`);
-      yield execCommand(start, false);
-    }
-    if (waitOn) {
-      consoleLogger.info(
-        `Waiting for ${waitOn} to be accessible (timeout: ${waitOnTimeout}s)`
-      );
-      yield waitOnFn({
-        resources: [waitOn],
-        timeout: waitOnTimeout * 1e3
-      });
-    }
-    const apiGenerator = new APIGenerator({
-      baseURL: client.baseURL,
-      apiKey: client.apiKey
-    });
-    let useLocalFiles = false;
-    if (tests.some((testPath) => testPath.endsWith(".yaml"))) {
-      useLocalFiles = true;
-    } else if (tests.some((testPath) => existsSync3(testPath))) {
-      useLocalFiles = true;
-    }
-    let testsToRun = [];
-    if (useLocalFiles) {
-      consoleLogger.info(
-        tests,
-        `Reading tests from the following local file paths:`
-      );
-      tests.forEach((testPath) => {
-        if (!existsSync3(testPath)) {
-          throw new Error(`Path '${testPath}' does not exist.`);
-        }
-        const statResult = statSync2(testPath);
-        if (statResult.isDirectory()) {
-          testsToRun = testsToRun.concat(getTestFilesRecursively(testPath));
-        } else if (testPath.endsWith(".yaml")) {
-          testsToRun.push(testPath);
-        } else {
-          throw new Error(
-            `Path '${testPath}' is not a directory or a .yaml file.`
-          );
-        }
-      });
-    } else {
-      consoleLogger.warn(
-        "The paths you specified are not files or directories that exist locally."
-      );
-      consoleLogger.info(
-        `Fetching tests from remote Momentic server (${client.baseURL})...`
-      );
-      if (all) {
-        testsToRun = yield client.getAllTestIds();
-      } else {
-        testsToRun = tests;
-      }
-    }
-    consoleLogger.info(
-      testsToRun,
-      `Identified ${testsToRun.length} tests to run locally:`
-    );
-    let results = [];
-    for (let i = 0; i < testsToRun.length; i += parallelization) {
-      const blockResults = yield Promise.all(
-        testsToRun.slice(i, i + parallelization).map((path3) => __async(this, null, function* () {
-          let failed = true;
-          try {
-            failed = yield runTest({
-              useLocalFiles,
-              path: path3,
-              apiClient: client,
-              generator: apiGenerator,
-              newBaseURL: waitOn
-            });
-          } catch (e) {
-            consoleLogger.error(`${e}`);
-          }
-          return { failed, path: path3 };
-        }))
-      );
-      results = results.concat(blockResults);
-    }
-    const failedResults = results.filter((result) => result.failed);
-    if (failedResults.length > 0) {
-      consoleLogger.error(
-        `Failed ${failedResults.length} out of ${results.length} tests:`
-      );
-      failedResults.forEach((result) => {
-        consoleLogger.error(`- ${result.path}`);
-      });
-      process.exit(1);
-    }
-    consoleLogger.info(`All ${results.length} tests passed!`);
-    process.exit(0);
-  });
-}
-function execCommand(fullCommand, waitToFinish = true) {
-  return __async(this, null, function* () {
-    const args = parseArgsStringToArgv2(fullCommand);
-    const toolPath = yield io.which(args[0], true);
-    const toolArguments = args.slice(1);
-    const promise = exec.exec(quote(toolPath), toolArguments);
-    if (waitToFinish) {
-      return promise;
-    }
-  });
-}
-
-// src/run-tests-remotely.ts
-function runTestsRemotely(_0) {
-  return __async(this, arguments, function* ({
-    tests,
-    client,
-    all
-  }) {
-    const { queuedTests } = yield client.queueTests({
-      testPaths: tests,
-      all
-    });
-    consoleLogger.info(`Successfully queued ${queuedTests.length} tests!`);
-  });
-}
-
-// src/cli.ts
-var program = new Command3();
-program.name("momentic").description("Momentic CLI").version(version);
-program.command("install-browsers").action(() => __async(void 0, null, function* () {
-  yield installBrowsers();
-}));
-program.addOption(
-  new Option2("--log-level <level>").choices(["debug", "info", "warn", "error"]).default("info")
-).on("option:log-level", (level) => {
-  consoleLogger.setMinLevel(stringToLogLevel[level.toUpperCase()]);
-});
-program.command("run").alias("run-tests").addOption(apiKeyOption).addOption(serverAddressOption).addOption(allOption).addOption(
-  new Option2(
-    "-r, --remote",
-    "Run tests remotely. The production version of this test will be queued for execution."
-  ).default(true).conflicts(["start, waitOn, waitOnTimeout, local"]).implies({
-    local: false
-  })
-).addOption(
-  new Option2(
-    "-l, --local",
-    "Run tests locally. Useful for accessing apps on localhost. This option does not control where tests are read from (see <tests> argument documentation)."
-  ).implies({
-    remote: false
-  })
-).addOption(
-  new Option2(
-    "--start <command>",
-    "Arbitrary setup command that will run before Momentic steps begin."
-  )
-).addOption(
-  new Option2(
-    "--wait-on <url>",
-    "URL to wait to become accessible before Momentic tests begin."
-  )
-).addOption(
-  new Option2(
-    "--wait-on-timeout <timeout>",
-    "Max time to wait for the --wait-on URL to become accessible."
-  ).default(60, "one minute")
-).addOption(
-  new Option2(
-    "-p, --parallel <parallelization>",
-    "When running with the --local flag, the number of tests to run in parallel. Defaults to 1."
-  ).default(1)
-).addArgument(testsOrFilesVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
-  const { apiKey, server, remote, local, all } = options;
-  const client = new APIClient({
-    baseURL: server,
-    apiKey
-  });
-  if (local) {
-    try {
-      yield runTestsLocally(__spreadValues({
-        tests,
-        client
-      }, options));
-    } catch (e) {
-      consoleLogger.error(e);
-      process.exit(1);
-    }
-    return;
-  }
-  if (remote) {
-    if (tests.some((test) => test.endsWith(".yaml") || existsSync4(test))) {
-      const prompt = "A local file path was provided without the --local flag. The production version of the specified test will be queued remotely. Continue?";
-      if (!(yield promptForConfirmation(prompt, true))) {
-        consoleLogger.info("Run cancelled");
-        process.exit(1);
-      }
-      tests = tests.map((test) => {
-        if (test.endsWith(".yaml")) {
-          test = test.slice(0, -5);
-        }
-        return test;
-      });
-    }
-    yield runTestsRemotely({ tests, client, all });
-    return;
-  }
-  throw new Error("One of remote or local must be specified");
-}));
-program.command("pull").description(
-  "Fetch one or more tests from your organization and save it in YAML format on local disk."
-).addOption(apiKeyOption).addOption(serverAddressOption).addOption(outDirOption).addOption(allOption).addArgument(testPathsVariadicArgument).action((tests, options) => __async(void 0, null, function* () {
-  const { apiKey, server, outDir, all } = options;
-  if (!all && !(tests == null ? void 0 : tests.length)) {
-    throw new Error("At least one test name or --all must be provided");
-  }
-  const client = new APIClient({
-    baseURL: server,
-    apiKey
-  });
-  yield fetchAndSaveTestToDisk({ testPaths: tests, client, outDir, all });
-}));
-program.command("push").description(
-  "Save a local YAML file containing a test to your cloud workspace."
-).addOption(yesOption).addOption(apiKeyOption).addOption(serverAddressOption).addArgument(filePathsVariadicArgument).action((paths, options) => __async(void 0, null, function* () {
-  const { apiKey, server, yes } = options;
-  const client = new APIClient({
-    baseURL: server,
-    apiKey
-  });
-  yield saveTestToServer({ paths, client, yes });
-}));
-function main() {
-  return __async(this, null, function* () {
-    yield program.parseAsync(process.argv);
-  });
-}
-void main();
+  `.replaceAll(`
+`," ")),Cn=D.merge(f.object({type:f.literal("HOVER"),target:re,useVision:f.boolean().default(!1)})),vn=D.merge(f.object({type:f.literal("SELECT_OPTION"),target:re,option:f.string()})).describe('SELECT_OPTION <id> "<option>" - select an option from a combobox, listbox, or menu element on the page. Provide the id of the parent combobox, listbox, or menu element in <id>. Provide the name of the option in <option> enclosed by single quotes.'),Ft=D.merge(f.object({type:f.literal("AI_ASSERTION"),assertion:f.string(),useVision:f.boolean().default(!1),disableCache:f.boolean().default(!1),cancelOnFailure:f.boolean().default(!1)})),xn=f.object({clearContent:f.boolean().default(!0),pressKeysSequentially:f.boolean().default(!1)}),Rn=D.merge(f.object({type:f.literal("TYPE"),target:re,value:f.string(),pressEnter:f.boolean().default(!1),useVision:f.boolean().default(!1)})).merge(xn).describe('TYPE <id> "<text>" - type the specified text into the input with the specified id. The text should be specified by the user - do not use text from the EXAMPLES or generate text yourself. Make sure to include quotes around the text.'),In=D.merge(f.object({type:f.literal("PRESS"),value:f.string()})).describe('PRESS <key> - press the specified key, such as "ArrowLeft", "Enter", or "a". You must specify at least one key.'),Ln=D.merge(f.object({type:f.literal("TAB"),url:f.string()})),On=D.merge(f.object({type:f.literal("COOKIE"),value:f.string()})),Nn=D.merge(f.object({type:f.literal("SUCCESS"),condition:Ft.optional()})).describe("SUCCESS - the user goal has been successfully achieved"),ie=f.discriminatedUnion("type",[Tn,Rn,In,vn,gn,yn,fn,Nn]),Mn=f.discriminatedUnion("type",[bn,An,wn,Ft,Sn,Ln,On,Cn,En]),kt=f.discriminatedUnion("type",[...ie.options,...Mn.options]),Dn=D.merge(f.object({type:f.literal("FAILURE")})).describe("FAILURE - there are no commands to suggest that could make progress that have not already been tried before"),qe=f.discriminatedUnion("type",[...ie.options,Dn]);var pe=(i=>(i.AI_PROVIDER="AIProviderError",i.AI_TIMEOUT="AITimeoutError",i.JOB_TIMEOUT="JobTimeoutError",i.ACTION_FAILURE="ActionFailureError",i.ASSERTION_FAILURE="AssertionFailureError",i.WEB_AGENT_PLATFORM="InternalWebAgentError",i.UNKNOWN_PLATFORM="InternalPlatformError",i))(pe||{});var he=class extends Error{constructor(e,t={}){super(e,t),this.name="BrowserExecutionError"}};var Oe=class extends Error{constructor(e={}){super("Got empty a11y tree",e),this.name="EmptyA11yTreeError"}};var M=class extends Error{constructor(e,t,o={}){var s;let r=!1;for(let a of Object.values(pe))if(t.startsWith(a)){r=!0,e=a;break}r?super(t,o):super(`${e}: ${t}`,o),this.name="TestFailureError",this.stack=(s=this.stack)==null?void 0:s.slice(this.name.length+2),this.reason=e}toString(){return this.message}toJSON(){return{message:this.message}}};var Ri=ge.object({command:ge.string(),thoughts:ge.string()}),Ii=ge.string().pipe(ge.coerce.number());import*as N from"zod";var K="1.0.6",z=(o=>(o.AI_ACTION="AI_ACTION",o.PRESET_ACTION="PRESET_ACTION",o.MODULE="MODULE",o))(z||{}),fe=N.object({type:N.literal("AI_ACTION"),text:N.string(),commands:N.array(ie).optional()}),ye=N.object({type:N.literal("PRESET_ACTION"),command:kt}),Xe=N.object({type:N.literal("MODULE"),moduleId:N.string().uuid()}),Se=N.union([fe,ye]),Je=N.object({type:N.literal("RESOLVED_MODULE"),moduleId:N.string().uuid(),name:N.string(),steps:Se.array()}),we=N.union([fe,ye,Xe]),Qe=N.union([fe,ye,Je]);var _i=new Set(Object.values(B));var Ze={AI_ACTION:"AI action",MODULE:"Module",AI_ASSERTION:"AI check",CLICK:"Click",HOVER:"Hover",SELECT_OPTION:"Select",TYPE:"Type",PRESS:"Press",NAVIGATE:"Navigate",SCROLL_UP:"Scroll up",SCROLL_DOWN:"Scroll down",CAPTCHA:"Captcha",GO_BACK:"Go back",GO_FORWARD:"Go forward",WAIT:"Wait",REFRESH:"Refresh",TAB:"Switch tab",COOKIE:"Set cookie",SUCCESS:"Done"},zi={AI_ACTION:"Ask AI to plan and execute something on the page.",MODULE:"A list of steps that can be reused in multiple tests.",AI_ASSERTION:"Ask AI whether something is true on the page.",CLICK:"Click on an element on the page based on a description.",HOVER:"Hover over an element on the page based on a description.",SELECT_OPTION:"Select an option from a dropdown based on a description.",TYPE:"Type the specified text into an element.",PRESS:"Press the specified keys using the keyboard. (e.g. Ctrl+A)",NAVIGATE:"Navigate to the specified URL.",SCROLL_UP:"Scroll up one page.",SCROLL_DOWN:"Scroll down one page.",GO_BACK:"Go back in browser history.",GO_FORWARD:"Go forward in browser history.",WAIT:"Wait for the specified number of seconds.",REFRESH:"Refresh the page. This will not clear cookies or session data.",TAB:"Switch to different tab in the browser.",COOKIE:"Set a cookie that will persist throughout the browser session",CAPTCHA:"Solve captchas on the page. This may take 10-60 seconds.",SUCCESS:"Indicate the entire AI action has succeeded, optionally based on a condition."};import*as v from"zod";var se=(s=>(s.SUCCESS="SUCCESS",s.FAILED="FAILED",s.RUNNING="RUNNING",s.IDLE="IDLE",s.CANCELLED="CANCELLED",s))(se||{}),Ne=(o=>(o.SUCCESS="SUCCESS",o.FAILED="FAILED",o.CANCELLED="CANCELLED",o))(Ne||{}),Pn=v.object({beforeUrl:v.string(),beforeScreenshot:v.string().or(v.instanceof(Buffer)),afterUrl:v.string().optional(),afterScreenshot:v.string().or(v.instanceof(Buffer)).optional(),startedAt:v.coerce.date(),finishedAt:v.coerce.date(),viewport:v.object({height:v.number(),width:v.number()}),status:v.nativeEnum(Ne),message:v.string().optional(),elementInteracted:v.string().optional()}),et=v.object({startedAt:v.coerce.date(),finishedAt:v.coerce.date(),status:v.nativeEnum(se),message:v.string().optional(),userAgent:v.string().optional()}),tt=ye.merge(et).merge(v.object({results:Pn.array()})),$t=fe.merge(et).merge(v.object({results:tt.array()})),_n=Xe.merge(et).merge(v.object({results:v.union([$t,tt]).array()})),Me=v.discriminatedUnion("type",[$t,tt,_n]);function zn(n,e){return n.length<e?n:n.slice(0,e-3)+"[...]"}function Y(n){var e,t,o;switch(n.type){case"SUCCESS":return(e=n.condition)!=null&&e.assertion?`Check success condition: ${n.condition.assertion}`:"All commands completed";case"NAVIGATE":return`Go to URL: ${zn(n.url,30)}`;case"CAPTCHA":return"Solve captchas on the page";case"GO_BACK":return"Go back to the previous page";case"GO_FORWARD":return"Go forward to the next page";case"SCROLL_DOWN":return`Scroll down one page${n.target?` in the container of: ${n.target.elementDescriptor}`:""}`;case"SCROLL_UP":return`Scroll up one page${n.target?` in the container of: ${n.target.elementDescriptor}`:""}`;case"WAIT":return`Wait for ${n.delay} seconds`;case"REFRESH":return"Refresh the page";case"CLICK":return`Click on '${n.target.elementDescriptor}'`;case"TYPE":{let s="";return(t=n.target.a11yData)!=null&&t.serializedForm?s=`in element: ${n.target.a11yData.serializedForm}`:n.target.elementDescriptor.length>0&&(s=`in element: ${n.target.elementDescriptor}`),`Type '${n.value}' ${s}`}case"HOVER":{let s="";return(o=n.target.a11yData)!=null&&o.serializedForm?s=` over element: ${n.target.a11yData.serializedForm}`:n.target.elementDescriptor.length>0&&(s=` over element: ${n.target.elementDescriptor}`),`Hover${s}`}case"PRESS":return`Press '${n.value}'`;case"SELECT_OPTION":return`Select option '${n.option}' in '${n.target.elementDescriptor}'`;case"TAB":return`Switch to tab: ${n.url}`;case"COOKIE":return`Set cookie: ${n.value}`;case"AI_ASSERTION":return`${n.useVision?"Visual assertion":"Assertion"}: '${n.assertion}'`;default:return(s=>{throw"If Typescript complains about the line below, you missed a case or break in the switch above"})(n)}}import*as $ from"zod";import*as X from"zod";var Ht=X.object({type:X.nativeEnum(z),generatedStep:ie.optional(),serializedCommand:X.string().optional(),elementInteracted:X.string().optional()});var ae=$.object({goal:$.string(),url:$.string(),browserState:$.string(),history:$.string(),numPrevious:$.number(),lastCommand:Ht.or($.null())});import{parseString as Un}from"set-cookie-parser";function Bt(n){let e=Un(n);if(!e.name)throw new Error("Name missing from cookie");if(!e.value)throw new Error("Value missing from cookie");let t;if(e.sameSite){let r=e.sameSite.trim().toLowerCase();if(r==="strict")t="Strict";else if(r==="lax")t="Lax";else if(r==="none")t="None";else throw new Error(`Invalid sameSite setting in cookie: ${r}`)}return!e.path&&e.domain&&(e.path="/"),O(C({},e),{expires:e.expires?e.expires.getTime()/1e3:void 0,sameSite:t})}import{z as U}from"zod";var Fn="1.0.0",jt=U.object({run:U.string().describe("Run a single command in the shell. The working directory will be set to where the CLI was invoked from."),waitForCompletion:U.boolean().optional().describe("Defaults to true")}),Gt=U.object({type:U.literal("momentic/fixture"),schemaVersion:U.string(),name:U.string(),description:U.string().optional(),setup:U.object({steps:jt.array(),timeout:U.number().optional().describe("Timeout for all steps in seconds")}).optional(),teardown:U.object({steps:jt.array(),timeout:U.number().optional().describe("Timeout for all steps in seconds")}).optional()}),Zi={type:"momentic/fixture",schemaVersion:Fn,name:"example",description:"An example fixture",setup:{steps:[{run:"./scripts/seed_db.sh",waitForCompletion:!0},{run:"npm run start",waitForCompletion:!1}],timeout:30},teardown:{steps:[{run:"./scripts/shutdown_db.sh"}]}};import{z as kn}from"zod";var os=kn.string().array();import*as G from"zod";var Vt=G.object({thoughts:G.string(),id:G.number().int(),options:G.array(G.string()).optional()});var Wt={DEBUG:0,INFO:1,WARN:2,ERROR:3},$n={0:"DEBUG",1:"INFO",2:"WARN",3:"ERROR"},Hn={0:"\x1B[90m",1:"\x1B[32m",2:"\x1B[33m",3:"\x1B[31m"},nt=class n{constructor(e,t){this.minLogLevel=e,this.logBindings=t}log(e,...t){let o=$n[e],r;Array.isArray(t[0])?(r=t[0],t=t.slice(1)):typeof t[0]=="object"&&!(t[0]instanceof Error)&&(r=C(C({},t[0]),this.logBindings),t=t.slice(1));let s=Hn[e],a=[`${s}[${new Date().toTimeString().slice(0,8)}][${o}]`];if(e!==0&&a.push("\x1B[39m"),a.push(...t),console.log(...a),r&&!Array.isArray(r))for(let[i,c]of Object.entries(r)){let d=c;typeof c=="object"&&(d=JSON.stringify(c,void 0,2),d=d.split(`
+`).map((h,p)=>p>0?`  ${h}`:h).join(`
+`)),console.log(e===0?`${s}  ${i}:`:`  ${i}:`,d)}else if(r)for(let i of r){let c=i;typeof i=="object"&&(c=JSON.stringify(i,void 0,2),c=c.split(`
+`).map((d,h)=>h>0?`  ${d}`:d).join(`
+`)),console.log(e===0?`${s}  `:"  ",c)}e===0&&process.stdout.write("\x1B[39m")}setMinLevel(e){this.minLogLevel=e}info(...e){1<this.minLogLevel||this.log(1,...e)}debug(...e){0<this.minLogLevel||this.log(0,...e)}warn(...e){2<this.minLogLevel||this.log(2,...e)}error(...e){3<this.minLogLevel||this.log(3,...e)}child(e){return new n(this.minLogLevel,C(C({},this.logBindings),e))}flush(){}bindings(){return this.logBindings}},S=new nt(1,{});import{z as V}from"zod";var Bn=V.object({id:V.string(),createdAt:V.coerce.date(),createdBy:V.string(),organizationId:V.string(),name:V.string(),schemaVersion:V.string(),numSteps:V.number()}),cs=V.object({steps:Se.array()}).merge(Bn.omit({numSteps:!0}));import*as y from"zod";import{z as I}from"zod";var rt={WEBHOOK:"WEBHOOK",CRON:"CRON",MANUAL:"MANUAL",CLI:"CLI"},it={PENDING:"PENDING",RUNNING:"RUNNING",PASSED:"PASSED",FAILED:"FAILED",CANCELLED:"CANCELLED"},jn={PASSED:"PASSED",FAILED:"FAILED"},De=I.string().pipe(I.coerce.date()).or(I.date()),Gn=I.object({id:I.string(),createdAt:De,createdBy:I.string(),organizationId:I.string(),scheduledAt:De.or(I.null()),startedAt:De.or(I.null()),finishedAt:De.or(I.null()),testId:I.string().or(I.null()),status:I.nativeEnum(it),expectedStatus:I.nativeEnum(jn).or(I.null()),runKey:I.string(),trigger:I.nativeEnum(rt),attempts:I.number(),test:I.object({name:I.string(),id:I.string()}).or(I.null())}),st=Gn.merge(I.object({results:Me.array(),test:I.object({name:I.string(),id:I.string(),baseUrl:I.string()}).or(I.null())}));import{z as P}from"zod";import{z as Pe}from"zod";var Kt=Pe.object({name:Pe.string(),fixtures:Pe.array(Pe.string().describe("Name of the fixture (must be available locally in the fixtures directory).")).optional()});import{isValidCron as Vn}from"cron-validator";import{z as H}from"zod";var _e=H.object({availableAsModule:H.boolean().default(!1),disableAICaching:H.boolean().default(!1)}),Yt=H.object({cron:H.string().refine(n=>Vn(n),{message:"Invalid cron expression."}).default("0 0 */1 * *"),enabled:H.boolean().default(!1),timeZone:H.string().default("America/Los_Angeles"),jobKey:H.string().optional()}),qt=H.object({onSuccess:H.boolean().default(!1),onFailure:H.boolean().default(!0)});var Wn=P.string().min(1).max(255).superRefine((n,e)=>{try{Xn(n)}catch(t){return e.addIssue({code:P.ZodIssueCode.custom,message:t.message,fatal:!0}),P.NEVER}}),le=P.object({id:P.string(),name:Wn,baseUrl:P.string(),schemaVersion:P.string(),advanced:_e,retries:P.number(),envSettings:Kt.array().optional()}),Ts=le.pick({name:!0,baseUrl:!0,retries:!0,advanced:!0}),Kn=P.object({createdAt:P.coerce.date(),updatedAt:P.coerce.date(),schedule:Yt,notification:qt,createdBy:P.string(),organizationId:P.string()}),Xt=le.merge(Kn).merge(P.object({steps:P.array(Qe)})),Jt=le.merge(P.object({steps:P.array(Qe)}));var Yn=/^[a-f0-9]{8}-[a-f0-9]{4}-[1-5][a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/,qn=["modules","fixtures"];function Xn(n){if(n=n.toLowerCase().trim(),n.length===0||n.length>255)throw new Error("Name must be between 1 and 255 characters long");if(/[<>:"\/\\|?*\x00]/.test(n))throw new Error("Name can only contain alphanumeric characters, dashes, and underscores.");if(/^(con|prn|aux|nul|com[0-9]|lpt[0-9])(\..*)?$/i.test(n))throw new Error(`"${n}" is a reserved name on Windows and cannot be used as a filename.`);if(/^\.+$/.test(n)||/^\s|\s$/.test(n))throw new Error("Name cannot start or end with a space or dot.");if(n.endsWith(".yaml"))throw new Error('Name cannot end with ".yaml".');if(qn.includes(n))throw new Error("'modules' is a reserved folder name in Momentic. Please choose a different name.");if(n.match(Yn))throw new Error("Name cannot be a UUID. Please choose a different name.")}var be=y.object({disableCache:y.boolean()}),Ms=y.object({error:y.boolean(),reason:y.string(),message:y.string()}),Ds=ae.merge(be),Qt=qe,Ps=y.discriminatedUnion("vision",[ae.merge(be).merge(y.object({vision:y.literal(!1)})),ae.pick({goal:!0,url:!0}).merge(be).merge(y.object({screenshot:y.string(),vision:y.literal(!0)}))]),at=Ut,_s=ae.pick({browserState:!0,goal:!0}).merge(be),lt=Vt,zs=ae.pick({goal:!0,url:!0}).merge(be),Zt=y.string().array(),Us=y.object({testPaths:y.string().array().describe("can be either hyphenated, lowercase test names or UUIDs"),all:y.boolean().optional()}),eo=y.object({message:y.string(),queuedTests:y.object({name:y.string(),id:y.string()}).array()}),to=Xt,oo=y.string().array(),Fs=y.union([y.object({paths:y.string().array().describe("run specific test paths (e.g. todo-test)")}),y.object({path:y.string().describe("deprecated; present for backcompat")}),y.object({all:y.boolean().describe("run all tests")})]),no=y.object({tests:y.record(y.string().describe("Test name"),y.string().describe("Test YAML")),modules:y.record(y.string().describe("Module name"),y.string().describe("Module YAML"))}),Jn=y.object({test:y.string().describe("test YAML"),modules:y.record(y.string().describe("moduleId"),y.string().describe("module YAML"))}),ks=Jn.array();var $s=y.object({testPath:y.string(),testId:y.string()}).partial().merge(y.object({trigger:y.nativeEnum(rt)})),ro=st,io=st,Hs=y.object({startedAt:y.coerce.date(),finishedAt:y.coerce.date(),results:Me.array(),status:y.nativeEnum(it)}).partial(),Bs=y.object({screenshot:y.string()}),so=y.object({key:y.string()});function ze(n){switch(n.type){case"AI_ACTION":return`AI action: ${n.text}`;case"PRESET_ACTION":return Y(n.command);case"RESOLVED_MODULE":return`Module: ${n.moduleId}`}}import{stringify as Xs}from"yaml";import{z as L}from"zod";var na=L.object({test:L.string().describe("YAML for the test, including metadata and steps"),modules:L.record(L.string(),L.string()).describe("Map of module name to YAML for the module")}),ra=le.merge(L.object({steps:we.array(),fileType:L.literal("momentic/test")})),ia=Je.omit({type:!0}).merge(L.object({schemaVersion:L.string(),fileType:L.literal("momentic/module")})),sa=le.merge(L.object({steps:L.array(L.record(L.string(),L.unknown()))})),aa=L.object({moduleId:L.string().uuid(),name:L.string(),schemaVersion:L.string(),steps:L.array(L.record(L.string(),L.unknown()))});var ao="0.0.18";var W="v1",ce=class{constructor(e){this.baseURL=e.baseURL,this.apiKey=e.apiKey}getRun(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/runs/${e}`,{method:"GET"});return io.parse(t)})}createRun(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/runs`,{method:"POST",body:e});return ro.parse(t)})}updateRun(e,t){return l(this,null,function*(){yield this.sendRequest(`/${W}/runs/${e}`,{method:"PATCH",body:t})})}getTest(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/tests/${e}`,{method:"GET"});return to.parse(t)})}getAllTestIds(){return l(this,null,function*(){let e=yield this.sendRequest(`/${W}/tests`,{method:"GET"});return oo.parse(e)})}getTestYAMLExport(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/tests/export`,{method:"POST",body:e});return no.parse(t)})}updateTestWithYAML(e){return l(this,null,function*(){yield this.sendRequest(`/${W}/tests/update`,{method:"POST",body:e})})}queueTests(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/tests/queue`,{method:"POST",body:e});return eo.parse(t)})}uploadScreenshot(e){return l(this,null,function*(){let t=yield this.sendRequest(`/${W}/screenshots`,{method:"POST",body:e});return so.parse(t)})}sendRequest(e,t){return l(this,null,function*(){let o=yield fetch(`${this.baseURL}${e}`,{method:t.method,body:t.body?JSON.stringify(t.body):void 0,headers:{"Content-Type":"application/json",Authorization:`Bearer ${this.apiKey}`}});if(!o.ok)throw new Error(`Request to ${e} failed with status ${o.status}: ${yield o.text()}`);return o.status===204?o.text():o.json()})}};import{existsSync as tr,mkdirSync as ct,statSync as or}from"fs";import{join as lo}from"path";import Zn from"chalk";import er from"readline/promises";function de(n,e){return l(this,null,function*(){if(process.env.CI)return!0;let t=er.createInterface({input:process.stdin,output:process.stdout});n=`${n} (y/N) `;let o=e?Zn.bold.yellow(n):n,r=yield t.question(o);return t.close(),r.toLowerCase()==="y"})}var Fe="momentic",ke="modules",nr="fixtures",Ue=Fe,dt=lo(Fe,ke),ut=lo(Fe,nr);function rr(n){return tr(n)&&or(n).isDirectory()}function mt(n=!1){return l(this,null,function*(){rr(Ue)||(!n&&!(yield de(`A '${Fe}' folder was not found in the current directory. Setup the required Momentic folder structure?`))&&(S.error("Setup cancelled"),process.exit(1)),ct(Ue),ct(dt),ct(ut),S.info("Setup complete!"))})}import{registry as pt}from"playwright-core/lib/server";function ir(n){let e=[],t=[];for(let o of n){let r=pt.findExecutable(o);!r||r.installType==="none"?e.push(o):t.push(r)}return t}function co(){return l(this,null,function*(){let n=ir(["chromium"]);yield pt.installDeps(n,!1),yield pt.install(n,!1)})}import{Argument as ht,Option as Ae}from"commander";var $e=new Ae("--api-key <key>","API key for authentication. If not supplied, attempts to read the MOMENTIC_API_KEY env var.").env("MOMENTIC_API_KEY").makeOptionMandatory(!0),He=new Ae("--server <server>","Momentic server to use. Leave unchanged unless using Momentic on-premise.").default("https://api.momentic.ai"),gt=new Ae("-y, --yes","Skip confirmation prompts.").env("CI").default(!1),uo=new Ae("--no-report","Skip reporting test results to Momentic Cloud when running with the --local flag.").default(!0),ft=new Ae("-a --all","Select all tests in your organization from Momentic Cloud. Cannot be used together with <tests> arguments.").default(!1).preset(!0),mo=new ht("<tests...>",`One or more test paths to pull from Momentic Cloud.
+  
+A test path is a lowercased version of your test name where spaces are replaced with underscores: 'npx momentic pull hello-world'.`).argOptional(),po=new ht("<tests...>",`One or more test identifiers.
+  
+To use tests stored on your local file system, pass '--local' and specify file paths to Momentic YAML files or folders that exist locally: 'npx momentic run --local momentic/hello-world.yaml'.
+  
+To use tests stored remotely on Momentic Cloud, pass '--remote' and specify one or more test paths. A test path is a lowercased version of your test name where spaces are replaced with underscores: 'npx momentic run --remote hello-world'.`).argRequired(),ho=new ht("<paths...>","File paths pointing to one or more YAML files containing Momentic tests, or a directory of Momentic YAML files.");import{existsSync as ar,writeFileSync as go}from"fs";import{join as fo}from"path";function wo(o){return l(this,arguments,function*({testsToFetch:n,client:e,all:t}){let{tests:r,modules:s}=yield e.getTestYAMLExport({paths:n,all:t}),a=Object.keys(r).length;for(let[c,d]of Object.entries(r)){let h=fo(Ue,So(c));if(!(yield yo(h))){S.error("Pull cancelled");return}go(h,d,"utf-8"),S.info(`Wrote '${h}'`)}let i=Object.keys(s).length;for(let[c,d]of Object.entries(s)){let h=fo(dt,So(c));if(!(yield yo(h))){S.error("Pull cancelled");return}go(h,d,"utf-8"),S.info(`Wrote '${h}'`)}S.info(`Pulled ${a} test${a>1?"s":""}${i?` and ${i} module${i>1?"s":""}`:""}!`)})}function yo(n){return l(this,null,function*(){return ar(n)?de(`File '${n.replace(/(\s+)/g,"\\$1")}' already exists. Overwrite existing content?`,!0):!0})}function So(n){return`${n.toLowerCase().replaceAll(" ","-")}.yaml`}import{existsSync as yt,readFileSync as St,readdirSync as Ao,statSync as bo}from"fs";import Ee from"path";function Eo(n){return l(this,null,function*(){let e=To(n.paths);S.info(`Found ${e.size} test(s) to push:`),e.forEach(r=>S.info(`  - ${r}`)),S.info("Loading file contents and resolving dependent modules");let t=Array.from(e).map(wt),o=new Set(t.flatMap(r=>Object.keys(r.modules)));if(S.info(`Resolved ${e.size} test(s) and ${o.size} module(s)`),!n.yes&&!(yield de("Pushing tests overwrites tests on production and will instantly affect scheduled runs. Continue?",!0))){S.error("Push cancelled");return}yield n.client.updateTestWithYAML(t),S.info("Update successful!")})}function wt(n){let e;try{e=St(n,"utf8"),e=e.replace(/\r\n|\r/g,`
+`)}catch(a){throw new Error(`Could not read test file ${n}: ${a}`)}let t=new Set,o=/moduleId: (.*)/g,r;for(;(r=o.exec(e))!==null;)t.add(r[1].trim());let s={};if(t.size>0){let a=lr(n);t.forEach(i=>{s[i]||(s[i]=cr(a,i))})}return{test:e,modules:s}}function lr(n){let e=n;for(;e!=="/";){let t=Ee.join(e,ke);if(yt(t))return t;e=Ee.dirname(e)}throw new Error(`No '${ke}' directory found in the path ${n} or any of its parents`)}function cr(n,e){let t=Ao(n);for(let o of t){let r=Ee.join(n,o),s=St(r,"utf8");if(s.includes(e))return s}throw new Error(`Could not find module file for module ${e} in ${n}`)}function dr(n){if(!n.endsWith(".yaml"))return!1;let e=St(n,"utf8");return e.includes("momentic/test")?e.match(/localOnly:.*true/)?(S.warn(`Skipping local-only test: ${n}`),!1):!0:(S.warn(`Skipping YAML that is not a Momentic test: ${n}`),!1)}function To(n,e=new Set){for(let t of n){let o=Ee.resolve(t);if(o&&yt(o)&&bo(o).isDirectory()){let r=Ao(o).map(s=>Ee.join(o,s));To(r,e);continue}if(o.endsWith(".yaml")){if(!yt(o)||!bo(o).isFile())throw new Error(`File not found or unreadable: ${o}`);if(!dr(o))continue;e.add(o)}}return e}import{existsSync as ln,statSync as ri}from"fs";import ii from"wait-on";import{distance as Nr}from"fastest-levenshtein";import{chromium as Mr,devices as Vo}from"playwright";import{addExtra as Dr}from"playwright-extra";import Pr from"puppeteer-extra-plugin-recaptcha";import _r from"puppeteer-extra-plugin-stealth";var bt={js:'var K=Object.defineProperty;var P=Object.getOwnPropertySymbols;var z=Object.prototype.hasOwnProperty,B=Object.prototype.propertyIsEnumerable;var H=(t,e,n)=>e in t?K(t,e,{enumerable:!0,configurable:!0,writable:!0,value:n}):t[e]=n,D=(t,e)=>{for(var n in e||(e={}))z.call(e,n)&&H(t,n,e[n]);if(P)for(var n of P(e))B.call(e,n)&&H(t,n,e[n]);return t};var g=(t,e,n)=>(H(t,typeof e!="symbol"?e+"":e,n),n);var _=(t,e,n)=>new Promise((o,r)=>{var i=s=>{try{d(n.next(s))}catch(l){r(l)}},a=s=>{try{d(n.throw(s))}catch(l){r(l)}},d=s=>s.done?o(s.value):Promise.resolve(s.value).then(i,a);d((n=n.apply(t,e)).next())});var E=t=>function(e){return e&&e.isTrusted?t.apply(this,arguments):!0};globalThis.forTrusted==null&&(globalThis.forTrusted=E);var k={create(t,e,n,o){return{bottom:o,top:e,left:t,right:n,width:n-t,height:o-e}},copy(t){return{bottom:t.bottom,top:t.top,left:t.left,right:t.right,width:t.width,height:t.height}},translate(t,e,n){return e==null&&(e=0),n==null&&(n=0),{bottom:t.bottom+n,top:t.top+n,left:t.left+e,right:t.right+e,width:t.width,height:t.height}},subtract(t,e){return e=this.create(Math.max(t.left,e.left),Math.max(t.top,e.top),Math.min(t.right,e.right),Math.min(t.bottom,e.bottom)),e.width<0||e.height<0?[k.copy(t)]:[this.create(t.left,t.top,e.left,e.top),this.create(e.left,t.top,e.right,e.top),this.create(e.right,t.top,t.right,e.top),this.create(t.left,e.top,e.left,e.bottom),this.create(e.right,e.top,t.right,e.bottom),this.create(t.left,e.bottom,e.left,t.bottom),this.create(e.left,e.bottom,e.right,t.bottom),this.create(e.right,e.bottom,t.right,t.bottom)].filter(o=>o.height>0&&o.width>0)},intersects(t,e){return t.right>e.left&&t.left<e.right&&t.bottom>e.top&&t.top<e.bottom},intersectsStrict(t,e){return t.right>=e.left&&t.left<=e.right&&t.bottom>=e.top&&t.top<=e.bottom},equals(t,e){for(let n of["top","bottom","left","right","width","height"])if(t[n]!==e[n])return!1;return!0},intersect(t,e){return this.create(Math.max(t.left,e.left),Math.max(t.top,e.top),Math.min(t.right,e.right),Math.min(t.bottom,e.bottom))}};var N={_browserInfoLoaded:!0,_firefoxVersion:null,_isFirefox:!1,isFirefox(){if(!this._browserInfoLoaded)throw Error("browserInfo has not yet loaded.");return this._isFirefox},firefoxVersion(){if(!this._browserInfoLoaded)throw Error("browserInfo has not yet loaded.");return this._firefoxVersion},isString(t){return typeof t=="string"||t instanceof String}};var f={isReady(){return document.readyState!=="loading"},documentReady:function(){let t=document.readyState!=="loading",e=[];if(!t){let n;globalThis.addEventListener("DOMContentLoaded",n=E(function(){globalThis.removeEventListener("DOMContentLoaded",n,!0),t=!0;for(let o of e)o();e=null}),!0)}return function(n){if(t)return n();e.push(n)}}(),documentComplete:function(){let t=document.readyState==="complete",e=[];if(!t){let n;globalThis.addEventListener("load",n=E(function(o){if(o.target===document){globalThis.removeEventListener("load",n,!0),t=!0;for(let r of e)r();e=null}}),!0)}return function(n){t?n():e.push(n)}}(),createElement(t){let e=document.createElement(t);return e instanceof HTMLElement?(this.createElement=n=>document.createElement(n),e):(this.createElement=n=>document.createElementNS("http://www.w3.org/1999/xhtml",n),this.createElement(t))},addElementsToPage(t,e){let n=this.createElement("div");e.id!=null&&(n.id=e.id),e.className!=null&&(n.className=e.className);for(let o of t)n.appendChild(o);return document.body.appendChild(n),n},removeElement(t){return t.parentNode.removeChild(t)},isTopFrame(){return globalThis.top===globalThis.self},makeXPath(t){let e=[];for(let n of t)e.push(".//"+n,".//xhtml:"+n);return e.join(" | ")},evaluateXPath(t,e){let n=document.webkitIsFullScreen?document.webkitFullscreenElement:document.documentElement,o=function(r){return r==="xhtml"?"http://www.w3.org/1999/xhtml":null};return document.evaluate(t,n,o,e,null)},getVisibleClientRect(t,e){let n;e==null&&(e=!1);let o=(()=>{let i=[];for(n of t.getClientRects())i.push(k.copy(n));return i})(),r=function(){let i=window.getComputedStyle(t,null),a=i.getPropertyValue("display").indexOf("inline")===0&&i.getPropertyValue("font-size")==="0px";return r=()=>a,a};for(n of o){let i;if((n.width===0||n.height===0)&&e)for(let a of Array.from(t.children)){i=window.getComputedStyle(a,null);let d=i.getPropertyValue("position");if(i.getPropertyValue("float")==="none"&&!["absolute","fixed"].includes(d)&&!(n.height===0&&r()&&i.getPropertyValue("display").indexOf("inline")===0))continue;let s=this.getVisibleClientRect(a,!0);if(!(s===null||s.width<3||s.height<3))return s}else{if(n=this.cropRectToVisible(n),n===null||n.width<3||n.height<3||(i=window.getComputedStyle(t,null),i.getPropertyValue("visibility")!=="visible"))continue;return n}}return null},cropRectToVisible(t){let e=k.create(Math.max(t.left,0),Math.max(t.top,0),t.right,t.bottom);return e.top>=window.innerHeight-4||e.left>=window.innerWidth-4?null:e},getClientRectsForAreas(t,e){let n=[];for(let o of e){let r,i,a,d,s=o.coords.split(",").map(p=>parseInt(p,10)),l=o.shape.toLowerCase();if(["rect","rectangle"].includes(l))s.length==4&&([r,a,i,d]=s);else if(["circle","circ"].includes(l)){if(s.length==3){let[p,w,v]=s,u=v/Math.sqrt(2);r=p-u,i=p+u,a=w-u,d=w+u}}else l==="default"?s.length==2&&([r,a,i,d]=[0,0,t.width,t.height]):s.length>=4&&([r,a,i,d]=s);let c=k.translate(k.create(r,a,i,d),t.left,t.top);c=this.cropRectToVisible(c),c&&!isNaN(c.top)&&!isNaN(c.left)&&!isNaN(c.width)&&!isNaN(c.height)&&n.push({element:o,rect:c})}return n},isSelectable(t){if(!(t instanceof Element))return!1;let e=["button","checkbox","color","file","hidden","image","radio","reset","submit"];return t.nodeName.toLowerCase()==="input"&&e.indexOf(t.type)===-1||t.nodeName.toLowerCase()==="textarea"||t.isContentEditable},isEditable(t){return this.isSelectable(t)||(t.nodeName!=null?t.nodeName.toLowerCase():void 0)==="select"},isEmbed(t){let e=t.nodeName!=null?t.nodeName.toLowerCase():null;return["embed","object"].includes(e)},isFocusable(t){return t&&(this.isEditable(t)||this.isEmbed(t))},isDOMDescendant(t,e){let n=e;for(;n!==null;){if(n===t)return!0;n=n.parentNode}return!1},isSelected(t){let e=document.getSelection();if(t.isContentEditable){let n=e.anchorNode;return n&&this.isDOMDescendant(t,n)}else if(f.getSelectionType(e)==="Range"&&e.isCollapsed){let n=e.anchorNode.childNodes[e.anchorOffset];return t===n}else return!1},simulateSelect(t){if(t===document.activeElement&&f.isEditable(document.activeElement))return handlerStack.bubbleEvent("click",{target:t});if(t.focus(),t.tagName.toLowerCase()!=="textarea"||t.value.indexOf(`\n`)<0)try{if(t.selectionStart===0&&t.selectionEnd===0)return t.setSelectionRange(t.value.length,t.value.length)}catch(e){}},simulateClick(t,e){e==null&&(e={});let n=["mouseover","mousedown","mouseup","click"],o=[];for(let r of n){let i=this.simulateMouseEvent(r,t,e);o.push(i)}return o},simulateMouseEvent(t,e,n){if(n==null&&(n={}),t==="mouseout"){if(e==null&&(e=this.lastHoveredElement),this.lastHoveredElement=void 0,e==null)return}else t==="mouseover"&&(this.simulateMouseEvent("mouseout",void 0,n),this.lastHoveredElement=e);let o=new MouseEvent(t,{bubbles:!0,cancelable:!0,composed:!0,view:window,detail:1,ctrlKey:n.ctrlKey,altKey:n.altKey,shiftKey:n.shiftKey,metaKey:n.metaKey});return e.dispatchEvent(o)},simulateClickDefaultAction(t,e){let n;if(e==null&&(e={}),(t.tagName!=null?t.tagName.toLowerCase():void 0)!=="a"||!t.href)return;let{ctrlKey:o,shiftKey:r,metaKey:i,altKey:a}=e;KeyboardUtils.platform==="Mac"?n=i===!0&&o===!1:n=i===!1&&o===!0,n?chrome.runtime.sendMessage({handler:"openUrlInNewTab",url:t.href,active:r===!0}):r===!0&&i===!1&&o===!1&&a===!1?chrome.runtime.sendMessage({handler:"openUrlInNewWindow",url:t.href}):t.target==="_blank"&&chrome.runtime.sendMessage({handler:"openUrlInNewTab",url:t.href,active:!0})},simulateHover(t,e){return e==null&&(e={}),this.simulateMouseEvent("mouseover",t,e)},simulateUnhover(t,e){return e==null&&(e={}),this.simulateMouseEvent("mouseout",t,e)},addFlashRect(t){let e=this.createElement("div");return e.classList.add("vimiumReset"),e.classList.add("vimiumFlash"),e.style.left=t.left+"px",e.style.top=t.top+"px",e.style.width=t.width+"px",e.style.height=t.height+"px",document.documentElement.appendChild(e),e},getViewportTopLeft(){let t=document.documentElement,e=getComputedStyle(t),n=t.getBoundingClientRect();if(e.position==="static"&&!/content|paint|strict/.test(e.contain||"")){let o=parseInt(e.marginTop),r=parseInt(e.marginLeft);return{top:-n.top+o,left:-n.left+r}}else{let o,r;return N.isFirefox()?(r=parseInt(e.borderTopWidth),o=parseInt(e.borderLeftWidth)):{clientTop:r,clientLeft:o}=t,{top:-n.top-r,left:-n.left-o}}},suppressPropagation(t){t.stopImmediatePropagation()},suppressEvent(t){t.preventDefault(),this.suppressPropagation(t)},consumeKeyup:function(){let t=null;return function(e,n=null,o){if(!e.repeat){t!=null&&handlerStack.remove(t);let{code:r}=e;t=handlerStack.push({_name:"dom_utils/consumeKeyup",keyup(i){return i.code!==r||(this.remove(),o?f.suppressPropagation(i):f.suppressEvent(i)),handlerStack.continueBubbling},blur(i){return i.target===window&&this.remove(),handlerStack.continueBubbling}})}return typeof n=="function"&&n(),o?(f.suppressPropagation(e),handlerStack.suppressPropagation):(f.suppressEvent(e),handlerStack.suppressEvent)}}(),getSelectionType(t){return t==null&&(t=document.getSelection()),t.type?t.type:t.rangeCount===0?"None":t.isCollapsed?"Caret":"Range"},getElementWithFocus(t,e){let n,o=n=t.getRangeAt(0);f.getSelectionType(t)==="Range"&&(o=n.cloneRange(),o.collapse(e)),n=o.startContainer,n.nodeType===1&&(n=n.childNodes[o.startOffset]);let r=n;for(;r&&r.nodeType!==1;)r=r.previousSibling;return n=r||(n!=null?n.parentNode:void 0),n},getSelectionFocusElement(){let t=window.getSelection(),e=t.focusNode;return e==null?null:(e===t.anchorNode&&t.focusOffset===t.anchorOffset&&(e=e.childNodes[t.focusOffset]||e),e.nodeType!==Node.ELEMENT_NODE?e.parentElement:e)},getContainingElement(t){return(typeof t.getDestinationInsertionPoints=="function"?t.getDestinationInsertionPoints()[0]:void 0)||t.parentElement},windowIsTooSmall(){return window.innerWidth<3||window.innerHeight<3},injectUserCss(){let t=document.createElement("style");t.type="text/css",t.textContent=Settings.get("userDefinedLinkHintCss"),document.head.appendChild(t)}};var O={MAX_CONTENT_LENGTH:1e3,MAX_ATTRIBUTE_LENGTH:500,MAX_NUM_DATA_ATTRIBUTES:10,commonAttributes:["id","className","title","aria-label","aria-labelledby"],attributeNamesMapping:new Map([["a",["href","title","rel","target"]],["label",["for"]],["input",["type","name","placeholder","checked","maximumLength"]],["textarea",["placeholder","maximumLength"]],["button",["type"]],["select",["name","multiple"]],["div",["role"]],["iframe",["src"]],["img",["src","alt"]]]),describe(t){var r,i;let e={};this.addAttributes(t,this.commonAttributes,e);let n=((i=(r=t.tagName).toLowerCase)==null?void 0:i.call(r))||"";this.attributeNamesMapping.has(n)&&this.addAttributes(t,this.attributeNamesMapping.get(n),e),this.addDataAttrs(t,e);let o=this.getContent(t);return this.additionalHandling(t,D({tag:n,attributes:e},o&&{content:o}))},getContent(t){var n,o;let e=((o=(n=t.tagName).toLowerCase)==null?void 0:o.call(n))||"";return["input","textarea"].includes(e)?t.value:["div","iframe","img","body"].includes(e)?null:(["a","button","select","label"].includes(e),t.innerText)},additionalHandling(t,e){var o,r;if((((r=(o=t.tagName).toLowerCase)==null?void 0:r.call(o))||"")=="label"&&t.hasAttribute("for")){let i=t.getAttribute("for"),a=document.getElementById(i);a&&(e.target=this.describe(a))}return e},addAttributes(t,e,n){n||(n={});for(let o of e)t.hasAttribute(o)&&(n[o]=t.getAttribute(o).substring(0,this.MAX_ATTRIBUTE_LENGTH));return n},addDataAttrs(t,e){let n=0;for(let o in t.dataset)if(e[`data-${o}`]=t.dataset[o].substring(0,this.MAX_ATTRIBUTE_LENGTH),n++,n>this.MAX_NUM_DATA_ATTRIBUTES)return e;return e}};var x=null,C=()=>G()||document.scrollingElement||document.body,W=function(t){return t?t<0?-1:1:0},U={x:{axisName:"scrollLeft",max:"scrollWidth",viewSize:"clientWidth"},y:{axisName:"scrollTop",max:"scrollHeight",viewSize:"clientHeight"}},X=function(t,e,n){if(N.isString(n)){let o=n;return o==="viewSize"&&t===C()?e==="x"?window.innerWidth:window.innerHeight:t[U[e][o]]}else return n},V=function(t,e,n){let o=U[e].axisName,r=t[o];if(t.scrollBy){let i={behavior:"instant"};i[e==="x"?"left":"top"]=n,t.scrollBy(i)}else t[o]+=n;return t[o]!==r},q=function(t,e){let n=window.getComputedStyle(t);return!(n.getPropertyValue(`overflow-${e}`)==="hidden"||["hidden","collapse"].includes(n.getPropertyValue("visibility"))||n.getPropertyValue("display")==="none")},T=function(t,e,n,o){let r=o*X(t,e,n)||-1;return r=W(r),V(t,e,r)&&V(t,e,-r)},$=function(t,e,n,o){return e==null&&(e="y"),n==null&&(n=1),o==null&&(o=1),T(t,e,n,o)&&q(t,e)},j=function(t=null){let e;if(!t){let n=C();if(T(n,"y",1,1)||T(n,"y",-1,1))return n;t=document.body||C()}if(T(t,"y",1,1)||T(t,"y",-1,1))return t;{let n=Array.from(t.children).map(o=>({element:o,rect:f.getVisibleClientRect(o)})).filter(o=>o.rect);n.map(o=>o.area=o.rect.width*o.rect.height);for(e of n.sort((o,r)=>r.area-o.area)){let o=j(e.element);if(o)return o}return null}},L={init(){x=null},isScrollableElement(t){return x||(x=C()&&j()||C()),t!==x&&$(t)}},G=function(){let t=J[window.location.host];if(t)return document.querySelector(t)},J={"twitter.com":"div.permalink-container div.permalink[role=main]","reddit.com":"#overlayScrollContainer","new.reddit.com":"#overlayScrollContainer","www.reddit.com":"#overlayScrollContainer","web.telegram.org":".MessageList"};window.Scroller=L;var A=function(){let t=null;return f.documentReady(()=>t=document.hasFocus()),globalThis.addEventListener("focus",E(function(e){return e.target===window&&(t=!0),!0}),!0),globalThis.addEventListener("blur",E(function(e){return e.target===window&&(t=!1),!0}),!0),()=>t}();Object.assign(globalThis,{windowIsFocused:A});var R=class{constructor(e){g(this,"element");g(this,"image");g(this,"rect");g(this,"linkText");g(this,"showLinkText");g(this,"reason");g(this,"secondClassCitizen");g(this,"possibleFalsePositive");Object.seal(this),e&&Object.assign(this,e)}},M={getLocalHintsForElement(t){var p,w,v;let e=((w=(p=t.tagName).toLowerCase)==null?void 0:w.call(p))||"",n=!1,o=!1,r=!1,i=[],a=[],d=null;if(e==="img"){let u=t.getAttribute("usemap");if(u){let h=t.getClientRects();u=u.replace(/^#/,"").replace(\'"\',\'\\\\"\');let m=document.querySelector(`map[name="${u}"]`);if(m&&h.length>0){n=!0;let y=m.getElementsByTagName("area"),S=f.getClientRectsForAreas(h[0],y);S=S.map(F=>Object.assign(F,{image:t})),a.push(...S)}}}let s=t.getAttribute("aria-disabled");if(s&&["","true"].includes(s.toLowerCase()))return[];if(this.checkForAngularJs||(this.checkForAngularJs=function(){if(document.getElementsByClassName("ng-scope").length===0)return()=>!1;{let h=[];for(let m of["","data-","x-"])for(let y of["-",":","_"])h.push(`${m}ng${y}click`);return function(m){for(let y of h)if(m.hasAttribute(y))return!0;return!1}}}()),n||(n=this.checkForAngularJs(t)),t.hasAttribute("onclick"))n=!0;else{let u=t.getAttribute("role"),h=["button","tab","link","checkbox","menuitem","menuitemcheckbox","menuitemradio","radio"];if(u!=null&&h.includes(u.toLowerCase()))n=!0;else{let m=t.getAttribute("contentEditable");m!=null&&["","contenteditable","true","plaintext-only"].includes(m.toLowerCase())&&(n=!0)}}if(!n&&t.hasAttribute("jsaction")){let u=t.getAttribute("jsaction").split(";");for(let h of u){let m=h.trim().split(":");if(m.length>=1&&m.length<=2){let[y,S,F]=m.length===1?["click",...m[0].trim().split("."),"_"]:[m[0],...m[1].trim().split("."),"_"];n||(n=y==="click"&&S!=="none"&&F!=="_")}}}switch(e){case"a":n=!0;break;case"textarea":n||(n=!t.disabled&&!t.readOnly);break;case"input":n||(n=!(((v=t.getAttribute("type"))==null?void 0:v.toLowerCase())=="hidden"||t.disabled||t.readOnly&&f.isSelectable(t)));break;case"button":case"select":n||(n=!t.disabled);break;case"object":case"embed":n=!0;break;case"label":n||(n=t.control!=null&&!t.control.disabled&&this.getLocalHintsForElement(t.control).length===0);break;case"body":n||(n=t===document.body&&!A()&&window.innerWidth>3&&window.innerHeight>3&&(document.body!=null?document.body.tagName.toLowerCase():void 0)!=="frameset"?d="Frame.":void 0),n||(n=t===document.body&&A()&&L.isScrollableElement(t)?d="Scroll.":void 0);break;case"img":n||(n=["zoom-in","zoom-out"].includes(t.style.cursor));break;case"div":case"ol":case"ul":n||(n=t.clientHeight<t.scrollHeight&&L.isScrollableElement(t)?d="Scroll.":void 0);break;case"details":n=!0,d="Open.";break}let l=t.getAttribute("class");!n&&(l!=null&&l.toLowerCase().includes("button"))&&(n=!0,r=!0);let c=t.getAttribute("tabindex"),b=c?parseInt(c):-1;if(!n&&!(b<0)&&!isNaN(b)&&(n=!0,o=!0),n)if(a.length>0){let u=a.map(h=>new R({element:h.element,image:t,rect:h.rect,secondClassCitizen:o,possibleFalsePositive:r,reason:d}));i.push(...u)}else{let u=f.getVisibleClientRect(t,!0);if(u!==null){let h=new R({element:t,rect:u,secondClassCitizen:o,possibleFalsePositive:r,reason:d});i.push(h)}}return i},getElementFromPoint(t,e,n,o){n==null&&(n=document),o==null&&(o=[]);let r=n.elementsFromPoint?n.elementsFromPoint(t,e)[0]:n.elementFromPoint(t,e);return o.includes(r)?r:(o.push(r),r&&r.shadowRoot?M.getElementFromPoint(t,e,r.shadowRoot,o):r)},getLocalHints(t){if(!document.body)return[];let e=(s,l)=>{l==null&&(l=[]);for(let c of Array.from(s.querySelectorAll("*")))l.push(c),c.shadowRoot&&e(c.shadowRoot,l);return l},n=e(document.body),o=[];for(let s of Array.from(n))if(!t||s.href){let l=this.getLocalHintsForElement(s);o.push(...l)}o=o.reverse();let r=[1,2,3];o=o.filter((s,l)=>{if(!s.possibleFalsePositive)return!0;let b=Math.max(0,l-6);for(;b<l;){let p=o[b].element;for(let w of r)if(p=p==null?void 0:p.parentElement,p===s.element)return!1;b+=1}return!0});let i=o.filter(s=>{if(s.secondClassCitizen)return!1;let l=s.rect,c=M.getElementFromPoint(l.left+l.width*.5,l.top+l.height*.5);if(c&&(s.element.contains(c)||c.contains(s.element))||s.element.localName=="area"&&c==s.image)return!0;let p=[l.top+.1,l.bottom-.1],w=[l.left+.1,l.right-.1];for(let v of p)for(let u of w){let h=M.getElementFromPoint(u,v);if(h&&(s.element.contains(h)||h.contains(s.element)))return!0}});i.reverse();let{top:a,left:d}=f.getViewportTopLeft();for(let s of i)s.rect.top+=a,s.rect.left+=d;return i}};var I=class{constructor(){this.hints=null;this.hintMarkers=null;this.markersDiv=null;this.enrichedMarkers=null}reset(){this.removeMarkers(),this.hints=null,this.hintMarkers=null,this.markersDiv=null}capture(){return _(this,null,function*(){this.reset(),this.createMarkers(),this.displayMarkers()})}createMarkers(){this.hints=M.getLocalHints(),this.hintMarkers=new Map,this.hints.forEach((e,n)=>{var i,a;let o=f.createElement("div"),r=(a=(i=e.element.attributes["data-momentic-id"])==null?void 0:i.value)!=null?a:void 0;if(!r){console.warn(`[Momentic] No data-momentic-id found for interactive element ${e.element.outerHTML}`);return}o.style.left=e.rect.left+"px",o.style.top=e.rect.top+"px",o.style.zIndex=214e7+n,o.className="vimiumReset internalVimiumHintMarker vimiumHintMarker",Z(o,r),this.hintMarkers.set(r,{hint:e,marker:o})})}enrichMarkers(){if(this.hintMarkers){this.enrichedMarkers=[];for(let[e,n]of this.hintMarkers)this.enrichedMarkers.push(Object.assign(O.describe(n.hint.element),{hintString:e}))}}displayMarkers(){this.hintMarkers&&(this.markersDiv||(this.markersDiv=f.addElementsToPage(Array.from(this.hintMarkers.values()).map(e=>e.marker),{id:"vimiumHintMarkerContainer",className:"vimiumReset"})))}removeMarkers(){this.markersDiv&&(f.removeElement(this.markersDiv),this.markersDiv=null)}toggleMarkers(){this.markersDiv?this.removeMarkers():this.displayMarkers()}},Z=(t,e)=>{for(let n of e){let o=document.createElement("span");o.className="vimiumReset",o.textContent=n,t.appendChild(o)}};window.HintManager=I;\n',css:`/* Reproduced from https://github.com/philc/vimium/blob/master/content_scripts/vimium.css */
+
+/*
+ * Many CSS class names in this file use the verbose "vimiumXYZ" as the class name. This is so we
+ * don't use the same CSS class names that the page is using, so the page's CSS doesn't mess with
+ * the style of our Vimium dialogs.
+ *
+ * The z-indexes of Vimium elements are very large, because we always want them to show on top. We
+ * know that Chrome supports z-index values up to about 2^31. The values we use are large numbers
+ * approaching that bound. However, we must leave headroom for link hints. Hint marker z-indexes
+ * start at 2140000001.
+ */
+
+/*
+ * This vimiumReset class can be added to any of our UI elements to give it a clean slate. This is
+ * useful in case the page has declared a broad rule like "a { padding: 50px; }" which will mess up
+ * our UI. These declarations contain more specifiers than necessary to increase their specificity
+ * (precedence).
+ */
+ .vimiumReset,
+ div.vimiumReset,
+ span.vimiumReset,
+ table.vimiumReset,
+ a.vimiumReset,
+ a:visited.vimiumReset,
+ a:link.vimiumReset,
+ a:hover.vimiumReset,
+ td.vimiumReset,
+ tr.vimiumReset {
+   background: none;
+   border: none;
+   bottom: auto;
+   box-shadow: none;
+   color: black;
+   cursor: auto;
+   display: inline;
+   float: none;
+   font-family: 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+   font-size: inherit;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   height: auto;
+   left: auto;
+   letter-spacing: 0;
+   line-height: 100%;
+   margin: 0;
+   max-height: none;
+   max-width: none;
+   min-height: 0;
+   min-width: 0;
+   opacity: 1;
+   padding: 0;
+   position: static;
+   right: auto;
+   text-align: left;
+   text-decoration: none;
+   text-indent: 0;
+   text-shadow: none;
+   text-transform: none;
+   top: auto;
+   vertical-align: baseline;
+   white-space: normal;
+   width: auto;
+   z-index: 2140000000; /* Vimium's reference z-index value. */
+ }
+ 
+ thead.vimiumReset,
+ tbody.vimiumReset {
+   display: table-header-group;
+ }
+ 
+ tbody.vimiumReset {
+   display: table-row-group;
+ }
+ 
+ /* Linkhints CSS */
+ 
+ div.internalVimiumHintMarker {
+   position: absolute;
+   display: block;
+   top: -1px;
+   left: -1px;
+   white-space: nowrap;
+   overflow: hidden;
+   font-size: 11px;
+   padding: 1px 3px 0px 3px;
+   background: linear-gradient(to bottom, #fff785 0%, #ffc542 100%);
+   border: solid 1px #c38a22;
+   border-radius: 3px;
+   box-shadow: 0px 3px 7px 0px rgba(0, 0, 0, 0.3);
+ }
+ 
+ div.internalVimiumHintMarker span {
+   color: #302505;
+   font-family: Helvetica, Arial, sans-serif;
+   font-weight: bold;
+   font-size: 11px;
+   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+ }
+ 
+ div.internalVimiumHintMarker > .matchingCharacter {
+   color: #d4ac3a;
+ }
+ 
+ div > .vimiumActiveHintMarker span {
+   color: #a07555 !important;
+ }
+ 
+ /* Input hints CSS */
+ 
+ div.internalVimiumInputHint {
+   position: absolute;
+   display: block;
+   background-color: rgba(255, 247, 133, 0.3);
+   border: solid 1px #c38a22;
+   pointer-events: none;
+ }
+ 
+ div.internalVimiumSelectedInputHint {
+   background-color: rgba(255, 102, 102, 0.3);
+   border: solid 1px #993333 !important;
+ }
+ 
+ div.internalVimiumSelectedInputHint span {
+   color: white !important;
+ }
+ 
+ /* Frame Highlight Marker CSS*/
+ div.vimiumHighlightedFrame {
+   position: fixed;
+   top: 0px;
+   left: 0px;
+   width: 100%;
+   height: 100%;
+   padding: 0px;
+   margin: 0px;
+   border: 5px solid yellow;
+   box-sizing: border-box;
+   pointer-events: none;
+ }
+ 
+ /* Help Dialog CSS */
+ 
+ iframe.vimiumHelpDialogFrame {
+   background-color: rgba(10, 10, 10, 0.6);
+   padding: 0px;
+   top: 0px;
+   left: 0px;
+   width: 100%;
+   height: 100%;
+   display: block;
+   position: fixed;
+   border: none;
+   z-index: 2139999997; /* Three less than the reference value. */
+ }
+ 
+ div#vimiumHelpDialogContainer {
+   opacity: 1;
+   background-color: white;
+   border: 2px solid #b3b3b3;
+   border-radius: 6px;
+   width: 840px;
+   max-width: calc(100% - 100px);
+   max-height: calc(100% - 100px);
+   margin: 50px auto;
+   overflow-y: auto;
+   overflow-x: auto;
+ }
+ 
+ div#vimiumHelpDialog {
+   min-width: 600px;
+   padding: 8px 12px;
+ }
+ 
+ span#vimiumTitle,
+ span#vimiumTitle span,
+ span#vimiumTitle * {
+   font-size: 20px;
+ }
+ #vimiumTitle {
+   display: block;
+   line-height: 130%;
+   white-space: nowrap;
+ }
+ td.vimiumHelpDialogTopButtons {
+   width: 100%;
+   text-align: right;
+ }
+ #helpDialogOptionsPage,
+ #helpDialogWikiPage {
+   font-size: 14px;
+   padding-left: 5px;
+   padding-right: 5px;
+ }
+ div.vimiumColumn {
+   width: 50%;
+   float: left;
+   font-size: 11px;
+   line-height: 130%;
+ }
+ 
+ div.vimiumColumn tr {
+   display: table-row;
+ }
+ 
+ div.vimiumColumn td {
+   display: table-cell;
+   font-size: 11px;
+   line-height: 130%;
+ }
+ div.vimiumColumn table,
+ div.vimiumColumn td,
+ div.vimiumColumn tr {
+   padding: 0;
+   margin: 0;
+ }
+ div.vimiumColumn table {
+   width: 100%;
+   table-layout: auto;
+ }
+ div.vimiumColumn td {
+   vertical-align: top;
+   padding: 1px;
+ }
+ div#vimiumHelpDialog div.vimiumColumn tr > td:first-of-type {
+   /* This is the "key" column, e.g. "j", "gg". */
+   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   font-size: 14px;
+   text-align: right;
+   white-space: nowrap;
+ }
+ span.vimiumHelpDialogKey {
+   background-color: rgb(243, 243, 243);
+   color: rgb(33, 33, 33);
+   margin-left: 2px;
+   padding-top: 1px;
+   padding-bottom: 1px;
+   padding-left: 4px;
+   padding-right: 4px;
+   border-radius: 3px;
+   border: solid 1px #ccc;
+   border-bottom-color: #bbb;
+   box-shadow: inset 0 -1px 0 #bbb;
+   font-family: monospace;
+   font-size: 11px;
+ }
+ /* Make the description column as wide as it can be. */
+ div#vimiumHelpDialog div.vimiumColumn tr > td:nth-of-type(3) {
+   width: 100%;
+ }
+ div#vimiumHelpDialog div.vimiumDivider {
+   display: block;
+   height: 1px;
+   width: 100%;
+   margin: 10px auto;
+   background-color: #9a9a9a;
+ }
+ div#vimiumHelpDialog td.vimiumHelpSectionTitle {
+   padding-top: 3px;
+   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   font-size: 16px;
+   font-weight: bold;
+ }
+ div#vimiumHelpDialog td.vimiumHelpDescription {
+   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   font-size: 14px;
+ }
+ div#vimiumHelpDialog span.vimiumCopyCommandNameName {
+   font-style: italic;
+   cursor: pointer;
+   font-size: 12px;
+ }
+ /* Advanced commands are hidden by default until you show them. */
+ div#vimiumHelpDialog tr.advanced {
+   display: none;
+ }
+ div#vimiumHelpDialog.showAdvanced tr.advanced {
+   display: table-row;
+ }
+ div#vimiumHelpDialog div.advanced td:nth-of-type(3) {
+   color: #555;
+ }
+ div#vimiumHelpDialog a.closeButton {
+   font-family: 'courier new';
+   font-weight: bold;
+   color: #555;
+   text-decoration: none;
+   font-size: 24px;
+   position: relative;
+   top: 3px;
+   padding-left: 5px;
+   cursor: pointer;
+ }
+ div#vimiumHelpDialog a {
+   text-decoration: underline;
+ }
+ 
+ div#vimiumHelpDialog a.closeButton:hover {
+   color: black;
+   -webkit-user-select: none;
+ }
+ div#vimiumHelpDialogFooter {
+   display: block;
+   position: relative;
+   margin-bottom: 37px;
+ }
+ table.helpDialogBottom {
+   width: 100%;
+ }
+ td.helpDialogBottomRight {
+   width: 100%;
+   float: right;
+   text-align: right;
+ }
+ td.helpDialogBottomRight,
+ td.helpDialogBottomLeft {
+   padding: 0px;
+ }
+ div#vimiumHelpDialogFooter * {
+   font-size: 10px;
+ }
+ a#toggleAdvancedCommands,
+ span#help-dialog-tip {
+   position: relative;
+   top: 19px;
+   white-space: nowrap;
+   font-size: 10px;
+ }
+ a:link.vimiumHelDialogLink,
+ a:visited.vimiumHelDialogLink,
+ a:hover.vimiumHelDialogLink,
+ a:active.vimiumHelDialogLink,
+ a#toggleAdvancedCommands {
+   color: #2f508e;
+   text-decoration: underline;
+   cursor: pointer;
+ }
+ 
+ /* Vimium HUD CSS */
+ 
+ div.vimiumHUD {
+   display: block;
+   position: fixed;
+   width: calc(100% - 20px);
+   bottom: 8px;
+   left: 8px;
+   background: #f1f1f1;
+   text-align: left;
+   border-radius: 4px;
+   box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.8);
+   border: 1px solid #aaa;
+   z-index: 2139999999;
+ }
+ 
+ iframe.vimiumHUDFrame {
+   background-color: transparent;
+   padding: 0px;
+   overflow: hidden;
+   display: block;
+   position: fixed;
+   width: 20%;
+   min-width: 300px;
+   height: 58px;
+   bottom: -14px;
+   right: 20px;
+   margin: 0 0 0 -40%;
+   border: none;
+   z-index: 2139999998; /* Two less than the reference value. */
+   opacity: 0;
+ }
+ 
+ div.vimiumHUD .vimiumHUDSearchArea {
+   display: block;
+   padding: 3px;
+   background-color: #f1f1f1;
+   border-radius: 4px 4px 0 0;
+ }
+ 
+ div.vimiumHUD .vimiumHUDSearchAreaInner {
+   color: #777;
+   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+   font-size: 14px;
+   height: 30px;
+   margin-bottom: 0;
+   padding: 2px 4px;
+   border-radius: 3px;
+   width: 100%;
+   outline: none;
+   box-sizing: border-box;
+   line-height: 20px;
+ }
+ 
+ div.vimiumHUD .hud-find {
+   background: #fff;
+   border: 1px solid #ccc;
+ }
+ 
+ div.vimiumHUD span#hud-find-input,
+ div.vimiumHUD span#hud-match-count {
+   color: #000;
+   display: inline;
+   outline: none;
+   white-space: nowrap;
+   overflow-y: hidden;
+ }
+ 
+ div.vimiumHUD span#hud-find-input:before {
+   content: '/';
+ }
+ 
+ div.vimiumHUD span#hud-match-count {
+   color: #aaa;
+   font-size: 12px;
+ }
+ 
+ div.vimiumHUD span#hud-find-input br {
+   display: none;
+ }
+ 
+ div.vimiumHUD span#hud-find-input * {
+   display: inline;
+   white-space: nowrap;
+ }
+ 
+ body.vimiumFindMode ::selection {
+   background: #ff9632;
+ }
+ 
+ /* Vomnibar Frame CSS */
+ 
+ iframe.vomnibarFrame {
+   background-color: transparent;
+   padding: 0px;
+   overflow: hidden;
+ 
+   display: block;
+   position: fixed;
+   width: calc(80% + 20px); /* same adjustment as in pages/vomnibar.js */
+   min-width: 400px;
+   height: calc(100% - 70px);
+   top: 70px;
+   left: 50%;
+   margin: 0 0 0 -40%;
+   border: none;
+   font-family: sans-serif;
+   z-index: 2139999998; /* Two less than the reference value. */
+ }
+ 
+ div.vimiumFlash {
+   box-shadow: 0px 0px 4px 2px #4183c4;
+   padding: 1px;
+   background-color: transparent;
+   position: absolute;
+   z-index: 2140000000;
+ }
+ 
+ /* UIComponent CSS */
+ iframe.vimiumUIComponentHidden {
+   display: none;
+ }
+ 
+ iframe.vimiumUIComponentVisible {
+   display: block;
+   color-scheme: light dark;
+ }
+ 
+ iframe.vimiumUIComponentReactivated {
+   border: 5px solid yellow;
+ }
+ 
+ iframe.vimiumNonClickable {
+   pointer-events: none;
+ }
+ 
+ @media (prefers-color-scheme: dark) {
+   /* DarkReader is a popular dark mode browser extension. It can apply an invert filter to the whole
+    * page to make the page dark, when used in Filter and Filter+ modes. We want to reverse/invert
+    * that filter again for Vimium's UI elements, because Vimium is already dark mode aware. */
+   iframe.reverseDarkReaderFilter {
+     -webkit-filter: invert(100%) hue-rotate(180deg) !important;
+     filter: invert(100%) hue-rotate(180deg) !important;
+   }
+ 
+   /* Dark mode CSS for options page and exclusions */
+ 
+   body.vimiumBody {
+     background-color: #292a2d;
+     color: white;
+   }
+ 
+   body.vimiumBody a,
+   body.vimiumBody a:visited {
+     color: #8ab4f8;
+   }
+ 
+   body.vimiumBody textarea,
+   body.vimiumBody input {
+     background-color: #1d1d1f;
+     border-color: #1d1d1f;
+     color: #e8eaed;
+   }
+ 
+   body.vimiumBody div.example {
+     color: #9aa0a6;
+   }
+ 
+   body.vimiumBody div#state,
+   body.vimiumBody div#footer {
+     background-color: #202124;
+     border-color: rgba(255, 255, 255, 0.1);
+   }
+ 
+   /* Dark Mode CSS for Help Dialog */
+ 
+   div#vimiumHelpDialogContainer {
+     border-color: rgba(255, 255, 255, 0.1);
+     background-color: #202124;
+   }
+ 
+   div#vimiumHelpDialog {
+     background-color: #292a2d;
+     color: white;
+   }
+ 
+   div#vimiumHelpDialog td.vimiumHelpDescription {
+     color: #c9cccf;
+   }
+ 
+   span#vimiumTitle,
+   div#vimiumHelpDialog td.vimiumHelpSectionTitle {
+     color: white;
+   }
+ 
+   #vimiumTitle > span:first-child {
+     color: #8ab4f8 !important;
+   }
+ 
+   div#vimiumHelpDialog a {
+     color: #8ab4f8;
+   }
+ 
+   div#vimiumHelpDialog div.vimiumDivider {
+     background-color: rgba(255, 255, 255, 0.1);
+   }
+ 
+   span.vimiumHelpDialogKey {
+     background-color: #1d1d1f;
+     border: solid 1px black;
+     box-shadow: none;
+     color: white;
+   }
+ }
+ `};var J=(n,e)=>{let{hostname:t,pathname:o}=new URL(n),{hostname:r,pathname:s}=new URL(e);return t!==r||o!==s};import{distance as Io}from"fastest-levenshtein";var Co=new Set(["about:blank","chrome-error://chromewebdata/"]),vo=2;var mr=["focusable","keyshortcuts","controls"],pr=["textbox","checkbox","combobox","button","link","list","listitem","tablist","tabpanel","tab","searchbox","menu","menubar","form","dialog","alertdialog","banner","navigation","main","menuitem","menuitemcheckbox","menuitemradio","option","radio","progressbar","switch"],hr=["notRendered","notVisible","ariaHiddenSubtree","ariaHiddenElement"],gr=80,fr={paragraph:"p",searchbox:"input"},Oo=["paragraph","option","StaticText"],Lo={indentLevel:0,noID:!1,noChildren:!1,noProperties:!1,maxLevel:void 0,neighbors:void 0},At=class{constructor(e){this.id=e.id,this.role=e.role,this.name=e.name,this.content=e.content,this.properties={},this.pathFromRoot=e.pathFromRoot,this.children=e.children,this.backendNodeID=e.backendNodeID,e.properties&&e.properties.forEach(t=>{t.name==="keyshortcuts"?this.dataMomenticId=parseInt(t.value.value):this.properties[t.name]=t.value.value})}getLogForm(){var e,t;return JSON.stringify({id:this.id,name:(e=this.name)!=null?e:"",role:(t=this.role)!=null?t:"",backendNodeId:this.backendNodeID})}isInteresting(){return pr.includes(this.role)||this.children.some(e=>e.role==="StaticText")?!0:!!this.name.trim()||!!this.content}serialize(e=Lo){var w,b;let{indentLevel:t,noChildren:o,noProperties:r,noID:s}=Object.assign({},Lo,e),a=" ".repeat(t),i=fr[this.role]||this.role,c=this.name,d=C({},this.properties);i==="heading"&&(d.level&&(i=`h${d.level}`,delete d.level),c==="heading"&&(c=""));let h=!Oo.includes(this.role);if(this.role==="StaticText")return`${a}${c}
+`;let p=`${a}<${i}`;!s&&h&&(p+=` id="${this.id}"`),c&&(p+=` name="${c}"`),this.content&&(p+=` content="${this.content}"`),Object.keys(this.properties).length>0&&!r&&Object.entries(this.properties).forEach(([m,g])=>{mr.includes(m)||(typeof g=="string"?p+=` ${m}="${g}"`:typeof g=="boolean"?g?p+=` ${m}`:p+=` ${m}={false}`:typeof g!="undefined"&&(p+=` ${m}={${JSON.stringify(g)}}`))});let A=e.maxLevel!==void 0&&t/2>=e.maxLevel;if(this.children.length===0||o||A)return p+=` />
+`,p;{let m="";for(let u of this.children)m+=u.serialize(O(C({},e),{indentLevel:t+2}));let g=m.trim();g.length<=gr&&!g.includes(`
+`)?p+=`>${g}</${i}>
+`:p+=`>
+${m}${a}</${i}>
+`}if(e.neighbors!==void 0&&e.neighbors>0&&this.parent){let m=this.parent.children.findIndex(E=>E.id===this.id),g=m>0?(w=this.parent.children[m-1])==null?void 0:w.serialize(O(C({},e),{neighbors:0})):"",u=m<this.parent.children.length-1?(b=this.parent.children[m+1])==null?void 0:b.serialize(O(C({},e),{neighbors:0})):"";return`${g||""}
+${p}
+${u||""}`}return p}},Et=class{constructor(e,t,o){this.root=e;this.a11yIdNodeMap=t;this.dataMomenticIdMap=o}serialize(){return this.root?this.root.serialize():""}};function yr(n){var e,t;return(e=n.name)!=null&&e.value?`"${n.name.value}"`:(t=n.role)!=null&&t.value&&n.role.value!=="none"&&n.role.value!=="generic"?`"${n.role.value}"`:`"${n.nodeId}"`}function No(n,e,t){var i,c,d,h,p,A,w;if(!e&&n.parentId)throw new Error(`Got no parent for accessibility node ${n.nodeId}: ${JSON.stringify(n)}`);let o=new At({id:parseInt(n.nodeId),role:((i=n.role)==null?void 0:i.value)||"",name:((c=n.name)==null?void 0:c.value)||"",content:((d=n.value)==null?void 0:d.value)||"",properties:n.properties,children:[],pathFromRoot:(e?`${e.pathFromRoot} `:"")+yr(n),backendNodeID:n.backendDOMNodeId});(h=n.value)!=null&&h.value&&(o.content=`${(p=n.value)==null?void 0:p.value}`);let r=(A=n.childIds)!=null?A:[];for(let b of r){if(!b)continue;let m=t.get(parseInt(b));if(!m)continue;let g=No(m,o,t);g.length&&(o.children=o.children.concat(g))}if(o.role==="StaticText"&&(o.children=[]),o.children.length===1&&o.children[0].role==="StaticText"){let b=o.name,m=(w=o.children[0])==null?void 0:w.name;(b===m||!m)&&(o.children=[])}let s=[];for(let b=o.children.length-1;b>=0;b--){let m=o.children[b];if(m.role!=="StaticText"){s.push(m);continue}if(b===0||o.children[b-1].role!=="StaticText"){s.push(m);continue}o.children[b-1].name+=` ${m.name}`}if(o.children=s.reverse(),o.role==="generic"&&o.children.length===1){let b=o.children[0];if(!Oo.includes(b.role)&&o.name===b.name)return o.children}if(!o.isInteresting()&&n.parentId)return o.children;for(let b of o.children)b.parent=o;return[o]}function Mo(n,e,t,o,r=1){n.id=r,r+=1,e.set(n.id,n),n.dataMomenticId?t.set(n.dataMomenticId,n):n.role!=="StaticText"&&n.role!=="RootWebArea"&&n.role!=="paragraph"&&o.debug({node:n.serialize({neighbors:1,maxLevel:1})},"Node has no data-momentic-id");for(let s of n.children)r=Mo(s,e,t,o,r);return r}function Do(n,e){if(!n.root)throw new Error("a11y tree has null root");n.allNodes=n.allNodes.filter(a=>{var c;return a.ignored?!((c=a.ignoredReasons)==null?void 0:c.find(d=>hr.includes(d.name))):!0});let t=new Map;for(let a of n.allNodes)t.set(parseInt(a.nodeId),a);let o=No(n.root,null,t);if(o.length>1)throw new Error(`Something went horribly wrong processing the a11y tree, we got: ${JSON.stringify(o)}`);if(o.length===0)throw new Oe;let r=new Map,s=new Map;return Mo(o[0],r,s,e),new Et(o[0],r,s)}var Te=(n,e)=>{e.id=n.id,e.content=n.content,e.name=n.name,e.role=n.role,e.numChildren=n.children.length,e.serializedForm=n.serialize({noID:!0,maxLevel:1,neighbors:1})},Tt=(n,e)=>{var r;let t=1;n.role===e.role&&t++;let o=["name","content"];for(let s of o){if(!((r=n[s])!=null&&r.trim()))continue;let a=Io(n[s],e[s])/Math.min(n[s].length,e[s].length);a===0?t+=2:a<=.1&&t++}if(e.numChildren!==void 0&&(n.children.length===e.numChildren&&e.numChildren>0?t++:(e.numChildren>0&&n.children.length===0||Math.abs(n.children.length-e.numChildren)>2)&&t--),e.serializedForm){let s=n.serialize({noID:!0,maxLevel:1,neighbors:1}),a=Io(s,e.serializedForm)/Math.min(s.length,e.serializedForm.length);a===0?t+=2:a<=.1&&t++}return t};var Q={r:147,g:196,b:125,a:.55},Po={showInfo:!1,showRulers:!1,showStyles:!1,showAccessibilityInfo:!1,showExtensionLines:!1,contrastAlgorithm:"aa",contentColor:Q,paddingColor:Q,borderColor:Q,marginColor:Q,eventTargetColor:Q,shapeColor:Q,shapeMarginColor:Q};var Z=(n=1e3)=>new Promise(e=>setTimeout(()=>e(),n));function _o(){cursor=document.createElement("img"),cursor.setAttribute("src","data:image/svg+xml;base64,PHN2ZyBoZWlnaHQ9IjMyIiB2aWV3Qm94PSIwIDAgMzIgMzIiIHdpZHRoPSIzMiIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiIHRyYW5zZm9ybT0idHJhbnNsYXRlKDEwIDcpIj48cGF0aCBkPSJtNi4xNDggMTguNDczIDEuODYzLTEuMDAzIDEuNjE1LS44MzktMi41NjgtNC44MTZoNC4zMzJsLTExLjM3OS0xMS40MDh2MTYuMDE1bDMuMzE2LTMuMjIxeiIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Im02LjQzMSAxNyAxLjc2NS0uOTQxLTIuNzc1LTUuMjAyaDMuNjA0bC04LjAyNS04LjA0M3YxMS4xODhsMi41My0yLjQ0MnoiIGZpbGw9IiMwMDAiLz48L2c+PC9zdmc+"),cursor.setAttribute("id","selenium_cursor"),cursor.setAttribute("style","position: absolute; z-index: 99999999999; pointer-events: none; left:0; top:0"),cursor.style.filter="invert(0%) sepia(6%) saturate(24%) hue-rotate(315deg) brightness(89%) contrast(110%)",document.body.appendChild(cursor),document.onmousemove=function(n){n=n||window.event,document.getElementById("selenium_cursor").style.left=n.pageX+"px",document.getElementById("selenium_cursor").style.top=n.pageY+"px"}}function zo(){window.globalHintManager||(window.globalHintManager=new window.HintManager),window.globalHintManager.capture()}function Uo(){window.globalHintManager&&window.globalHintManager.reset()}function Fo(){let n=document.body.getElementsByTagName("*"),e=1;for(let t=0;t<n.length;t++){let o=e.toString();for(;[6].some(s=>o.includes(s.toString()));)e++,o=e.toString();let r=n[t];r==null||r.setAttribute("data-momentic-id",`${e}`),r==null||r.setAttribute("aria-keyshortcuts",`${e}`),e++}}var Sr=new Set(["document","script","XMLHttpRequest","fetch","xhr"]),wr=new Set(["script","document"]),br=["intercom.io","googletagmanager.com","google-analytics.com","www.gstatic.com","gstatic.com","apis.google.com","sentry.io","newrelic.com","p.retool.com","m.stripe.com","m.stripe.network","js.stripe.com","assets.trybento.co","udon.trybento.co","cdn.lr-in-prod.com","r.lr-in-prod.com","content.product-usage.assembledhq.com","data.product-usage.assembledhq.com","static.zdassets.com","o.clarity.ms/collect"],Ar=["api.stripe.com","supabase.co"];function Ct(n){return`${n.resourceType()} ${n.method()} ${n.url()}`}function ko(n){return n=n.replace(/^www\./,""),n}function $o(n){return Ar.some(e=>n.includes(e))}function Ho(n,e){if(!Sr.has(n.resourceType()))return!1;let t=new URL(e),o=new URL(n.url());return br.some(r=>o.hostname.includes(r))?!1:wr.has(n.resourceType())||n.method()!=="GET"?!0:ko(o.hostname).includes(ko(t.hostname))}var Rt=Dr(Mr);Rt.use(_r());Rt.use(Pr({provider:{id:"2captcha",token:process.env.TWO_CAPTCHA_KEY},visualFeedback:!0}));function xt(n){return l(this,null,function*(){yield n.send("Accessibility.enable"),yield n.send("DOM.enable"),yield n.send("Overlay.enable")})}var q=class q{constructor({browser:e,context:t,page:o,baseURL:r,cdpClient:s,logger:a}){this.a11yIdToNodeMap=new Map;this.dataMomenticIdToNodeMap=new Map;this.browser=e,this.context=t,this.page=o,this.baseURL=r,this.cdpClient=s,this.logger=a}static init(s,a,i){return l(this,arguments,function*(e,t,o,r=8e3){let c=yield Rt.launch({headless:!0,handleSIGTERM:!1}),d=yield c.newContext({viewport:q.VIEWPORT,deviceScaleFactor:process.platform==="darwin"?2:1,userAgent:Vo["Desktop Chrome"].userAgent,geolocation:{latitude:37.7749,longitude:-122.4194},locale:"en-US",timezoneId:"America/Los_Angeles"}),h=yield d.newPage(),p=yield d.newCDPSession(h),A=new q({browser:c,context:d,page:h,baseURL:e,cdpClient:p,logger:t}),w=!1;l(this,null,function*(){try{yield A.navigate(e,!1),yield xt(p)}catch(E){t.error({err:E},"Failed to initialize chrome browser")}finally{w=!0}});let m=()=>l(this,null,function*(){if(o)try{o({viewport:A.viewport,buffer:yield A.screenshot()})}catch(E){t.error({err:E},"Failed to take screenshot")}});m();let g=setInterval(()=>{m()},250),u=Date.now();for(;!w&&Date.now()-u<r;)yield Z(250);return clearInterval(g),w||t.warn("Timeout elapsed waiting for browser to initialize - are you sure this page is accessible?"),A})}reset(e){return l(this,null,function*(){this.a11yIdToNodeMap.clear(),this.dataMomenticIdToNodeMap.clear();let t=yield this.context.pages();this.page=t[0];for(let o=1;o<t.length;o++)yield t[o].close();e.clearCookies&&(yield this.context.clearCookies()),e.clearStorage&&(yield this.page.evaluate(()=>{localStorage.clear()})),yield this.page.goto(this.baseURL,{waitUntil:"load",timeout:3e3})})}pageSetup(){return l(this,null,function*(){try{yield this.page.evaluate(_o)}catch(e){}})}wait(e){return l(this,null,function*(){yield this.page.waitForTimeout(e)})}toggleHints(e){return l(this,null,function*(){e.state==="on"?(yield this.page.addStyleTag({content:bt.css}),yield this.page.addScriptTag({content:bt.js}),yield this.page.evaluate(zo)):yield this.page.evaluate(Uo)})}showHints(){return l(this,null,function*(){yield this.toggleHints({state:"on"});let e=()=>l(this,null,function*(){try{yield this.toggleHints({state:"off"})}catch(t){this.logger.debug({err:t},"Failed to remove vision hints")}});setTimeout(()=>{e()},3e3)})}cleanup(){return l(this,null,function*(){yield this.page.close(),yield this.context.close(),yield this.browser.close()})}get closed(){return this.page.isClosed()||!this.browser.isConnected()}html(){return l(this,null,function*(){return yield this.page.content()})}get url(){return this.page.url()}screenshotWithHints(e=100,t="device",o="/tmp/screenshots/test.jpg"){return l(this,null,function*(){let r=o==null?void 0:o.split("."),s=r==null?void 0:r.slice(0,-1).join("."),a=r==null?void 0:r.slice(-1)[0],i=yield this.screenshot(e,t,o?`${s}-before-hint.${a}`:void 0);yield this.showHints();let c=yield this.screenshot(e,t,o?`${s}-after-hint.${a}`:void 0);return{before:i,after:c}})}screenshot(e=100,t="device",o){return l(this,null,function*(){return this.page.screenshot({fullPage:!1,quality:e,scale:t,type:"jpeg",caret:"initial",path:o})})}get viewport(){let e=this.page.viewportSize();if(!e)throw new Error("failed to get viewport");return e}navigate(e,t=!0){return l(this,null,function*(){this.logger.debug(`Navigating to ${e}`);let o=Date.now(),r=()=>l(this,null,function*(){try{yield this.page.goto(e,{waitUntil:"load",timeout:3e3}),this.logger.debug({url:e},`Got load event in ${Math.floor(Date.now()-o)}ms`)}catch(s){this.logger.warn({url:e},"Timeout elapsed waiting for page to fire load event, continuing anyways...")}});if(t?yield this.wrapPossibleNavigation(r):yield r(),Co.has(this.url)&&process.env.NODE_ENV==="production")throw new Error(`${e} took too long to load \u{1F61E}. Please ensure the site and your internet are working.`);this.logger.debug({url:e},"Navigation complete")})}fill(r,s){return l(this,arguments,function*(e,t,o={}){let a=yield this.click(e,{doubleClick:!1,rightClick:!1});return yield this.type(t,o),a})}type(o){return l(this,arguments,function*(e,t={}){let{clearContent:r=!0,pressKeysSequentially:s=!1}=t;r&&(process.platform==="darwin"?yield this.page.keyboard.press("Meta+A"):yield this.page.keyboard.press("Control+A"),yield this.page.keyboard.press("Backspace")),s?yield this.page.keyboard.type(e):yield this.page.keyboard.insertText(e)})}clickByA11yID(o){return l(this,arguments,function*(e,t={}){let r=this.a11yIdToNodeMap.get(e);if(!r)throw new Error(`Could not find DOM node during click: ${e}`);let s=yield this.clickUsingCDP(r,t);return yield this.highlightNode(s),r.serialize({noChildren:!0,noProperties:!0,noID:!0})})}selectOptionByA11yID(e,t){return l(this,null,function*(){let o=this.a11yIdToNodeMap.get(e);if(!o)throw new Error(`Could not find DOM node while selecting option: ${e}`);if(!o.backendNodeID)throw new Error(`Select target missing backend node id: ${o.getLogForm()}`);return yield(yield this.getLocatorFromBackendID(o.backendNodeID)).selectOption(t,{timeout:8e3}),yield this.highlightNode(o),o.serialize({noChildren:!0,noProperties:!0,noID:!0})})}scrollIntoView(e){return l(this,null,function*(){let t=yield this.resolveCachedTargetToID(e),o=this.a11yIdToNodeMap.get(t);if(!o)throw new Error(`Could not find node in DOM with a11y id: ${t}`);if(!o.backendNodeID)throw new Error(`Focus target missing backend node id: ${o.getLogForm()}`);yield(yield this.getLocatorFromBackendID(o.backendNodeID)).scrollIntoViewIfNeeded({timeout:8e3})})}highlight(e){return l(this,null,function*(){try{let t=yield this.resolveCachedTargetToID(e),o=this.a11yIdToNodeMap.get(t);if(!o)throw new Error(`Could not find DOM node during highlight: ${t}`);if(!o.backendNodeID)throw new Error(`Select target missing backend node id: ${o.getLogForm()}`);yield this.highlightNode(o)}catch(t){this.logger.warn({err:t,target:e},"Failed to highlight target")}})}highlightNode(e){return l(this,null,function*(){try{yield this.cdpClient.send("Overlay.highlightNode",{highlightConfig:Po,backendNodeId:e.backendNodeID})}catch(o){this.logger.warn("Failed to add node highlight, a page navigation likely occurred. This is non-fatal for tests.")}let t=()=>l(this,null,function*(){try{yield this.cdpClient.send("Overlay.hideHighlight",{backendNodeId:e.backendNodeID})}catch(o){this.logger.debug({err:o},"Failed to remove node highlight")}});setTimeout(()=>{t()},3e3)})}wrapPossibleNavigation(r){return l(this,arguments,function*(e,t=8e3,o=!0){let s=Date.now(),a=this.url,i=Date.now(),c=new Map,d=new Map,h=T=>{var xe;let x=Ct(T.request());d.set(x,((xe=d.get(x))!=null?xe:0)+1);let F=T.status();F>=500&&this.logger.warn({request:x,status:F},"Received 500 level response")},p=T=>{var F;if(!Ho(T,this.url))return;let x=Ct(T);c.set(x,((F=c.get(x))!=null?F:0)+1),i=Date.now()};this.page.on("response",h),this.page.on("request",p);let A=[];o&&(A=(yield this.context.pages()).map(T=>T.url()));let w=!1,b=e().catch(T=>(w=!0,T instanceof Error?T:new Error(`${T}`)));yield Z(250);let m=T=>l(this,null,function*(){let x=yield T;if(x instanceof Error)throw x;return x}),g=new Set,u=!1,R=yield l(this,null,function*(){for(;!w&&!(!u&&Date.now()-s>t);){if(yield Z(250),u=!1,g=new Set,Date.now()-i<=1250)continue;let T=!1;for(let x of c.keys())c.get(x)!==d.get(x)&&($o(x)&&(u=!0),T=!0,g.add(x));if(!T)return this.logger.debug({url:this.url,requests:JSON.stringify(Array.from(c.entries()))},`Network idle in ${Math.floor(Date.now()-s)}ms`),!0}return!w&&g.size>0&&this.logger.warn({url:this.url,unfinishedRequests:JSON.stringify(Array.from(g.entries()))},"Timeout elapsed waiting for network idle, continuing anyways..."),!1});if(this.page.off("response",h),this.page.off("request",p),!R)return m(b);let j=this.url;if(!w&&J(j,a)){this.logger.debug({startURL:a,newURL:this.url},"Detected url change in wrapPossibleNavigation, waiting for load state");let T=Math.max(t-(Date.now()-s),0);if(T>0)try{yield this.page.waitForLoadState("load",{timeout:T})}catch(x){this.logger.warn({url:this.url},"Timeout elapsed waiting for load state to fire, continuing anyways...")}}if(o){let T=(yield this.context.pages()).map(x=>x.url());if(T.length>A.length)for(let x of T)x!==j&&(yield this.switchToPage(x))}return m(b)})}resolveCachedTargetToID(e){return l(this,null,function*(){if(!Le(e)){let i=this.a11yIdToNodeMap.get(e.id);if(!i)throw new Error(`Resolving target failed, fresh value did not exist in node map: ${e.id}`);return Te(i,e),e.id}let t=(yield this.getA11yTree()).serialize();this.logger.debug({tree:t},"Refreshed a11y tree before resolving target");let o=this.a11yIdToNodeMap.get(e.id);if(o){let i=Tt(o,e);if(i>=5)return this.logger.debug({target:e,proposedNode:o.getLogForm(),comparisonScore:i},"Resolved cached a11y target to node with exact same id"),Te(o,e),e.id}let r=1/0,s=1/0,a;for(let i of this.a11yIdToNodeMap.values()){let c=Tt(i,e);if(c>=5)return this.logger.debug({newNode:i.getLogForm(),target:e,comparisonScore:c},"Resolved cached a11y target to new node with field comparison"),Te(i,e),i.id;if(!e.serializedForm)continue;let d=i.serialize({noID:!0,maxLevel:1,neighbors:1});if(Math.abs(d.length-e.serializedForm.length)>15)continue;let h=Nr(e.serializedForm,d),p=h/Math.min(e.serializedForm.length,d.length);h<r&&p<.2&&(r=h,s=p,a=i)}if(a&&r<15)return this.logger.debug({newNode:a.getLogForm(),target:e,distance:r,ratio:s},"Resolved cached a11y target to new node with pure levenshtein distance"),Te(a,e),a.id;throw new Error(`Could not find any relevant node given cached target: ${JSON.stringify(e)}`)})}click(o){return l(this,arguments,function*(e,t={}){let r=yield this.resolveCachedTargetToID(e);return yield this.wrapPossibleNavigation(()=>this.clickByA11yID(r,t))})}hover(e){return l(this,null,function*(){let t=yield this.resolveCachedTargetToID(e),o=this.a11yIdToNodeMap.get(t);if(!o)throw new Error(`Could not find DOM node for hover: ${t}`);if(!o.backendNodeID)throw new Error(`Hover target missing backend node id: ${o.getLogForm()}`);return yield(yield this.getLocatorFromBackendID(o.backendNodeID)).hover({timeout:8e3}),yield this.highlightNode(o),o.serialize({noChildren:!0,noProperties:!0,noID:!0})})}selectOption(e,t){return l(this,null,function*(){let o=yield this.resolveCachedTargetToID(e);return this.selectOptionByA11yID(o,t)})}press(e){return l(this,null,function*(){yield this.wrapPossibleNavigation(()=>this.page.keyboard.press(e))})}refresh(){return l(this,null,function*(){yield this.page.reload(),yield this.pageSetup()})}getA11yTree(){return l(this,null,function*(){yield xt(this.cdpClient),yield this.page.evaluate(Fo);let e=null,t=0,o=this.url;for(;!e;)try{let r=yield this.getRawA11yTree();if(!r.root||r.allNodes.length===0)throw new Error("No a11y tree found on page");e=Do(r,this.logger)}catch(r){if(this.logger.error({err:r,url:o},"Error fetching a11y tree"),t===0)yield Z(1e3),t++;else throw new Error(`Max retries exceeded fetching a11y tree: ${r}`)}return e.root||this.logger.warn("A11y tree was pruned entirely"),this.a11yIdToNodeMap=e.a11yIdNodeMap,this.dataMomenticIdToNodeMap=e.dataMomenticIdMap,e})}getA11yIdFromDataMomenticId(e){var t;return(t=this.dataMomenticIdToNodeMap.get(e))==null?void 0:t.id}getRawA11yTree(){return l(this,null,function*(){let e=this.page.url(),t=Date.now(),o=()=>{t=Date.now()};this.cdpClient.addListener("Accessibility.nodesUpdated",o);let r=!1,s=()=>{this.logger.info({url:e},"Load event fired on page"),r=!0,t=Date.now()};this.cdpClient.addListener("Accessibility.loadComplete",s);let a=Date.now(),i=!0;for(;Date.now()-a<3e3;){if(yield Z(250),!r&&Date.now()-a<1e3){process.env.NODE_ENV!=="production"&&this.logger.debug({url:e},"A11y tree not loaded yet, waiting...");continue}if(Date.now()-t>=1250){i=!1;break}this.logger.debug({url:e},"A11y tree not stable yet, waiting...")}this.logger.debug({duration:Date.now()-a,eventReceived:r,timeoutTriggered:i},"A11y wait phase completed");let{node:c}=yield this.cdpClient.send("Accessibility.getRootAXNode"),{nodes:d}=yield this.cdpClient.send("Accessibility.queryAXTree",{backendNodeId:c.backendDOMNodeId});return this.cdpClient.removeListener("Accessibility.loadComplete",s),this.cdpClient.removeListener("Accessibility.nodesUpdated",o),{root:c,allNodes:d}})}clickUsingVisualCoordinates(e){return l(this,null,function*(){let t=yield this.getElementLocation(e);if(!t)throw new Error(`Could not find element location with backend node id: ${e}`);this.logger.debug({location:t},"Executing mouse click"),yield this.page.mouse.click(t.centerX,t.centerY)})}getIDAttributeUsingCDP(e){return l(this,null,function*(){yield this.cdpClient.send("DOM.getDocument",{depth:0});let t=yield this.cdpClient.send("DOM.requestNode",{objectId:e}),r=(yield this.cdpClient.send("DOM.getAttributes",{nodeId:t.nodeId})).attributes,s=r.findIndex(a=>a==="data-momentic-id");return s===-1?"":r[s+1]||""})}getLocatorFromBackendID(e){return l(this,null,function*(){let t=yield this.cdpClient.send("DOM.resolveNode",{backendNodeId:e});if(!t||!t.object.objectId)throw new Error(`Could not resolve backend node ${e}`);try{let o=yield this.getIDAttributeUsingCDP(t.object.objectId);if(!o)throw new Error("Failed getting data-momentic-id attribute using CDP");return this.page.locator(`[data-momentic-id="${o}"]`)}catch(o){throw this.logger.error({err:o},"Failed to get ID attribute"),o}})}clickUsingCDP(o){return l(this,arguments,function*(e,t={}){let r=0,s=e;for(;r<vo;){if(!s||s.role==="RootWebArea")throw new Error(`Attempted to click node with no clickable surrounding elements: ${e.getLogForm()}`);if(s.role==="StaticText"){s=s.parent;continue}let a=s.backendNodeID;if(!a){this.logger.warn({node:s.getLogForm()},"Click candidate had no backend node ID"),s=s.parent;continue}try{let i=yield this.getLocatorFromBackendID(a);return t.doubleClick?yield i.dblclick({timeout:8e3}):yield i.click({timeout:8e3,button:t.rightClick?"right":"left"}),s.id!==e.id&&this.logger.info({oldNode:e.getLogForm(),newNode:s.getLogForm()},"Redirected click successfully to new element"),s}catch(i){this.logger.error({err:i,node:s.getLogForm()},"Failed click or click timed out"),r++,s=s.parent}}throw new Error(`Max click redirection attempts exhausted on original element: ${e.getLogForm()}`)})}getElementLocation(e){return l(this,null,function*(){let t=yield this.cdpClient.send("DOMSnapshot.captureSnapshot",{computedStyles:[],includeDOMRects:!0,includePaintOrder:!0}),o=yield this.page.evaluate(()=>window.devicePixelRatio);process.platform==="darwin"&&o===1&&(o=2);let r=t.documents[0],s=r.layout,a=r.nodes,i=a.nodeName||[],c=a.backendNodeId||[],d=s.nodeIndex,h=s.bounds,p=-1;for(let E=0;E<i.length;E++)if(c[E]===e){p=d.indexOf(E);break}if(p===-1)throw new Error(`Could not find any backend node with ID ${e}`);let[A=0,w=0,b=0,m=0]=h[p];A/=o,w/=o,b/=o,m/=o;let g=A+b/2,u=w+m/2;return{centerX:g,centerY:u}})}scrollUp(){return l(this,null,function*(){yield this.page.mouse.wheel(0,-q.VIEWPORT.height)})}scrollDown(){return l(this,null,function*(){yield this.page.mouse.wheel(0,q.VIEWPORT.height)})}goForward(){return l(this,null,function*(){yield this.wrapPossibleNavigation(()=>this.page.goForward({timeout:8e3})),yield this.pageSetup()})}goBack(){return l(this,null,function*(){yield this.wrapPossibleNavigation(()=>this.page.goBack({timeout:8e3})),yield this.pageSetup()})}switchToPage(e){return l(this,null,function*(){let t=yield this.context.pages();for(let o=0;o<t.length;o++){let r=t[o];if(r.url().includes(e)){this.logger.info(`Switching to tab ${o} with url ${r.url()}`),this.page=r,yield r.waitForLoadState("load",{timeout:3e3}),yield this.pageSetup(),this.cdpClient=yield this.context.newCDPSession(r),yield xt(this.cdpClient);return}}throw new Error(`Could not find page with url containing ${e}`)})}setCookie(e){return l(this,null,function*(){let t=Bt(e);yield this.context.addCookies([t])})}solveCaptcha(){return l(this,null,function*(){yield this.getA11yTree();let e;for(let i of this.a11yIdToNodeMap.values())if(i.role==="image"&&i.name.toLowerCase().includes("captcha")){if(!i.backendNodeID)continue;e=yield this.getLocatorFromBackendID(i.backendNodeID);break}if(!e){let i=yield this.page.solveRecaptchas();if(!i.captchas||!i.captchas.length)throw new Error("No captchas found on the page");return}let t=yield e.screenshot({type:"jpeg",animations:"allow",quality:100}),o=yield fetch("https://api.2captcha.com/createTask",{method:"POST",body:JSON.stringify({clientKey:process.env.TWO_CAPTCHA_KEY,task:{type:"ImageToTextTask",body:t.toString("base64"),case:!0},languagePool:"en"})});if(!o.ok){let i=`Captcha solver API returned error response: ${o.statusText}`;throw this.logger.error({text:yield o.text()},i),new Error(i)}let{taskId:r}=yield o.json(),s=Date.now(),a="";for(;Date.now()-s<6e4;){yield Z(2500);let i=yield fetch("https://api.2captcha.com/getTaskResult",{method:"POST",body:JSON.stringify({clientKey:process.env.TWO_CAPTCHA_KEY,taskId:r})});if(!i.ok){let d=`Captcha solution API returned error response: ${i.statusText}`;throw this.logger.error({text:yield i.text()},d),new Error(d)}let c=yield i.json();if(c.errorId){let d=`Captcha solution API returned error ID ${c.errorId}`;throw this.logger.error(d),new Error(d)}if(c.status==="ready"){a=c.solution.text;break}}if(!a)throw new Error("Captcha solution timed out");return a})}};q.USER_AGENT=Vo["Desktop Chrome"].userAgent,q.VIEWPORT={width:1920,height:1080};var _=q;var zr={type:"a11y",version:"1.0.0",useHistory:"diff",useGoalSplitter:!0},It=zr;import Ur from"dedent";import Fr from"diff-lines";var kr=1e4,Ce=class{constructor({browser:e,config:t,generator:o,logger:r}){this.browser=e,this.generator=o,this.config=t,this.logger=r,this.pendingInstructions=[],this.commandHistory=[]}get history(){return this.commandHistory.filter(e=>e.state==="DONE")}get lastExecutedCommand(){let e=this.history;return e.length===0?null:e[e.length-1]}resetHistory(){this.commandHistory=[],this.pendingInstructions=[]}resetState(){return l(this,null,function*(){this.resetHistory(),yield this.browser.navigate(this.browser.baseURL)})}getBrowserState(){return l(this,null,function*(){let t=yield(yield this.browser.getA11yTree()).serialize();return this.logger.debug({tree:t},"Got a11y tree"),t})}getSerializedHistory(e,t){let o;return this.config.useHistory==="diff"?o=this.getDiffHistory(e,t):o=this.getListHistory(),o}splitUserGoal(e,t,o){return l(this,null,function*(){if(e==="AI_ACTION"&&t.match(/[,!;.]|(?:and)|(?:then)/)&&this.config.useGoalSplitter){let r=yield this.generator.getGranularGoals({goal:t,url:this.browser.url},o);this.pendingInstructions=r.reverse()}else this.pendingInstructions=[t]})}promptToCommand(e,t,o){return l(this,null,function*(){try{return yield this.promptToCommandHelper(e,t,o)}catch(r){throw r instanceof M?r:new M("InternalWebAgentError",r instanceof Error?r.message:`${r}`,{cause:r})}})}promptToCommandHelper(e,t,o){return l(this,null,function*(){if(this.pendingInstructions.length===0){if(!t.trim())throw new Error("Cannot generate commands for empty goal");yield this.splitUserGoal(e,t,o)}let r=this.pendingInstructions[this.pendingInstructions.length-1];this.logger.info({goal:r},"Starting prompt translation");let s=Date.now(),a=this.browser.url,i=yield this.getBrowserState();this.logger.info({duration:Date.now()-s,url:a},"Got browser state");let c=this.commandHistory.length;this.commandHistory.push({state:"PENDING",browserStateBeforeCommand:i,urlBeforeCommand:a,type:e});let d=this.getSerializedHistory(a,i),h=yield this.generator.getProposedCommand({url:a,numPrevious:c,browserState:i,history:d,goal:r,lastCommand:this.lastExecutedCommand},o);if(this.logger.info({type:h.type,thoughts:h.thoughts},"Got proposed command"),h.type==="SUCCESS"){let p=this.pendingInstructions.pop();if(this.logger.info({finishedInstruction:p,remainingInstructions:this.pendingInstructions},"Removing pending instruction due to SUCCESS"),this.pendingInstructions.length!==0)return this.commandHistory=[],this.promptToCommand(e,"",o)}else h.type==="FAILURE"&&(this.logger.info({remainingInstructions:this.pendingInstructions},"Removing pending instructions due to FAILURE"),this.pendingInstructions=[]);return h})}locateElement(e,t,o){return l(this,null,function*(){if(!e)throw new M("InternalWebAgentError","Cannot locate element with empty description");let r=yield this.getBrowserState(),s;if(t){let{before:a,after:i}=yield this.browser.screenshotWithHints();if(s=yield this.generator.getElementLocationWithVision({goal:e,screenshot:a,hintActivatedScreenshot:i},o),s.id>0){let c=this.browser.getA11yIdFromDataMomenticId(s.id);if(!c)throw new M("InternalWebAgentError",`Unable to find corresponding DOM node for id ${s.id}`);s.id=c}}else s=yield this.generator.getElementLocation({browserState:r,goal:e},o);if(s.id<0)throw new M("ActionFailureError",`Unable to locate element: ${s.thoughts?s.thoughts:"please ensure the element is visible and conforms to Accessibility guidelines"}`);return s})}getDiffHistory(e,t){let o=this.history.filter(s=>s.type==="AI_ACTION");if(o.length===0)return"<NONE/>";let r=[`
+You have already executed the following commands successfully (most recent listed first)`,"-".repeat(10)];return o.reverse().forEach((s,a)=>{if(r.push(`COMMAND ${o.length-a}${a===0?" (command just executed)":""}: ${s.serializedCommand}`),a===0)if(J(s.urlBeforeCommand,e))r.push(`  URL CHANGE: '${s.urlBeforeCommand}' -> '${e}'`);else{let i=Fr(s.browserStateBeforeCommand,t,{n_surrounding:1});i?i.length<kr?(r.push("PAGE CONTENT CHANGE:"),i.split(`
+`).forEach(c=>r.push(`  ${c}`))):r.push("PAGE CONTENT CHANGE: <TOO_LONG_TO_DISPLAY/>"):r.push("PAGE CONTENT CHANGE: <NONE/>")}r.push("-".repeat(10))}),r.push(`STARTING URL: ${this.browser.baseURL}`),r.join(`
+`)}getListHistory(){return Ur`Here are the commands that you have successfully executed:
+    ${this.commandHistory.filter(e=>e.type==="AI_ACTION").map(e=>`- ${e.serializedCommand}`).join(`
+`)}`}executeCommand(e,t,o=!1){return l(this,null,function*(){let r=this.commandHistory[this.commandHistory.length-1];if(!o&&(!r||r.state!=="PENDING"))throw new M("InternalWebAgentError","Executing command but there is no pending entry in the history");let s;try{let a=Date.now();s=yield this.executePresetStep(e,t);let i=Date.now()-a;this.logger.debug({result:s,duration:i},"Got execution result")}catch(a){throw a instanceof Error?new he(`Failed to execute command: ${a}`,{cause:a}):new he("Unexpected throw from executing command",{cause:new Error(`${a}`)})}return s.succeedImmediately&&!o&&(this.pendingInstructions.pop(),this.pendingInstructions.length>0&&(s.succeedImmediately=!1)),s.elementInteracted&&"target"in e&&e.target&&!e.target.elementDescriptor&&(e.target.elementDescriptor=s.elementInteracted.trim()),o||(r.generatedStep=e,r.serializedCommand=Y(e),r.state="DONE"),s})}executeAssertion(e,t){return l(this,null,function*(){let o;if(t.useVision)o={goal:t.assertion,url:e,screenshot:yield this.browser.screenshot(),browserState:"",history:"",numPrevious:-1,lastCommand:null};else{let s=yield this.getBrowserState(),a=this.getSerializedHistory(e,s);o={goal:t.assertion,url:e,browserState:s,history:a,lastCommand:this.lastExecutedCommand,numPrevious:this.commandHistory.length}}let r=yield this.generator.getAssertionResult(o,t.useVision,t.disableCache);if(r.relevantElements&&Promise.all(r.relevantElements.map(s=>this.browser.highlight({id:s}))),!r.result)throw new M("AssertionFailureError",r.thoughts);return{succeedImmediately:!1,thoughts:r.thoughts,urlAfterCommand:e}})}wrapElementTargetingCommand(e,t,o,r,s=!0){return l(this,null,function*(){if(!e.a11yData&&!e.elementDescriptor)throw new M("InternalWebAgentError","Cannot target element with no target data or element descriptor");let a=e.a11yData&&Le(e.a11yData);e.a11yData||(e.a11yData=Ie.parse(yield this.locateElement(e.elementDescriptor,t,o)),s=!1);try{let i=yield r(e.a11yData);return a?this.logger.debug({target:e},"Successfully used cached target to perform action"):this.logger.debug({target:e},"Successfully generated and used new a11y target information"),i}catch(i){if(s&&e.elementDescriptor)return this.logger.warn({err:i,target:e},"Failed to execute action with cached target, retrying with AI"),e.a11yData=void 0,this.wrapElementTargetingCommand(e,t,o,r,!0);if(i instanceof M)throw i;let c=`Failed to find '${e.elementDescriptor}': ${i instanceof Error?i.message:i}`;throw this.logger.error({err:i,target:e},c),new M("ActionFailureError",c,{cause:i})}})}executePresetStep(e,t){return l(this,null,function*(){try{return yield this.executePresetStepHelper(e,t)}catch(o){throw o instanceof M?o:new M("InternalWebAgentError",o instanceof Error?o.message:`${o}`,{cause:o})}})}executePresetStepHelper(e,t){return l(this,null,function*(){var r;let o=this.browser.url;switch(e.type){case"SUCCESS":return(r=e.condition)!=null&&r.assertion.trim()?this.executeAssertion(o,e.condition):{succeedImmediately:!1,urlAfterCommand:this.browser.url};case"AI_ASSERTION":return this.executeAssertion(o,e);case"NAVIGATE":yield this.browser.navigate(e.url);break;case"CAPTCHA":let s=yield this.browser.solveCaptcha();s&&(yield this.wrapElementTargetingCommand({elementDescriptor:"the captcha image solution input"},e.useVision,t,d=>this.browser.click(d)),yield this.browser.type(s,{clearContent:!0,pressKeysSequentially:!1}));break;case"GO_BACK":yield this.browser.goBack();break;case"GO_FORWARD":yield this.browser.goForward();break;case"SCROLL_DOWN":case"SCROLL_UP":let a;return e.target&&(e.target.elementDescriptor.trim()||e.target.a11yData)&&(a=yield this.wrapElementTargetingCommand(e.target,e.useVision,t,d=>this.browser.hover(d))),e.type==="SCROLL_UP"?yield this.browser.scrollUp():yield this.browser.scrollDown(),{succeedImmediately:!1,urlAfterCommand:o,elementInteracted:a};case"WAIT":yield this.browser.wait(e.delay*1e3);break;case"REFRESH":yield this.browser.refresh();break;case"CLICK":{let d=yield this.wrapElementTargetingCommand(e.target,e.useVision,t,p=>this.browser.click(p,{doubleClick:e.doubleClick,rightClick:e.rightClick})),h={urlAfterCommand:this.browser.url,succeedImmediately:!1,elementInteracted:d};return J(o,h.urlAfterCommand)&&(h.succeedImmediately=!0,h.succeedImmediatelyReason="URL changed"),h}case"SELECT_OPTION":{let d=yield this.wrapElementTargetingCommand(e.target,!1,t,h=>this.browser.selectOption(h,e.option));return{succeedImmediately:!1,urlAfterCommand:this.browser.url,elementInteracted:d}}case"TAB":yield this.browser.switchToPage(e.url);break;case"COOKIE":if(!e.value)break;yield this.browser.setCookie(e.value);break;case"TYPE":{let d=yield this.wrapElementTargetingCommand(e.target,e.useVision,t,p=>this.browser.click(p));yield this.browser.type(e.value,{clearContent:e.clearContent,pressKeysSequentially:e.pressKeysSequentially}),e.pressEnter&&(yield this.browser.press("Enter"));let h={urlAfterCommand:this.browser.url,succeedImmediately:!1,elementInteracted:d};return J(o,h.urlAfterCommand)&&(h.succeedImmediately=!0,h.succeedImmediatelyReason="URL changed"),h}case"HOVER":{let d=yield this.wrapElementTargetingCommand(e.target,e.useVision,t,h=>this.browser.hover(h));return{succeedImmediately:!1,urlAfterCommand:this.browser.url,elementInteracted:d}}case"PRESS":yield this.browser.press(e.value);let i={urlAfterCommand:this.browser.url,succeedImmediately:!1};return J(o,i.urlAfterCommand)&&(i.succeedImmediately=!0,i.succeedImmediatelyReason="URL changed"),i;default:return(d=>{throw"If Typescript complains about the line below, you missed a case or break in the switch above"})(e)}return{succeedImmediately:!1,urlAfterCommand:this.browser.url}})}};import $r from"fetch-retry";var Hr=$r(global.fetch),ue="v1",ve=class{constructor(e){this.baseURL=e.baseURL,this.apiKey=e.apiKey}getElementLocation(e,t){return l(this,null,function*(){let o=yield this.sendRequest(`/${ue}/web-agent/locate-element`,{browserState:e.browserState,goal:e.goal,disableCache:t});return lt.parse(o)})}getElementLocationWithVision(e,t){return l(this,null,function*(){var r,s;let o=yield this.sendRequest(`/${ue}/web-agent/visual-locate`,{goal:e.goal,screenshot:(r=e.screenshot)==null?void 0:r.toString("base64"),hintActivatedScreenshot:(s=e.hintActivatedScreenshot)==null?void 0:s.toString("base64"),disableCache:t});return lt.parse(o)})}getAssertionResult(e,t,o){return l(this,null,function*(){var s;if(t){let a=yield this.sendRequest(`/${ue}/web-agent/assertion`,{url:e.url,goal:e.goal,screenshot:(s=e.screenshot)==null?void 0:s.toString("base64"),disableCache:o,vision:!0});return at.parse(a)}let r=yield this.sendRequest(`/${ue}/web-agent/assertion`,{url:e.url,browserState:e.browserState,goal:e.goal,history:e.history,numPrevious:e.numPrevious,lastCommand:e.lastCommand,disableCache:o,vision:!1});return at.parse(r)})}getProposedCommand(e,t){return l(this,null,function*(){let o=yield this.sendRequest(`/${ue}/web-agent/next-command`,{url:e.url,browserState:e.browserState,goal:e.goal,history:e.history,numPrevious:e.numPrevious,lastCommand:e.lastCommand,disableCache:t});return Qt.parse(o)})}getGranularGoals(e,t){return l(this,null,function*(){let o=yield this.sendRequest(`/${ue}/web-agent/split-goal`,{url:e.url,goal:e.goal,disableCache:t});return Zt.parse(o)})}sendRequest(e,t){return l(this,null,function*(){let o=yield Hr(`${this.baseURL}${e}`,{retries:1,retryDelay:1e3,method:"POST",body:JSON.stringify(t),headers:{"Content-Type":"application/json",Authorization:`Bearer ${this.apiKey}`}});if(!o.ok)throw new Error(`Request to ${e} failed with status ${o.status}: ${yield o.text()}`);return o.json()})}};import Br from"@actions/exec";import jr from"@actions/io";import{spawn as Gr}from"child_process";import Vr from"quote";import Wr from"string-argv";function Wo(n,e=!0){return l(this,null,function*(){let t=Wr(n),o=yield jr.which(t[0],!0),r=t.slice(1),s=Br.exec(Vr(o),r,{delay:100});if(e)return s})}function Ko(n){return l(this,null,function*(){return new Promise((e,t)=>{let o={stdio:"inherit",env:process.env,detached:!0},r=Gr("bash",["-c",n],o),s=!1;process.on("exit",()=>r.pid!==void 0&&!s&&process.kill(-r.pid)),r.on("close",a=>{if(s=!0,a===0){e();return}t(`command exited with code ${a}`)})})})}import Lt from"fs";import Yo from"path";var Kr=new Set(["modules","node_modules","dist","bin",".git","logs",".npm",".next","out",".yarn","__pycache__","build",".env",".venv","venv","env","wheels"]);function Ot(n){var r;let e=(r=n.split(Yo.sep).pop())!=null?r:"";if(Kr.has(e))return e!=="modules"&&S.warn(`Skipping directory '${n}' because it is likely an artifact folder.`),[];let t=Lt.readdirSync(n),o=[];return t.forEach(s=>{let a=Yo.join(n,s);Lt.statSync(a).isDirectory()?o=o.concat(Ot(a)):s.endsWith(".yaml")&&(Lt.readFileSync(a,"utf-8").includes("momentic/test")?o.push(a):S.warn(`Skipping file '${a}' because it does not appear to be a valid Momentic test.`))}),o}var Ve=s=>l(void 0,null,function*(){var a=s,{controller:n,step:e,logger:t,advanced:o}=a,r=ne(a,["controller","step","logger","advanced"]);var c,d,h,p,A,w,b;(c=r.onStarted)==null||c.call(r),n.resetHistory();let i=O(C({},e),{startedAt:new Date,userAgent:_.USER_AGENT,finishedAt:new Date,results:[],status:"SUCCESS"});try{let m=0,g=e.commands&&e.commands.length>0;for(;;){if(m>20)throw new Error(`Exceeded max number of commands per step (${20})`);let u,E=new Date,R=yield n.browser.screenshot(),j=yield r.onSaveScreenshot(R);if(g){if(u=e.commands[m],!u)throw new Error(`Saved command at index ${m} is undefined.`)}else u=yield n.promptToCommand(e.type,e.text,o.disableAICaching);if(u.type==="FAILURE"){i.finishedAt=new Date,i.status="FAILED",i.message=u.thoughts;break}(d=r.onCommandGenerated)==null||d.call(r,{commandIndex:m,message:Ze[u.type]||`Unknown command (${u.type})`});let T={beforeScreenshot:j,beforeUrl:n.browser.url,startedAt:E,viewport:n.browser.viewport,finishedAt:new Date,status:"SUCCESS"};t.info(`Starting sub-command ${m} within AI step: ${Y(u)}`);try{let x=yield n.executeCommand(u,o.disableAICaching,g);t.info(`AI sub-command ${m} completed successfully`),T.elementInteracted=x.elementInteracted,(h=r.onCommandExecuted)==null||h.call(r,{commandIndex:m,message:Y(u),command:u});let F=yield n.browser.screenshot(),xe=yield r.onSaveScreenshot(F);T.afterScreenshot=xe,T.afterUrl=n.browser.url,T.finishedAt=new Date;let Dt={status:"SUCCESS",startedAt:T.startedAt,finishedAt:T.finishedAt,type:"PRESET_ACTION",command:u,results:[T]};if(i.results.push(Dt),u.type==="SUCCESS"){i.finishedAt=new Date,i.status="SUCCESS",i.message=(p=x.thoughts)!=null?p:"All commands completed.";break}if(x.succeedImmediately&&!g){i.finishedAt=new Date,i.status="SUCCESS",i.message=x.succeedImmediatelyReason,u={type:"SUCCESS"},(A=r.onCommandExecuted)==null||A.call(r,{commandIndex:m+1,message:Y(u),command:u}),i.results.push(O(C({},Dt),{command:u}));break}}catch(x){if(g){g=!1,m=0,i.results=[];continue}let F=x instanceof Error?x.message:`${x}`;T.status="FAILED",T.message=F,T.finishedAt=new Date,T.afterScreenshot=void 0,T.afterUrl=n.browser.url,i.results.push({status:"FAILED",startedAt:T.startedAt,finishedAt:T.finishedAt,type:"PRESET_ACTION",command:u,results:[T],message:F}),i.status="FAILED",i.finishedAt=new Date,i.message=F;break}m++}}catch(m){i.message=m instanceof Error?m.message:`${m}`,i.finishedAt=new Date,i.status="FAILED"}return i.status==="SUCCESS"?(w=r.onSuccess)==null||w.call(r,{message:i.message||"AI step succeeded.",startedAt:i.startedAt.getTime(),durationMs:i.finishedAt.getTime()-i.startedAt.getTime(),output:i}):(b=r.onFailure)==null||b.call(r,{message:i.message||"AI step errored.",startedAt:i.startedAt.getTime(),durationMs:i.finishedAt.getTime()-i.startedAt.getTime(),output:i}),i});var We=r=>l(void 0,null,function*(){var s=r,{controller:n,step:e,advanced:t}=s,o=ne(s,["controller","step","advanced"]);var h,p,A,w;(h=o.onStarted)==null||h.call(o);let a=new Date,i=n.browser.url,c=yield n.browser.screenshot(),d=yield o.onSaveScreenshot(c);try{let b=yield n.executePresetStep(e.command,t.disableAICaching),m=yield n.browser.screenshot(),g=yield o.onSaveScreenshot(m),u=new Date,E=O(C({},e),{startedAt:a,finishedAt:u,status:"SUCCESS",results:[]}),R="Successfully executed preset action.";e.command.type==="AI_ASSERTION"&&(R=b.thoughts||"Assertion passed.");let j={beforeUrl:i,beforeScreenshot:d,afterUrl:n.browser.url,afterScreenshot:g,startedAt:a,finishedAt:u,viewport:n.browser.viewport,status:"SUCCESS"};return E.status="SUCCESS",E.results=[j],E.message=R,(p=o.onSuccess)==null||p.call(o,{message:R,startedAt:a.getTime(),durationMs:u.getTime()-a.getTime(),command:e.command,output:E}),E}catch(b){let m=new Date,g=b instanceof Error?b.message:`${b}`;if(e.command.type==="AI_ASSERTION"&&e.command.cancelOnFailure){let E=O(C({},e),{startedAt:a,finishedAt:m,status:"CANCELLED",message:g,results:[{beforeUrl:i,beforeScreenshot:d,afterUrl:n.browser.url,afterScreenshot:void 0,startedAt:a,finishedAt:m,viewport:n.browser.viewport,status:"CANCELLED",message:g}]});return(A=o.onCancelled)==null||A.call(o,{message:g,startedAt:a.getTime(),durationMs:m.getTime()-a.getTime(),output:E}),E}let u=O(C({},e),{startedAt:a,finishedAt:m,status:"FAILED",message:g,results:[{beforeUrl:i,beforeScreenshot:d,afterUrl:n.browser.url,afterScreenshot:void 0,startedAt:a,finishedAt:m,viewport:n.browser.viewport,status:"FAILED",message:g}]});return(w=o.onFailure)==null||w.call(o,{message:g,startedAt:a.getTime(),durationMs:m.getTime()-a.getTime(),output:u}),u}});var Xo=s=>l(void 0,null,function*(){var a=s,{controller:n,step:e,advanced:t,logger:o}=a,r=ne(a,["controller","step","advanced","logger"]);var c,d,h;(c=r.onStarted)==null||c.call(r);let i={type:"MODULE",moduleId:e.moduleId,startedAt:new Date,userAgent:_.USER_AGENT,results:[],finishedAt:new Date,status:"SUCCESS"};for(let p=0;p<e.steps.length;p++){let A=e.steps[p];o.debug({i:p,moduleStep:A},"Starting module step"),o.info(`Starting module sub-step ${p+1}/${e.steps.length}: ${ze(A)}`);let w;switch(A.type){case"PRESET_ACTION":w=yield We({controller:n,step:A,advanced:t,logger:o,onSaveScreenshot:r.onSaveScreenshot,onStarted(){var m;(m=r.onStepStarted)==null||m.call(r,{index:p})},onSuccess({message:m,startedAt:g,durationMs:u,output:E}){var R;(R=r.onStepSuccess)==null||R.call(r,{index:p,message:m,startedAt:g,durationMs:u,output:E})},onFailure({message:m,startedAt:g,durationMs:u,output:E}){var R;(R=r.onStepFailure)==null||R.call(r,{index:p,message:m,startedAt:g,durationMs:u,output:E})},onCancelled({message:m,startedAt:g,durationMs:u,output:E}){var R;(R=r.onStepCancelled)==null||R.call(r,{index:p,message:m,startedAt:g,durationMs:u,output:E})}});break;case"AI_ACTION":w=yield Ve({controller:n,step:A,advanced:t,logger:o,onSaveScreenshot:r.onSaveScreenshot,onStarted(){var m;(m=r.onStepStarted)==null||m.call(r,{index:p})},onSuccess({message:m,startedAt:g,durationMs:u,output:E}){var R;(R=r.onStepSuccess)==null||R.call(r,{index:p,message:m,startedAt:g,durationMs:u,output:E})},onFailure({message:m,startedAt:g,durationMs:u,output:E}){var R;(R=r.onStepFailure)==null||R.call(r,{index:p,message:m,startedAt:g,durationMs:u,output:E})},onCommandGenerated({commandIndex:m,message:g}){var u;(u=r.onCommandGenerated)==null||u.call(r,{index:p,commandIndex:m,message:g})},onCommandExecuted({commandIndex:m,message:g,command:u}){var E;(E=r.onCommandExecuted)==null||E.call(r,{index:p,commandIndex:m,message:g,command:u})}});break;default:return(m=>{throw"If Typescript complains about the line below, you missed a case or break in the switch above"})(A)}if(i.results.push(w),w.status==="FAILED"){i.status="FAILED",i.finishedAt=new Date;for(let b=p+1;b<e.steps.length;b++){let m=e.steps[b],g=O(C({},m),{status:"CANCELLED",startedAt:new Date,finishedAt:new Date,userAgent:_.USER_AGENT,results:[],message:"Cancelled due to previous failure."});i.results.push(g)}break}}return i.status==="SUCCESS"?(d=r.onSuccess)==null||d.call(r,{message:"Executed module step.",startedAt:i.startedAt.getTime(),durationMs:i.finishedAt.getTime()-i.startedAt.getTime(),output:i}):(h=r.onFailure)==null||h.call(r,{message:"Failed to execute module step.",startedAt:i.startedAt.getTime(),durationMs:i.finishedAt.getTime()-i.startedAt.getTime(),output:i}),i});var Jo=a=>l(void 0,[a],function*({test:n,runId:e,controller:t,logger:o,onUpdateRun:r,onSaveScreenshot:s}){try{let i=yield Yr({test:n,runId:e,controller:t,logger:o,onUpdateRun:r,onSaveScreenshot:s});if(i==="PASSED"||i==="CANCELLED")return i;throw new M("InternalPlatformError",i.message||"")}catch(i){throw i instanceof M||(i=new M("InternalPlatformError",i instanceof Error?i.message:`${i}`,{cause:i})),i}finally{yield t.browser.cleanup()}}),Yr=a=>l(void 0,[a],function*({test:n,runId:e,controller:t,logger:o,onUpdateRun:r,onSaveScreenshot:s}){var A;let i=_e.parse(n.advanced),c=o.child({runId:e,testId:n.id});c.info("Starting test run"),yield r({status:"RUNNING",startedAt:new Date});let d,h="PASSED",p=[];for(let w=0;w<n.steps.length;w++){let b=n.steps[w];c.info(`Starting step ${w+1}/${n.steps.length}: ${ze(b)}`);let m;switch(b.type){case"PRESET_ACTION":m=yield We({controller:t,step:b,advanced:i,logger:c,onSaveScreenshot:s});break;case"AI_ACTION":m=yield Ve({controller:t,step:b,advanced:i,logger:c,onSaveScreenshot:s});break;case"RESOLVED_MODULE":m=yield Xo({controller:t,step:b,advanced:i,logger:c,onSaveScreenshot:s});break;default:return(u=>{throw"If Typescript complains about the line below, you missed a case or break in the switch above"})(b)}if(p.push(m),yield r({results:p}),m.status==="SUCCESS"){c.info(`Step ${w+1}/${n.steps.length} succeeded`);continue}if(m.status!=="FAILED"&&m.status!=="CANCELLED")throw new M("InternalPlatformError",`Received unexpected non-terminal status from step: ${m.status}`);c.info({message:(A=p[p.length-1])==null?void 0:A.message},`Step ${w+1}/${n.steps.length} ended with status: ${m.status}`),d=m,h=m.status;for(let g=w+1;g<n.steps.length;g++){let u=n.steps[g];if(u.type==="RESOLVED_MODULE"){let E={type:"MODULE",moduleId:u.moduleId,startedAt:new Date,userAgent:_.USER_AGENT,results:u.steps.map(R=>O(C({},R),{status:"CANCELLED",startedAt:new Date,finishedAt:new Date,userAgent:_.USER_AGENT,results:[]})),finishedAt:new Date,status:"CANCELLED"};p.push(E)}else{let E=O(C({},u),{status:"CANCELLED",startedAt:new Date,finishedAt:new Date,userAgent:_.USER_AGENT,results:[]});p.push(E)}}break}return yield r({status:h,finishedAt:new Date,results:p}),h==="FAILED"?d:h});import qr from"diff-lines";import Ye from"semver";var Qo={name:"Migrate to ai step v2",fromVersion:"1.0.4",toVersion:"1.0.5",recursiveKeys:new Set(["results","commands"]),stopOnFailure:!0,execute:n=>l(void 0,null,function*(){return n=n.filter(e=>!(e.status!==void 0&&e.type==="AI_ACTION")),n=n.map(e=>{var t,o;return e.status===void 0||e.type==="PRESET_ACTION"&&(e.results=(o=(t=e.commands)!=null?t:e.results)!=null?o:[]),e}),n})};var Zo={name:"Make sure ai step v2 has done command",fromVersion:"1.0.5",toVersion:"1.0.6",recursiveKeys:new Set(["results","commands"]),stopOnFailure:!0,execute:n=>l(void 0,null,function*(){return n.map(e=>{if(e.type!=="AI_ACTION"||e.status!==void 0||!e.commands||!e.commands.length)return e;let t=e.commands,o=t[t.length-1];return o&&o.type!=="SUCCESS"&&t.push({type:"SUCCESS"}),e})})};var en={name:"Migrate AI assertions to preset actions",fromVersion:"1.0.0",toVersion:"1.0.1",recursiveKeys:new Set,execute:n=>l(void 0,null,function*(){return n.map(e=>{if(e.type!=="AI_ASSERTION")return e;let o={type:"PRESET_ACTION",command:{type:"AI_ASSERTION",assertion:e.text,useVision:!1,disableCache:!0}},r=C(C({},e),o);return delete r.text,r})}),stopOnFailure:!0};var Ke=new Set(["CLICK","TYPE","SELECT_OPTION"]),tn={name:"Migrate element descriptor to live in a target object",fromVersion:"1.0.3",toVersion:"1.0.4",recursiveKeys:new Set,execute:n=>l(void 0,null,function*(){return n.map(e=>{let t=e.command,o=t==null?void 0:t.type,r=t==null?void 0:t.elementDescriptor;return(r!==void 0||Ke.has(o))&&(t.target={elementDescriptor:r!=null?r:""}),e.commands&&Array.isArray(e.commands)&&e.commands.forEach(a=>{let i=a==null?void 0:a.elementDescriptor,c=a==null?void 0:a.type;(i!==void 0||Ke.has(c))&&(a.target={elementDescriptor:i!=null?i:""})}),e.results&&Array.isArray(e.results)&&e.results.forEach(a=>{let i=a.command,c=i==null?void 0:i.elementDescriptor,d=i==null?void 0:i.type;(c!==void 0||Ke.has(d))&&(i.target={elementDescriptor:c!=null?c:""}),a.commands&&Array.isArray(a.commands)&&a.commands.forEach(p=>{let A=p==null?void 0:p.elementDescriptor,w=p==null?void 0:p.type;(A!==void 0||Ke.has(w))&&(p.target={elementDescriptor:A!=null?A:""})})}),e})}),stopOnFailure:!0};var on={name:"Migrate FAILURE status to FAILED",fromVersion:"1.0.1",toVersion:"1.0.2",recursiveKeys:new Set,execute:n=>l(void 0,null,function*(){return n.map(e=>{let t=e;return t.status==="FAILURE"&&(t.status="FAILED"),typeof t.commands=="object"&&Array.isArray(t.commands)&&t.commands.forEach(o=>{if(o&&typeof o=="object"){let r=o;(r==null?void 0:r.status)==="FAILURE"&&(r.status="FAILED")}}),t})}),stopOnFailure:!0};var nn={name:"Migrate preset step types to use the same",fromVersion:"1.0.2",toVersion:"1.0.3",recursiveKeys:new Set,execute:n=>l(void 0,null,function*(){return n.map(e=>{let t=e.command,o=t==null?void 0:t.type;return o!=null&&o.startsWith("PRESET_")&&(t.type=o.slice(7)),e.commands&&Array.isArray(e.commands)&&e.commands.forEach(s=>{let a=s.type;a!=null&&a.startsWith("PRESET_")&&(s.type=a.slice(7))}),e.results&&Array.isArray(e.results)&&e.results.forEach(s=>{let a=s.command,i=a==null?void 0:a.type;i!=null&&i.startsWith("PRESET_")&&(a.type=i.slice(7)),s.commands&&Array.isArray(s.commands)&&s.commands.forEach(d=>{let h=d.type;h!=null&&h.startsWith("PRESET_")&&(d.type=h.slice(7))})}),e})}),stopOnFailure:!0};var ee=[en,on,nn,tn,Qo,Zo];if(K!==ee[ee.length-1].toVersion)throw new Error("Please bump LATEST_VERSION in types package after adding a migration");ee.forEach((n,e)=>{if(!Ye.valid(n.toVersion)||!Ye.valid(n.fromVersion))throw new Error(`Migration '${n.name}' has invalid version`);if(!Ye.gt(n.toVersion,n.fromVersion))throw new Error(`Migration '${n.name}' has toVersion <= fromVersion`);if(e===0)return;if(ee[e-1].toVersion!==n.fromVersion)throw new Error(`Migration '${n.name}' at index ${e} is not contiguous with previous migration`)});function Xr(n){return n.every(e=>e&&typeof e=="object"&&!Array.isArray(e))}var Nt=o=>l(void 0,[o],function*({metadata:n,steps:e,logger:t}){let r=e,{schemaVersion:s,id:a}=n,i=ee.findIndex(h=>Ye.gt(h.toVersion,s));if(i===-1)return t.debug({id:a},"Step migrations up to date"),{steps:r,newVersion:s};let c=s;for(let h=i;h<ee.length;h++){let p=ee[h],A={id:a,migration:p.name,toVersion:p.toVersion};t.debug(A,"Starting migration");try{r=yield rn(r,p),c=p.toVersion}catch(w){throw t.error(C({err:w},A),"Migration failed"),new Error(`Step migration ${p.name} failed: ${w}`)}}let d=qr(JSON.stringify(e,void 0,2),JSON.stringify(r,void 0,2),{n_surrounding:1});return t.debug({diffs:d,id:a},"Migration diffs"),{newVersion:c,steps:r}});function rn(n,e){return l(this,null,function*(){let t=yield e.execute(n);for(let o of t)for(let r of Object.keys(o)){if(!e.recursiveKeys.has(r))continue;let s=o[r];!s||!Array.isArray(s)||Xr(s)&&(o[r]=yield rn(s,e))}return t})}import{v4 as oi}from"uuid";import{parse as sn}from"yaml";import{existsSync as Jr,readFileSync as Qr}from"fs";import{join as Zr}from"path";import{parse as ei}from"yaml";function ti(n){let e=Zr(ut,`${n}.yaml`);if(!Jr(e))throw new Error(`Fixture '${n}' does not exist at expected path ${e}`);let t;try{t=ei(Qr(e,"utf-8").replace(/\r\n|\r/g,`
+`))}catch(r){throw new Error(`Fixture at path ${e} does not parse as valid YAML: ${r}`)}let o;try{o=Gt.parse(t)}catch(r){throw new Error(`Fixture at path ${e} does not conform to expected schema: ${r}`)}return o}function Mt(n,e){return l(this,null,function*(){let t=ti(n),o=e==="setup"?t.setup:t.teardown;if(!o){S.warn(`Fixture '${n}' does not have any steps in the ${e} phase, skipping...`);return}let r=o.timeout,s=function(){return l(this,null,function*(){for(let d=0;d<o.steps.length;d++){let h=o.steps[d],p=h.run,A=w=>l(this,null,function*(){try{yield Ko(`set -ex; ${p}`)}catch(b){if(w){let m=`Fixture '${n}' ${e} step ${d+1} errored in the background. The test will continue, but this may affect test execution and results: ${b}`;S.error(m)}else throw new Error(`Fixture '${n}' ${e} step ${d+1} errored: ${b}`)}});h.waitForCompletion===!1?A(!0):yield A(!1)}})};if(S.info(`Running ${e} phase of fixture '${n}'`),!r){yield s();return}let a,i,c=function(){return l(this,null,function*(){return new Promise((d,h)=>{i=d,a=setTimeout(()=>{i=void 0,h(`Fixture '${n}' ${e} phase timed out after ${r} seconds`)},r*1e3)})})};try{yield Promise.race([s(),c()])}catch(d){throw d}finally{i&&i(),clearTimeout(a)}})}function an(a){return l(this,arguments,function*({path:n,apiClient:e,generator:t,newBaseURL:o,useLocalFiles:r,noReport:s}){var m;let i;r?(S.info(`Reading ${n} from local filesystem`),i=yield ni(n)):(S.info(`Fetching ${n} from Momentic Cloud server (${e.baseURL})`),i=yield e.getTest(n)),i.schemaVersion>K&&S.warn(`Test ${n} has schema version ${i.schemaVersion}, which is greater than what is currently supported by this SDK. Please update your momentic package version to avoid unexpected behavior.`);let c=(m=i.envSettings)==null?void 0:m.find(g=>g.name==="development");for(let g of(c==null?void 0:c.fixtures)||[])yield Mt(g,"setup");let d=new URL(i.baseUrl);if(o){let g=new URL(o);d.hostname=g.hostname,d.protocol=g.protocol,d.port=g.port}let h=yield _.init(d.toString(),S),p=new Ce({browser:h,generator:t,config:It,logger:S}),A,w;if(s)w=oi();else try{A=yield e.createRun({testId:i.id,trigger:"CLI"}),w=A.id}catch(g){throw S.error(g),new Error(`Are you sure test ${i.name} exists on the server?`)}let b="FAILED";try{b=yield Jo({test:i,runId:w,controller:p,logger:S,onSaveScreenshot:g=>l(this,null,function*(){if(s)return"";let{key:u}=yield e.uploadScreenshot({screenshot:g.toString("base64")});return u}),onUpdateRun:g=>l(this,null,function*(){s||(yield e.updateRun(w,g))})})}catch(g){throw s||(yield e.updateRun(w,{status:"FAILED",finishedAt:new Date})),g}finally{try{for(let g of(c==null?void 0:c.fixtures)||[])yield Mt(g,"teardown")}catch(g){S.error(`Failed to run teardown fixtures: ${g}`)}}return b})}function ni(n){return l(this,null,function*(){let{test:e,modules:t}=wt(n),o=sn(e);if(!o.steps||!Array.isArray(o.steps))throw new Error(`Test ${n} is missing steps`);if(!o.schemaVersion||!o.id)throw new Error(`Test ${n} is missing an ID or schema version`);let r;if(o.schemaVersion<K){S.warn(`Test ${n} has schema version ${o.schemaVersion}, which is lower than the version used by this SDK, ${K}. Your test will be migrated to the latest version before execution.`);let{steps:i}=yield Nt({metadata:o,steps:o.steps,logger:S});r=we.array().parse(i)}else r=we.array().parse(o.steps);let s={};for(let[i,c]of Object.entries(t)){let d=sn(c);if(!d.schemaVersion||!d.moduleId)throw new Error(`Module ${i} is missing an ID or schema version`);if(!d.steps||!Array.isArray(d.steps))throw new Error(`Module ${i} is missing steps`);if(d.schemaVersion<K){S.warn(`Module ${i} has schema version ${d.schemaVersion}, which is lower than the version used by this SDK, ${K}. Your module will be migrated to the latest version before execution.`);let{steps:h}=yield Nt({metadata:{id:d.moduleId,schemaVersion:d.schemaVersion},steps:d.steps,logger:S});s[i]=O(C({},d),{steps:Se.array().parse(h)})}else s[i]=d}let a=r.map(i=>{if(i.type!=="MODULE")return i;let c=s[i.moduleId];if(!c)throw new Error(`Could not resolve module ${i.moduleId} required in test ${n}`);return{type:"RESOLVED_MODULE",moduleId:i.moduleId,name:c.name,steps:c.steps}});return Jt.parse(O(C({},o),{steps:a}))})}function cn(c){return l(this,arguments,function*({tests:n,start:e,waitOn:t,waitOnTimeout:o,client:r,all:s,noReport:a,parallelization:i=1}){e&&(S.info(`Running start command: ${e}`),yield Wo(e,!1)),t&&(S.info(`Waiting for ${t} to be accessible (timeout: ${o}s)`),yield ii({resources:[t],timeout:o*1e3}));let d=new ve({baseURL:r.baseURL,apiKey:r.apiKey}),h=!1;(n.some(u=>u.endsWith(".yaml"))||n.some(u=>ln(u)))&&(h=!0);let p=new Set;if(h)S.info(n,"Reading tests from the following local file paths:"),n.forEach(u=>{if(!ln(u))throw new Error(`Path '${u}' does not exist.`);if(ri(u).isDirectory())Ot(u).forEach(R=>p.add(R));else if(u.endsWith(".yaml"))p.add(u);else throw new Error(`Path '${u}' is not a directory or a .yaml file.`)});else if(S.warn("The paths you specified are not files or directories that exist locally."),S.warn(`Fetching tests from Momentic Cloud (${r.baseURL}) instead...`),s)for(let u of yield r.getAllTestIds())p.add(u);else p=new Set(n);let A=Array.from(p);S.info(A,`Identified ${A.length} tests to run locally:`);let w=[];for(let u=0;u<A.length;u+=i){let E=yield Promise.all(A.slice(u,u+i).map(R=>l(this,null,function*(){let j="FAILED";try{j=yield an({useLocalFiles:h,path:R,apiClient:r,generator:d,newBaseURL:t,noReport:a})}catch(T){let x=T instanceof Error?T.message:`${T}`;S.error(`Test ${R} failed with error: ${x}`)}return{runStatus:j,path:R}})));w=w.concat(E)}let b=w.filter(u=>u.runStatus==="PASSED");b.length>0&&(S.info(`Passed ${b.length} out of ${w.length} tests:`),b.forEach(u=>{S.info(`- ${u.path}`)}));let m=w.filter(u=>u.runStatus==="CANCELLED");m.length>0&&(S.warn(`Cancelled ${m.length} out of ${w.length} tests:`),m.forEach(u=>{S.warn(`- ${u.path}`)}));let g=w.filter(u=>u.runStatus==="FAILED");g.length>0&&(S.error(`Failed ${g.length} out of ${w.length} tests:`),g.forEach(u=>{S.error(`- ${u.path}`)}),process.exit(1)),process.exit(0)})}function dn(o){return l(this,arguments,function*({tests:n,client:e,all:t}){let{queuedTests:r}=yield e.queueTests({testPaths:n,all:t});S.info(`Successfully queued ${r.length} tests!`)})}var oe=new si;oe.name("momentic").description("Momentic CLI").version(ao);oe.command("install-browsers").action(()=>l(void 0,null,function*(){yield co()}));oe.addOption(new te("--log-level <level>").choices(["debug","info","warn","error"]).default("info")).on("option:log-level",n=>{S.setMinLevel(Wt[n.toUpperCase()])});oe.command("run").alias("run-tests").addOption($e).addOption(He).addOption(ft).addOption(new te("-r, --remote","Run tests remotely. The production version of this test will be queued for execution.").default(!0).conflicts(["start, waitOn, waitOnTimeout, local"]).implies({local:!1})).addOption(uo).addOption(new te("-l, --local","Run tests locally. Useful for accessing apps on localhost. This option does not control where tests are read from (see <tests> argument documentation).").implies({remote:!1,noReport:!0})).addOption(new te("--start <command>","Arbitrary setup command that will run before Momentic steps begin.")).addOption(new te("--wait-on <url>","URL to wait to become accessible before Momentic tests begin.")).addOption(new te("--wait-on-timeout <timeout>","Max time to wait for the --wait-on URL to become accessible.").default(60,"one minute")).addOption(new te("-p, --parallel <parallelization>","When running with the --local flag, the number of tests to run in parallel. Defaults to 1.").default(1)).addArgument(po).action((n,e)=>l(void 0,null,function*(){let{apiKey:t,server:o,remote:r,local:s,all:a}=e,i=new ce({baseURL:o,apiKey:t});if(s){try{yield cn(C({tests:n,client:i},e))}catch(c){S.error(c),process.exit(1)}return}if(r){for(let c of n)(c.endsWith(".yaml")||li(c))&&(S.error(ai`'${c}' looks like a local file or directory, but the --local flag was not supplied.
+            Please supply the --local flag to run tests locally, or specify the test path without its file extension to queue tests remotely (e.g. 'hello-world').`),process.exit(1));yield dn({tests:n,client:i,all:a});return}S.error("One of --remote or --local must be specified"),process.exit(1)}));oe.command("pull").description("Fetch one or more tests from Momentic Cloud and save it in to local disk in YAML format.").addOption($e).addOption(He).addOption(ft).addOption(gt).addArgument(mo).action((n,e)=>l(void 0,null,function*(){let{apiKey:t,server:o,all:r,yes:s}=e;if(yield mt(s),!r&&!(n!=null&&n.length))throw new Error("At least one test name or --all must be provided");let a=new ce({baseURL:o,apiKey:t});yield wo({testsToFetch:n,client:a,all:r})}));oe.command("push").description("Save one or more tests in YAML format to Momentic Cloud.").addOption(gt).addOption($e).addOption(He).addArgument(ho).action((n,e)=>l(void 0,null,function*(){let{apiKey:t,server:o,yes:r}=e;yield mt(r);let s=new ce({baseURL:o,apiKey:t});yield Eo({paths:n,client:s,yes:r})}));function ci(){return l(this,null,function*(){yield oe.parseAsync(process.argv)})}ci();
