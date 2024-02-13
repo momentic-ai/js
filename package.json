@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.20",
+  "version": "0.0.20-rc.1",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -10,7 +10,8 @@
   },
   "files": [
     "dist/**/*",
-    "bin/**/*"
+    "bin/**/*",
+    "static/**/*"
   ],
   "license": "MIT",
   "publishConfig": {
@@ -39,11 +40,14 @@
   "dependencies": {
     "@actions/exec": "^1.1.1",
     "@actions/io": "^1.1.3",
+    "body-parser": "^1.20.2",
     "chalk": "^5.3.0",
+    "cors": "^2.8.5",
     "commander": "^11.1.0",
     "cron-validator": "^1.3.1",
     "dedent": "^1.5.1",
     "diff-lines": "^1.1.1",
+    "express": "^4.18.2",
     "fastest-levenshtein": "^1.0.16",
     "fetch-retry": "^5.0.6",
     "playwright": "1.40.1",
@@ -54,6 +58,7 @@
     "quote": "^0.4.0",
     "semver": "^7.5.4",
     "set-cookie-parser": "^2.6.0",
+    "socket.io": "^4.7.2",
     "string-argv": "^0.3.2",
     "uuid": "^9.0.1",
     "wait-on": "^7.2.0",
