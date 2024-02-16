@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.23",
+  "version": "0.0.24",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -12,7 +12,7 @@
     "dist/**/*",
     "bin/**/*",
     "static/**/*",
-    "extensions/**/*"
+    "extension/**/*"
   ],
   "license": "MIT",
   "publishConfig": {
