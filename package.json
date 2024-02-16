@@ -11,7 +11,8 @@
   "files": [
     "dist/**/*",
     "bin/**/*",
-    "static/**/*"
+    "static/**/*",
+    "extensions/**/*"
   ],
   "license": "MIT",
   "publishConfig": {
@@ -50,6 +51,7 @@
     "express": "^4.18.2",
     "fastest-levenshtein": "^1.0.16",
     "fetch-retry": "^5.0.6",
+    "open": "^10.0.3",
     "playwright": "1.40.1",
     "playwright-core": "1.40.1",
     "playwright-extra": "^4.3.6",
