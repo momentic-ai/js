@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -52,6 +52,8 @@
     "fastest-levenshtein": "^1.0.16",
     "fetch-retry": "^5.0.6",
     "open": "^10.0.3",
+    "pino": "^8.16.1",
+    "pino-pretty": "^10.2.3",
     "playwright": "1.40.1",
     "playwright-core": "1.40.1",
     "playwright-extra": "^4.3.6",
