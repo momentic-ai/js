@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.32",
+  "version": "0.0.33",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -41,6 +41,7 @@
   "dependencies": {
     "@actions/exec": "^1.1.1",
     "@actions/io": "^1.1.3",
+    "@exodus/schemasafe": "^1.3.0",
     "@faker-js/faker": "^8.4.1",
     "axios": "^1.6.7",
     "body-parser": "^1.20.2",
@@ -53,6 +54,7 @@
     "express": "^4.18.2",
     "fastest-levenshtein": "^1.0.16",
     "fetch-retry": "^5.0.6",
+    "js-beautify": "^1.15.1",
     "moment": "^2.30.1",
     "open": "^10.0.3",
     "pino": "^8.16.1",
