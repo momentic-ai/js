@@ -78,14 +78,18 @@ function parseSetCookieString(setCookieString, requestDomain) {
   return cookieAttributes;
 }
 
-chrome.webRequest.onHeadersReceived.addListener(
+chrome.webRequest.onResponseStarted.addListener(
   function (details) {
     const url = new URL(details.initiator);
     const cookies = details.responseHeaders.filter((header) => {
       return header.name.toLowerCase() === "set-cookie";
     });
+    console.log(`[Momentic] Processing headers for ${url.toString()}`);
     cookies.forEach(({ value }) => {
-      console.log(`Overriding cookie on '${details.initiator}'`, value);
+      console.log(
+        `[Momentic] Overriding cookie on '${details.initiator}'`,
+        value,
+      );
       const attributes = parseSetCookieString(value, url.host);
       if (attributes.secure && attributes.sameSite === "none") {
         // already okay
