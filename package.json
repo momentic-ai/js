@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.42",
+  "version": "0.0.43",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
