@@ -59,7 +59,7 @@ dependencies:
   js-beautify:
     specifier: ^1.15.1
     version: 1.15.1
-  lodash:
+  lodash-es:
     specifier: ^4.17.21
     version: 4.17.21
   moment:
@@ -1093,6 +1093,10 @@ packages:
   /lazy-cache@1.0.4:
     resolution: {integrity: sha512-RE2g0b5VGZsOCFOCgP7omTRYFqydmZkBwl5oNnQ1lDYC57uyO9KqNnNVxT7COSHTxrRCWVcAVOcbjk+tvh/rgQ==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /lodash-es@4.17.21:
+    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
     dev: false
 
   /lodash@4.17.21:
