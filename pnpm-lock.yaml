@@ -41,6 +41,9 @@ dependencies:
   dedent:
     specifier: ^1.5.1
     version: 1.5.1
+  deep-object-diff:
+    specifier: ^1.1.9
+    version: 1.1.9
   diff-lines:
     specifier: ^1.1.1
     version: 1.1.1
@@ -545,6 +548,10 @@ packages:
     peerDependenciesMeta:
       babel-plugin-macros:
         optional: true
+    dev: false
+
+  /deep-object-diff@1.1.9:
+    resolution: {integrity: sha512-Rn+RuwkmkDwCi2/oXOFS9Gsr5lJZu/yTGpK7wAaAIE75CC+LCGEZHpY6VQJa/RoJcrmaA/docWJZvYohlNkWPA==}
     dev: false
 
   /deepmerge@4.3.1:
