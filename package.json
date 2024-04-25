@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.66",
+  "version": "0.0.67",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -68,6 +68,7 @@
     "playwright-core": "1.40.1",
     "playwright-extra": "^4.3.6",
     "pngjs": "^7.0.0",
+    "posthog-node": "^4.0.0",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
     "puppeteer-extra-plugin-recaptcha": "^3.6.8",
     "p-timeout": "^6.1.2",
