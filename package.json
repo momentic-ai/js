@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.78",
+  "version": "0.0.79",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -60,6 +60,7 @@
     "js-beautify": "^1.15.1",
     "lodash-es": "^4.17.21",
     "moment": "^2.30.1",
+    "nodejs-file-downloader": "^4.12.1",
     "open": "^10.0.3",
     "pino": "^8.16.1",
     "pino-pretty": "^10.2.3",
