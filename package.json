@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.100",
+  "version": "0.0.101",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -83,6 +83,7 @@
     "sharp": "^0.33.4",
     "socket.io": "^4.7.2",
     "string-argv": "^0.3.2",
+    "ts-debounce": "^4.0.0",
     "twilio": "^5.2.0",
     "uuid": "^9.0.1",
     "wait-on": "^7.2.0",
