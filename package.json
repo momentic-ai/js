@@ -1,6 +1,6 @@
 {
   "name": "momentic",
-  "version": "0.0.113",
+  "version": "0.0.114",
   "description": "The Momentic SDK for Node.js",
   "type": "module",
   "main": "./dist/index.js",
@@ -93,6 +93,7 @@
   "pnpm": {
     "supportedArchitectures": {
       "os": [
+        "linux",
         "win32",
         "darwin",
         "current"
