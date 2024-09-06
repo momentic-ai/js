@@ -57,7 +57,8 @@ yarn add momentic zod
 ```
 
 > [!NOTE]
-> This package is published with CommonJS and ES Modules (ESM) support.
+> This package is published as an ES Module (ESM) only. For applications using
+> CommonJS, use `await import("momentic")` to import and use this package.
 <!-- End SDK Installation [installation] -->
 
 <!-- Start Requirements [requirements] -->
@@ -75,7 +76,7 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -207,7 +208,7 @@ To change the default retry strategy for a single API call, simply provide a ret
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -247,7 +248,7 @@ const momentic = new Momentic({
         },
         retryConnectionErrors: false,
     },
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -279,7 +280,7 @@ import { Momentic } from "momentic";
 import { SDKValidationError } from "momentic/models/errors";
 
 const momentic = new Momentic({
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -327,7 +328,7 @@ import { Momentic } from "momentic";
 
 const momentic = new Momentic({
     serverIdx: 1,
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -351,7 +352,7 @@ import { Momentic } from "momentic";
 
 const momentic = new Momentic({
     serverURL: "https://api.momentic.ai",
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -422,16 +423,16 @@ const sdk = new Momentic({ httpClient });
 
 This SDK supports the following security scheme globally:
 
-| Name         | Type         | Scheme       |
-| ------------ | ------------ | ------------ |
-| `bearerAuth` | http         | HTTP Bearer  |
+| Name        | Type        | Scheme      |
+| ----------- | ----------- | ----------- |
+| `apiKey`    | http        | HTTP Bearer |
 
-To authenticate with the API the `bearerAuth` parameter must be set when initializing the SDK client instance. For example:
+To authenticate with the API the `apiKey` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
