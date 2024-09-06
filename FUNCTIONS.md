@@ -26,7 +26,7 @@ import { SDKValidationError } from "momentic/models/errors/sdkvalidationerror.js
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
