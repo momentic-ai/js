@@ -57,7 +57,7 @@ Check authentication status
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -81,7 +81,7 @@ import { authCheck } from "momentic/funcs/authCheck.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -129,7 +129,7 @@ Get feature flags
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -153,7 +153,7 @@ import { getFeatureFlags } from "momentic/funcs/getFeatureFlags.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -201,7 +201,7 @@ Update step caches
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -222,7 +222,7 @@ import { updateStepCaches } from "momentic/funcs/updateStepCaches.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -270,7 +270,7 @@ Get step caches
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -294,7 +294,7 @@ import { getStepCaches } from "momentic/funcs/getStepCaches.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -343,7 +343,7 @@ Update last used at for cache entries
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -364,7 +364,7 @@ import { updateLastUsedAt } from "momentic/funcs/updateLastUsedAt.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -412,7 +412,7 @@ Get all resolved environments
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -436,7 +436,7 @@ import { getAllEnvironments } from "momentic/funcs/getAllEnvironments.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -484,7 +484,7 @@ Update environments
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -505,7 +505,7 @@ import { updateEnvironments } from "momentic/funcs/updateEnvironments.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -553,7 +553,7 @@ Get a specific environment by name
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -579,7 +579,7 @@ import { getEnvironmentByName } from "momentic/funcs/getEnvironmentByName.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -630,7 +630,7 @@ Get cached result
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -654,7 +654,7 @@ import { getCachedResult } from "momentic/funcs/getCachedResult.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -703,7 +703,7 @@ Set cached result
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -724,7 +724,7 @@ import { setCachedResult } from "momentic/funcs/setCachedResult.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -772,7 +772,7 @@ Try to acquire a lock
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -796,7 +796,7 @@ import { tryAcquireLock } from "momentic/funcs/tryAcquireLock.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -845,7 +845,7 @@ Release a lock
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -866,7 +866,7 @@ import { releaseLock } from "momentic/funcs/releaseLock.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -914,7 +914,7 @@ Create a new run
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -938,7 +938,7 @@ import { createRun } from "momentic/funcs/createRun.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -987,7 +987,7 @@ Update an existing run
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1010,7 +1010,7 @@ import { updateRun } from "momentic/funcs/updateRun.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1060,7 +1060,7 @@ Get run statuses
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1084,7 +1084,7 @@ import { getRunStatuses } from "momentic/funcs/getRunStatuses.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1133,7 +1133,7 @@ Upload set of proposed steps
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1154,7 +1154,7 @@ import { uploadProposedSteps } from "momentic/funcs/uploadProposedSteps.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1202,7 +1202,7 @@ Upload a screenshot
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1226,7 +1226,7 @@ import { uploadScreenshot } from "momentic/funcs/uploadScreenshot.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1275,7 +1275,7 @@ Get suite run statuses
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1299,7 +1299,7 @@ import { getSuiteRunStatuses } from "momentic/funcs/getSuiteRunStatuses.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1348,7 +1348,7 @@ Queue suites
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1372,7 +1372,7 @@ import { queueSuites } from "momentic/funcs/queueSuites.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1421,7 +1421,7 @@ Get all test IDs
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1445,7 +1445,7 @@ import { getAllTestIds } from "momentic/funcs/getAllTestIds.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1493,7 +1493,7 @@ Export tests as YAML
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1517,7 +1517,7 @@ import { exportTests } from "momentic/funcs/exportTests.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1566,7 +1566,7 @@ Update tests with YAML representation
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1587,7 +1587,7 @@ import { updateTestsWithYAML } from "momentic/funcs/updateTestsWithYAML.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1635,7 +1635,7 @@ Queue multiple test runs
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1659,7 +1659,7 @@ import { queueTests } from "momentic/funcs/queueTests.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1708,7 +1708,7 @@ Queue a single test run
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1731,7 +1731,7 @@ import { queueSingleTest } from "momentic/funcs/queueSingleTest.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1781,7 +1781,7 @@ Get a single test
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1807,7 +1807,7 @@ import { getTest } from "momentic/funcs/getTest.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1858,7 +1858,7 @@ Update a single test
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1881,7 +1881,7 @@ import { updateTest } from "momentic/funcs/updateTest.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1931,7 +1931,7 @@ Get the next command for the web agent
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -1955,7 +1955,7 @@ import { getNextCommand } from "momentic/funcs/getNextCommand.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2004,7 +2004,7 @@ Get the assertion result for the web agent
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2028,7 +2028,7 @@ import { getAssertionResult } from "momentic/funcs/getAssertionResult.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2077,7 +2077,7 @@ Locate an element for the web agent
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2101,7 +2101,7 @@ import { locateElement } from "momentic/funcs/locateElement.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2150,7 +2150,7 @@ Split a goal into granular goals
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2174,7 +2174,7 @@ import { splitGoal } from "momentic/funcs/splitGoal.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2223,7 +2223,7 @@ Get reverse mapped description
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2247,7 +2247,7 @@ import { reverseMappedDescription } from "momentic/funcs/reverseMappedDescriptio
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2296,7 +2296,7 @@ Extract text from the web page
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2320,7 +2320,7 @@ import { textExtraction } from "momentic/funcs/textExtraction.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2369,7 +2369,7 @@ Get recommended chunks
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2393,7 +2393,7 @@ import { recommendChunks } from "momentic/funcs/recommendChunks.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2442,7 +2442,7 @@ Perform template matching
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2466,7 +2466,7 @@ import { templateMatching } from "momentic/funcs/templateMatching.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2515,7 +2515,7 @@ Classify test results
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2539,7 +2539,7 @@ import { resultClassification } from "momentic/funcs/resultClassification.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2588,7 +2588,7 @@ Get autohealing proposal for a section
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2612,7 +2612,7 @@ import { autohealSection } from "momentic/funcs/autohealSection.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2661,7 +2661,7 @@ Extract keywords
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2685,7 +2685,7 @@ import { keywordExtractor } from "momentic/funcs/keywordExtractor.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2734,7 +2734,7 @@ Send an SMS message
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2755,7 +2755,7 @@ import { smsSend } from "momentic/funcs/smsSend.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2803,7 +2803,7 @@ Fetch the latest SMS message
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2827,7 +2827,7 @@ import { smsFetchLatest } from "momentic/funcs/smsFetchLatest.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2876,7 +2876,7 @@ Fetch the latest email
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
@@ -2900,7 +2900,7 @@ import { emailFetchLatest } from "momentic/funcs/emailFetchLatest.js";
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {

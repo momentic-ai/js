@@ -6,7 +6,7 @@
 import { Security } from "momentic/models/components";
 
 let value: Security = {
-    bearerAuth: "<value>",
+    apiKey: "<value>",
 };
 ```
 
@@ -14,4 +14,4 @@ let value: Security = {
 
 | Field              | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `bearerAuth`       | *string*           | :heavy_check_mark: | N/A                |
+| `apiKey`           | *string*           | :heavy_check_mark: | N/A                |
