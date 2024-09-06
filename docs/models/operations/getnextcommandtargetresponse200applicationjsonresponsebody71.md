@@ -1,0 +1,19 @@
+# GetNextCommandTargetResponse200ApplicationJSONResponseBody71
+
+## Example Usage
+
+```typescript
+import { GetNextCommandTargetResponse200ApplicationJSONResponseBody71 } from "momentic/models/operations";
+
+let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody71 = {
+    elementDescriptor: "<value>",
+};
+```
+
+## Fields
+
+| Field                                                                                                                                                                            | Type                                                                                                                                                                             | Required                                                                                                                                                                         | Description                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `type`                                                                                                                                                                           | *string*                                                                                                                                                                         | :heavy_check_mark:                                                                                                                                                               | N/A                                                                                                                                                                              |
+| `elementDescriptor`                                                                                                                                                              | *string*                                                                                                                                                                         | :heavy_check_mark:                                                                                                                                                               | N/A                                                                                                                                                                              |
+| `a11yData`                                                                                                                                                                       | [operations.GetNextCommandTargetResponse200ApplicationJSONResponseBody7A11yData](../../models/operations/getnextcommandtargetresponse200applicationjsonresponsebody7a11ydata.md) | :heavy_minus_sign:                                                                                                                                                               | DEPRECATED: new a11y cache is stored in DB and resolved into the 'cache' field                                                                                                   |
