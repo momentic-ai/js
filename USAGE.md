@@ -3,7 +3,7 @@
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    bearerAuth: "<YOUR_BEARER_TOKEN_HERE>",
+    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
