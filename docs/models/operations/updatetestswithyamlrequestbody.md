@@ -6,10 +6,10 @@
 import { UpdateTestsWithYAMLRequestBody } from "momentic/models/operations";
 
 let value: UpdateTestsWithYAMLRequestBody = {
-    test: "<value>",
-    modules: {
-        key: "<value>",
-    },
+  test: "<value>",
+  modules: {
+    "key": "<value>",
+  },
 };
 ```
 

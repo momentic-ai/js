@@ -6,8 +6,10 @@
 import { KeyParams } from "momentic/models/operations";
 
 let value: KeyParams = {
-    orgId: "<value>",
-    cacheKeys: ["<value>"],
+  orgId: "<value>",
+  cacheKeys: [
+    "<value>",
+  ],
 };
 ```
 

@@ -6,11 +6,11 @@
 import { ResponseBody4 } from "momentic/models/operations";
 
 let value: ResponseBody4 = {
-    id: "8ea19f1d-1705-4133-9d08-086a1840394c",
-    target: {
-        elementDescriptor: "<value>",
-    },
-    option: "<value>",
+  id: "8ea19f1d-1705-4133-9d08-086a1840394c",
+  target: {
+    elementDescriptor: "<value>",
+  },
+  option: "<value>",
 };
 ```
 

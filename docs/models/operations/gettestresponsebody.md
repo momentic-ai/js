@@ -8,16 +8,16 @@ Test retrieved successfully
 import { GetTestResponseBody } from "momentic/models/operations";
 
 let value: GetTestResponseBody = {
-    id: "<id>",
-    name: "<value>",
-    schemaVersion: "<value>",
-    advanced: {},
-    retries: 3250.47,
-    steps: [
-        {
-            key: "<value>",
-        },
-    ],
+  id: "<id>",
+  name: "<value>",
+  schemaVersion: "<value>",
+  advanced: {},
+  retries: 3250.47,
+  steps: [
+    {
+      "key": "<value>",
+    },
+  ],
 };
 ```
 

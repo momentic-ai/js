@@ -8,8 +8,8 @@ Element located successfully
 import { LocateElementResponseBody } from "momentic/models/operations";
 
 let value: LocateElementResponseBody = {
-    thoughts: "<value>",
-    id: 25497,
+  thoughts: "<value>",
+  id: 25497,
 };
 ```
 

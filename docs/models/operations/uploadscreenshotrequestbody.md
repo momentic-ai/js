@@ -6,7 +6,7 @@
 import { UploadScreenshotRequestBody } from "momentic/models/operations";
 
 let value: UploadScreenshotRequestBody = {
-    screenshot: "<value>",
+  screenshot: "<value>",
 };
 ```
 

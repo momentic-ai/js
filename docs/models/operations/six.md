@@ -6,7 +6,7 @@
 import { Six } from "momentic/models/operations";
 
 let value: Six = {
-    id: "74ba4469-b6e2-4141-9598-90afa563e251",
+  id: "74ba4469-b6e2-4141-9598-90afa563e251",
 };
 ```
 

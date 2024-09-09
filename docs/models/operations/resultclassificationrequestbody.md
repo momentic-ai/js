@@ -6,12 +6,12 @@
 import { ResultClassificationRequestBody } from "momentic/models/operations";
 
 let value: ResultClassificationRequestBody = {
-    results: [
-        {
-            key: "<value>",
-        },
-    ],
-    errorMessage: "<value>",
+  results: [
+    {
+      "key": "<value>",
+    },
+  ],
+  errorMessage: "<value>",
 };
 ```
 

@@ -6,8 +6,8 @@
 import { Five } from "momentic/models/operations";
 
 let value: Five = {
-    id: "6fe4c8b7-11e5-4b7f-92ed-028921cddc69",
-    url: "http://illegal-antique.com",
+  id: "6fe4c8b7-11e5-4b7f-92ed-028921cddc69",
+  url: "http://illegal-antique.com",
 };
 ```
 

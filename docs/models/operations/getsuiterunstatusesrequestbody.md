@@ -8,7 +8,9 @@ List of suite run IDs to get statuses for
 import { GetSuiteRunStatusesRequestBody } from "momentic/models/operations";
 
 let value: GetSuiteRunStatusesRequestBody = {
-    suiteRunIds: ["<value>"],
+  suiteRunIds: [
+    "<value>",
+  ],
 };
 ```
 

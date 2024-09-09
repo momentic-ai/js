@@ -6,10 +6,10 @@
 import { Two } from "momentic/models/operations";
 
 let value: Two = {
-    percentXYLocation: {
-        percentX: 4254.51,
-        percentY: 7980.47,
-    },
+  percentXYLocation: {
+    percentX: 4254.51,
+    percentY: 7980.47,
+  },
 };
 ```
 

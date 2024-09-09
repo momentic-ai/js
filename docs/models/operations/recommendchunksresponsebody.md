@@ -8,7 +8,9 @@ Recommended chunks retrieved successfully
 import { RecommendChunksResponseBody } from "momentic/models/operations";
 
 let value: RecommendChunksResponseBody = {
-    ids: [3335.07],
+  ids: [
+    3335.07,
+  ],
 };
 ```
 

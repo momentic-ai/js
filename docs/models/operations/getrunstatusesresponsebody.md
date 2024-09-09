@@ -6,9 +6,9 @@
 import { GetRunStatusesResponseBody } from "momentic/models/operations";
 
 let value: GetRunStatusesResponseBody = {
-    id: "<id>",
-    status: "FAILED",
-    testId: "<value>",
+  id: "<id>",
+  status: "FAILED",
+  testId: "<value>",
 };
 ```
 

@@ -6,12 +6,12 @@
 import { UpdateStepCachesRequestBody } from "momentic/models/operations";
 
 let value: UpdateStepCachesRequestBody = {
-    entries: [
-        {
-            key: "<value>",
-        },
-    ],
-    testId: "<value>",
+  entries: [
+    {
+      "key": "<value>",
+    },
+  ],
+  testId: "<value>",
 };
 ```
 

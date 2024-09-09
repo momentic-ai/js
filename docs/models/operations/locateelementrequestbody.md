@@ -6,9 +6,9 @@
 import { LocateElementRequestBody } from "momentic/models/operations";
 
 let value: LocateElementRequestBody = {
-    browserState: "<value>",
-    goal: "<value>",
-    screenshot: "<value>",
+  browserState: "<value>",
+  goal: "<value>",
+  screenshot: "<value>",
 };
 ```
 

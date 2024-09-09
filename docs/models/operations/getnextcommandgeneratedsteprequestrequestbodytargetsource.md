@@ -5,7 +5,8 @@
 ```typescript
 import { GetNextCommandGeneratedStepRequestRequestBodyTargetSource } from "momentic/models/operations";
 
-let value: GetNextCommandGeneratedStepRequestRequestBodyTargetSource = "XY_PERCENT";
+let value: GetNextCommandGeneratedStepRequestRequestBodyTargetSource =
+  "XY_PERCENT";
 ```
 
 ## Values

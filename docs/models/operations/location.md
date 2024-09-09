@@ -6,9 +6,9 @@
 import { Location } from "momentic/models/operations";
 
 let value: Location = {
-    url: "http://physical-pegboard.info",
-    lineNumber: 4375.87,
-    columnNumber: 2975.34,
+  url: "http://physical-pegboard.info",
+  lineNumber: 4375.87,
+  columnNumber: 2975.34,
 };
 ```
 

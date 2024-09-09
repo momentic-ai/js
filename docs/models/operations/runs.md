@@ -6,13 +6,13 @@
 import { Runs } from "momentic/models/operations";
 
 let value: Runs = {
+  id: "<id>",
+  status: "CANCELLED",
+  testId: "<value>",
+  test: {
+    name: "<value>",
     id: "<id>",
-    status: "CANCELLED",
-    testId: "<value>",
-    test: {
-        name: "<value>",
-        id: "<id>",
-    },
+  },
 };
 ```
 

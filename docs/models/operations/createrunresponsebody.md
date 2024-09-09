@@ -8,7 +8,7 @@ Run created successfully
 import { CreateRunResponseBody } from "momentic/models/operations";
 
 let value: CreateRunResponseBody = {
-    id: "<id>",
+  id: "<id>",
 };
 ```
 

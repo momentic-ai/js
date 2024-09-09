@@ -6,8 +6,8 @@
 import { ResponseBody5 } from "momentic/models/operations";
 
 let value: ResponseBody5 = {
-    id: "c4f3789f-d871-4f99-9d2e-fd121aa6f1e6",
-    url: "http://extra-small-recession.org",
+  id: "c4f3789f-d871-4f99-9d2e-fd121aa6f1e6",
+  url: "http://extra-small-recession.org",
 };
 ```
 

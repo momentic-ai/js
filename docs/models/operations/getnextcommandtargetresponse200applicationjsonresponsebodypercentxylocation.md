@@ -5,10 +5,12 @@
 ```typescript
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBodyPercentXYLocation } from "momentic/models/operations";
 
-let value: GetNextCommandTargetResponse200ApplicationJSONResponseBodyPercentXYLocation = {
-    percentX: 6813.93,
-    percentY: 6494.63,
-};
+let value:
+  GetNextCommandTargetResponse200ApplicationJSONResponseBodyPercentXYLocation =
+    {
+      percentX: 6813.93,
+      percentY: 6494.63,
+    };
 ```
 
 ## Fields

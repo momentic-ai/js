@@ -6,11 +6,13 @@
 import { TryAcquireLockRequestBody } from "momentic/models/operations";
 
 let value: TryAcquireLockRequestBody = {
-    keyParams: {
-        orgId: "<value>",
-        cacheKeys: ["<value>"],
-    },
-    clientMetadata: "<value>",
+  keyParams: {
+    orgId: "<value>",
+    cacheKeys: [
+      "<value>",
+    ],
+  },
+  clientMetadata: "<value>",
 };
 ```
 

@@ -6,7 +6,7 @@
 import { GetNextCommandGeneratedStepRequestTarget } from "momentic/models/operations";
 
 let value: GetNextCommandGeneratedStepRequestTarget = {
-    id: 67249,
+  id: 67249,
 };
 ```
 

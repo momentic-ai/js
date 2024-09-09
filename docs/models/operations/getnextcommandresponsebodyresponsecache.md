@@ -6,9 +6,9 @@
 import { GetNextCommandResponseBodyResponseCache } from "momentic/models/operations";
 
 let value: GetNextCommandResponseBodyResponseCache = {
-    target: {
-        id: 401259,
-    },
+  target: {
+    id: 401259,
+  },
 };
 ```
 

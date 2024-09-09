@@ -6,8 +6,8 @@
 import { ParametersT } from "momentic/models/operations";
 
 let value: ParametersT = {
-    name: "<value>",
-    defaultValue: "<value>",
+  name: "<value>",
+  defaultValue: "<value>",
 };
 ```
 

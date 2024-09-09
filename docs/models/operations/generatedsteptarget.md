@@ -6,7 +6,7 @@
 import { GeneratedStepTarget } from "momentic/models/operations";
 
 let value: GeneratedStepTarget = {
-    id: 788740,
+  id: 788740,
 };
 ```
 

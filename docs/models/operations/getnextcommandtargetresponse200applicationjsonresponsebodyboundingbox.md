@@ -7,10 +7,11 @@ css pixel bounding box
 ```typescript
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBodyBoundingBox } from "momentic/models/operations";
 
-let value: GetNextCommandTargetResponse200ApplicationJSONResponseBodyBoundingBox = {
+let value:
+  GetNextCommandTargetResponse200ApplicationJSONResponseBodyBoundingBox = {
     width: 1288.6,
     height: 3256.85,
-};
+  };
 ```
 
 ## Fields

@@ -6,7 +6,7 @@
 import { SmsFetchLatestRequestBody } from "momentic/models/operations";
 
 let value: SmsFetchLatestRequestBody = {
-    to: "<value>",
+  to: "<value>",
 };
 ```
 

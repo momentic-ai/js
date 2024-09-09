@@ -6,8 +6,8 @@
 import { Suite } from "momentic/models/operations";
 
 let value: Suite = {
-    id: "<id>",
-    name: "<value>",
+  id: "<id>",
+  name: "<value>",
 };
 ```
 

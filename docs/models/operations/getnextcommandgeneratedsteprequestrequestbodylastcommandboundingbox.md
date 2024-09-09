@@ -7,10 +7,11 @@ css pixel bounding box
 ```typescript
 import { GetNextCommandGeneratedStepRequestRequestBodyLastCommandBoundingBox } from "momentic/models/operations";
 
-let value: GetNextCommandGeneratedStepRequestRequestBodyLastCommandBoundingBox = {
+let value: GetNextCommandGeneratedStepRequestRequestBodyLastCommandBoundingBox =
+  {
     width: 201.07,
     height: 1649.4,
-};
+  };
 ```
 
 ## Fields

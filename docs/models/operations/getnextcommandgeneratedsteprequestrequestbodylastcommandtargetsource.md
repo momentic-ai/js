@@ -5,7 +5,9 @@
 ```typescript
 import { GetNextCommandGeneratedStepRequestRequestBodyLastCommandTargetSource } from "momentic/models/operations";
 
-let value: GetNextCommandGeneratedStepRequestRequestBodyLastCommandTargetSource = "RECORDING";
+let value:
+  GetNextCommandGeneratedStepRequestRequestBodyLastCommandTargetSource =
+    "RECORDING";
 ```
 
 ## Values

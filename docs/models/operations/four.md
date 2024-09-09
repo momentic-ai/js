@@ -6,14 +6,14 @@
 import { Four } from "momentic/models/operations";
 
 let value: Four = {
-    id: "c5fbb258-7053-4202-873d-5fe9b90c2890",
-    target: {
-        percentXYLocation: {
-            percentX: 6990.98,
-            percentY: 2378.93,
-        },
+  id: "c5fbb258-7053-4202-873d-5fe9b90c2890",
+  target: {
+    percentXYLocation: {
+      percentX: 6990.98,
+      percentY: 2378.93,
     },
-    option: "<value>",
+  },
+  option: "<value>",
 };
 ```
 

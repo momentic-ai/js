@@ -6,9 +6,9 @@
 import { GeneratedStepCache } from "momentic/models/operations";
 
 let value: GeneratedStepCache = {
-    target: {
-        id: 743835,
-    },
+  target: {
+    id: 743835,
+  },
 };
 ```
 

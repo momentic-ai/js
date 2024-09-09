@@ -6,10 +6,10 @@
 import { GetAllEnvironmentsResponseBody } from "momentic/models/operations";
 
 let value: GetAllEnvironmentsResponseBody = {
-    name: "<value>",
-    variables: {
-        key: "<value>",
-    },
+  name: "<value>",
+  variables: {
+    "key": "<value>",
+  },
 };
 ```
 

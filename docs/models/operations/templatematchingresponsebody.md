@@ -8,9 +8,9 @@ Template matching performed successfully
 import { TemplateMatchingResponseBody } from "momentic/models/operations";
 
 let value: TemplateMatchingResponseBody = {
-    x: 5436.78,
-    y: 1482.68,
-    correlation: 2826.99,
+  x: 5436.78,
+  y: 1482.68,
+  correlation: 2826.99,
 };
 ```
 

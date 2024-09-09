@@ -6,8 +6,8 @@
 import { Classification } from "momentic/models/operations";
 
 let value: Classification = {
-    reason: "UserConfigurationError",
-    summary: "<value>",
+  reason: "UserConfigurationError",
+  summary: "<value>",
 };
 ```
 

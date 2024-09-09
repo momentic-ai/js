@@ -6,8 +6,8 @@
 import { ResponseBody8 } from "momentic/models/operations";
 
 let value: ResponseBody8 = {
-    id: "aac366c8-dd6b-4144-a907-474778a7bd46",
-    assertion: "<value>",
+  id: "aac366c8-dd6b-4144-a907-474778a7bd46",
+  assertion: "<value>",
 };
 ```
 

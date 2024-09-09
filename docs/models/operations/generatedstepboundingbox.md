@@ -8,8 +8,8 @@ css pixel bounding box
 import { GeneratedStepBoundingBox } from "momentic/models/operations";
 
 let value: GeneratedStepBoundingBox = {
-    width: 6874.88,
-    height: 4834.09,
+  width: 6874.88,
+  height: 4834.09,
 };
 ```
 

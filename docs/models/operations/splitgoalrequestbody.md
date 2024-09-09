@@ -6,8 +6,8 @@
 import { SplitGoalRequestBody } from "momentic/models/operations";
 
 let value: SplitGoalRequestBody = {
-    goal: "<value>",
-    url: "http://unfortunate-leg.net",
+  goal: "<value>",
+  url: "http://unfortunate-leg.net",
 };
 ```
 

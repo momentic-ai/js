@@ -6,7 +6,7 @@
 import { GetSuiteRunStatusesFailureDetails } from "momentic/models/operations";
 
 let value: GetSuiteRunStatusesFailureDetails = {
-    errorMessage: "<value>",
+  errorMessage: "<value>",
 };
 ```
 

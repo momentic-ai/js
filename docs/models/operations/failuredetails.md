@@ -6,7 +6,7 @@
 import { FailureDetails } from "momentic/models/operations";
 
 let value: FailureDetails = {
-    errorMessage: "<value>",
+  errorMessage: "<value>",
 };
 ```
 

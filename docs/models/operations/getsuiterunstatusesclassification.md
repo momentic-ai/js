@@ -6,8 +6,8 @@
 import { GetSuiteRunStatusesClassification } from "momentic/models/operations";
 
 let value: GetSuiteRunStatusesClassification = {
-    reason: "AIProviderError",
-    summary: "<value>",
+  reason: "AIProviderError",
+  summary: "<value>",
 };
 ```
 

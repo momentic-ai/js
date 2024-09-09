@@ -6,10 +6,10 @@
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBody2 } from "momentic/models/operations";
 
 let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody2 = {
-    percentXYLocation: {
-        percentX: 2775.96,
-        percentY: 5392.24,
-    },
+  percentXYLocation: {
+    percentX: 2775.96,
+    percentY: 5392.24,
+  },
 };
 ```
 

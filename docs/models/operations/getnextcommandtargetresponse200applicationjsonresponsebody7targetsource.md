@@ -5,7 +5,8 @@
 ```typescript
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBody7TargetSource } from "momentic/models/operations";
 
-let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody7TargetSource =
+let value:
+  GetNextCommandTargetResponse200ApplicationJSONResponseBody7TargetSource =
     "USER_CSS_SELECTOR";
 ```
 

@@ -6,14 +6,14 @@
 import { GetNextCommandRequestBody } from "momentic/models/operations";
 
 let value: GetNextCommandRequestBody = {
-    goal: "<value>",
-    url: "https://tall-self-control.org",
-    browserState: "<value>",
-    history: "<value>",
-    numPrevious: 2817.3,
-    lastCommand: {
-        type: "IFRAME",
-    },
+  goal: "<value>",
+  url: "https://tall-self-control.org",
+  browserState: "<value>",
+  history: "<value>",
+  numPrevious: 2817.3,
+  lastCommand: {
+    type: "IFRAME",
+  },
 };
 ```
 

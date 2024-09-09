@@ -6,24 +6,24 @@
 import { GetSuiteRunStatusesResponseBody } from "momentic/models/operations";
 
 let value: GetSuiteRunStatusesResponseBody = {
-    id: "05dfc2dd-f7cc-478c-a1ba-928fc816742c",
-    orgId: "<value>",
-    createdAt: "<value>",
-    startedAt: "<value>",
-    finishedAt: "<value>",
-    status: "RETRYING",
-    trigger: "CRON",
-    runs: [
-        {
-            id: "<id>",
-            status: "RUNNING",
-            testId: "<value>",
-            test: {
-                name: "<value>",
-                id: "<id>",
-            },
-        },
-    ],
+  id: "05dfc2dd-f7cc-478c-a1ba-928fc816742c",
+  orgId: "<value>",
+  createdAt: "<value>",
+  startedAt: "<value>",
+  finishedAt: "<value>",
+  status: "RETRYING",
+  trigger: "CRON",
+  runs: [
+    {
+      id: "<id>",
+      status: "RUNNING",
+      testId: "<value>",
+      test: {
+        name: "<value>",
+        id: "<id>",
+      },
+    },
+  ],
 };
 ```
 

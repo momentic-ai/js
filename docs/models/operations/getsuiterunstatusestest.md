@@ -6,8 +6,8 @@
 import { GetSuiteRunStatusesTest } from "momentic/models/operations";
 
 let value: GetSuiteRunStatusesTest = {
-    name: "<value>",
-    id: "<id>",
+  name: "<value>",
+  id: "<id>",
 };
 ```
 

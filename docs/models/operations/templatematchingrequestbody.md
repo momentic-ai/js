@@ -6,9 +6,9 @@
 import { TemplateMatchingRequestBody } from "momentic/models/operations";
 
 let value: TemplateMatchingRequestBody = {
-    searchImageBase64String: "<value>",
-    pageImageBase64String: "<value>",
-    id: "5efd20e4-57e1-4858-b6a8-9fbe3a5aa8e4",
+  searchImageBase64String: "<value>",
+  pageImageBase64String: "<value>",
+  id: "5efd20e4-57e1-4858-b6a8-9fbe3a5aa8e4",
 };
 ```
 

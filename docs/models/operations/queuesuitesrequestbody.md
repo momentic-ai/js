@@ -6,7 +6,9 @@
 import { QueueSuitesRequestBody } from "momentic/models/operations";
 
 let value: QueueSuitesRequestBody = {
-    paths: ["<value>"],
+  paths: [
+    "<value>",
+  ],
 };
 ```
 

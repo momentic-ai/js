@@ -6,10 +6,10 @@
 import { GetNextCommandTargetResponse2002 } from "momentic/models/operations";
 
 let value: GetNextCommandTargetResponse2002 = {
-    percentXYLocation: {
-        percentX: 6658.59,
-        percentY: 9268.8,
-    },
+  percentXYLocation: {
+    percentX: 6658.59,
+    percentY: 9268.8,
+  },
 };
 ```
 

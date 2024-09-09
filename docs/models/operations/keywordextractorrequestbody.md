@@ -6,8 +6,8 @@
 import { KeywordExtractorRequestBody } from "momentic/models/operations";
 
 let value: KeywordExtractorRequestBody = {
-    goal: "<value>",
-    completionType: "<value>",
+  goal: "<value>",
+  completionType: "<value>",
 };
 ```
 

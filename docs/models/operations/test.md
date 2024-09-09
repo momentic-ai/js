@@ -6,8 +6,8 @@
 import { Test } from "momentic/models/operations";
 
 let value: Test = {
-    name: "<value>",
-    id: "<id>",
+  name: "<value>",
+  id: "<id>",
 };
 ```
 

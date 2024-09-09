@@ -8,7 +8,7 @@ DEPRECATED: new a11y cache is stored in DB and resolved into the 'cache' field
 import { A11yData } from "momentic/models/operations";
 
 let value: A11yData = {
-    id: 952792,
+  id: 952792,
 };
 ```
 

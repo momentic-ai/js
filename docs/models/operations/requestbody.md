@@ -6,10 +6,10 @@
 import { RequestBody } from "momentic/models/operations";
 
 let value: RequestBody = {
-    name: "<value>",
-    variables: {
-        key: "<value>",
-    },
+  name: "<value>",
+  variables: {
+    "key": "<value>",
+  },
 };
 ```
 

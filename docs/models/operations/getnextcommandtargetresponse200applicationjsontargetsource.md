@@ -5,7 +5,8 @@
 ```typescript
 import { GetNextCommandTargetResponse200ApplicationJSONTargetSource } from "momentic/models/operations";
 
-let value: GetNextCommandTargetResponse200ApplicationJSONTargetSource = "CLICK_TO_FIND";
+let value: GetNextCommandTargetResponse200ApplicationJSONTargetSource =
+  "CLICK_TO_FIND";
 ```
 
 ## Values

@@ -8,8 +8,8 @@ css pixel bounding box
 import { GetNextCommandTargetResponse200BoundingBox } from "momentic/models/operations";
 
 let value: GetNextCommandTargetResponse200BoundingBox = {
-    width: 5173.09,
-    height: 8539.4,
+  width: 5173.09,
+  height: 8539.4,
 };
 ```
 

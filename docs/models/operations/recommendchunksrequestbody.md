@@ -6,16 +6,18 @@
 import { RecommendChunksRequestBody } from "momentic/models/operations";
 
 let value: RecommendChunksRequestBody = {
-    description: "Implemented tertiary interface",
-    tokenLimit: 265.22,
-    chunks: [
-        {
-            content: "<value>",
-            ids: ["<value>"],
-            tokenLength: 7505.95,
-        },
-    ],
-    numRecs: 6256.37,
+  description: "Implemented tertiary interface",
+  tokenLimit: 265.22,
+  chunks: [
+    {
+      content: "<value>",
+      ids: [
+        "<value>",
+      ],
+      tokenLength: 7505.95,
+    },
+  ],
+  numRecs: 6256.37,
 };
 ```
 

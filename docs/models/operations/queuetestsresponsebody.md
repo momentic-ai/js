@@ -8,14 +8,16 @@ Tests queued successfully
 import { QueueTestsResponseBody } from "momentic/models/operations";
 
 let value: QueueTestsResponseBody = {
-    message: "<value>",
-    queuedTests: [
-        {
-            name: "<value>",
-            id: "<id>",
-        },
-    ],
-    runIds: ["92059293-96fe-4a75-96eb-10faaa2352c5"],
+  message: "<value>",
+  queuedTests: [
+    {
+      name: "<value>",
+      id: "<id>",
+    },
+  ],
+  runIds: [
+    "92059293-96fe-4a75-96eb-10faaa2352c5",
+  ],
 };
 ```
 

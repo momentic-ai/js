@@ -6,10 +6,10 @@
 import { LogsPerPage } from "momentic/models/operations";
 
 let value: LogsPerPage = {
-    timestamp: 8917.73,
-    text: "<value>",
-    type: "<value>",
-    tabIndex: 567.13,
+  timestamp: 8917.73,
+  text: "<value>",
+  type: "<value>",
+  tabIndex: 567.13,
 };
 ```
 

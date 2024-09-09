@@ -6,16 +6,16 @@
 import { DebugData } from "momentic/models/operations";
 
 let value: DebugData = {
-    logsPerPage: [
-        [
-            {
-                timestamp: 9636.63,
-                text: "<value>",
-                type: "<value>",
-                tabIndex: 2726.56,
-            },
-        ],
+  logsPerPage: [
+    [
+      {
+        timestamp: 9636.63,
+        text: "<value>",
+        type: "<value>",
+        tabIndex: 2726.56,
+      },
     ],
+  ],
 };
 ```
 

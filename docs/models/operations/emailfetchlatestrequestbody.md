@@ -6,7 +6,7 @@
 import { EmailFetchLatestRequestBody } from "momentic/models/operations";
 
 let value: EmailFetchLatestRequestBody = {
-    inbox: "<value>",
+  inbox: "<value>",
 };
 ```
 

@@ -6,7 +6,7 @@
 import { GetNextCommandResponseBodyResponse200ApplicationJson6Target } from "momentic/models/operations";
 
 let value: GetNextCommandResponseBodyResponse200ApplicationJson6Target = {
-    id: 536178,
+  id: 536178,
 };
 ```
 

@@ -6,13 +6,13 @@
 import { GeneratedStep1 } from "momentic/models/operations";
 
 let value: GeneratedStep1 = {
-    id: "3be453f8-70b3-426b-9a73-429cdb1a8422",
-    target: {
-        percentXYLocation: {
-            percentX: 7044.74,
-            percentY: 3960.6,
-        },
+  id: "3be453f8-70b3-426b-9a73-429cdb1a8422",
+  target: {
+    percentXYLocation: {
+      percentX: 7044.74,
+      percentY: 3960.6,
     },
+  },
 };
 ```
 

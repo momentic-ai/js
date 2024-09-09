@@ -8,7 +8,7 @@ DEPRECATED: new a11y cache is stored in DB and resolved into the 'cache' field
 import { GetNextCommandTargetRequestA11yData } from "momentic/models/operations";
 
 let value: GetNextCommandTargetRequestA11yData = {
-    id: 474867,
+  id: 474867,
 };
 ```
 

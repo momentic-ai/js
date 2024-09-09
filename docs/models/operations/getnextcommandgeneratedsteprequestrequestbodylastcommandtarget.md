@@ -6,7 +6,7 @@
 import { GetNextCommandGeneratedStepRequestRequestBodyLastCommandTarget } from "momentic/models/operations";
 
 let value: GetNextCommandGeneratedStepRequestRequestBodyLastCommandTarget = {
-    id: 230742,
+  id: 230742,
 };
 ```
 

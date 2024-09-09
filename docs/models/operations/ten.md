@@ -6,7 +6,7 @@
 import { Ten } from "momentic/models/operations";
 
 let value: Ten = {
-    id: "921879fc-e953-4f73-af7f-bc7abd74dd39",
+  id: "921879fc-e953-4f73-af7f-bc7abd74dd39",
 };
 ```
 

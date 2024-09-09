@@ -8,7 +8,9 @@ Keywords extracted successfully
 import { KeywordExtractorResponseBody } from "momentic/models/operations";
 
 let value: KeywordExtractorResponseBody = {
-    keywords: ["<value>"],
+  keywords: [
+    "<value>",
+  ],
 };
 ```
 

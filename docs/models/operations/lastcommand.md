@@ -6,7 +6,7 @@
 import { LastCommand } from "momentic/models/operations";
 
 let value: LastCommand = {
-    type: "PRESET_ACTION",
+  type: "PRESET_ACTION",
 };
 ```
 

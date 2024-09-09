@@ -6,9 +6,9 @@
 import { CreateRunRequestBody } from "momentic/models/operations";
 
 let value: CreateRunRequestBody = {
-    testId: "<value>",
-    testName: "<value>",
-    trigger: "CLI",
+  testId: "<value>",
+  testName: "<value>",
+  trigger: "CLI",
 };
 ```
 

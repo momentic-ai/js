@@ -8,8 +8,8 @@ Assertion result retrieved successfully
 import { GetAssertionResultResponseBody } from "momentic/models/operations";
 
 let value: GetAssertionResultResponseBody = {
-    thoughts: "<value>",
-    result: false,
+  thoughts: "<value>",
+  result: false,
 };
 ```
 

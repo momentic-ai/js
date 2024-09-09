@@ -8,8 +8,8 @@ Test results classified successfully
 import { ResultClassificationResponseBody } from "momentic/models/operations";
 
 let value: ResultClassificationResponseBody = {
-    reason: "AIProviderError",
-    summary: "<value>",
+  reason: "AIProviderError",
+  summary: "<value>",
 };
 ```
 

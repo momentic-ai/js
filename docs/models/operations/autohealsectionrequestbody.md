@@ -6,13 +6,13 @@
 import { AutohealSectionRequestBody } from "momentic/models/operations";
 
 let value: AutohealSectionRequestBody = {
-    results: [
-        {
-            key: "<value>",
-        },
-    ],
-    goal: "<value>",
-    errorMessage: "<value>",
+  results: [
+    {
+      "key": "<value>",
+    },
+  ],
+  goal: "<value>",
+  errorMessage: "<value>",
 };
 ```
 

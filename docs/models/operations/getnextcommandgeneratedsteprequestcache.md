@@ -6,9 +6,9 @@
 import { GetNextCommandGeneratedStepRequestCache } from "momentic/models/operations";
 
 let value: GetNextCommandGeneratedStepRequestCache = {
-    target: {
-        id: 533206,
-    },
+  target: {
+    id: 533206,
+  },
 };
 ```
 

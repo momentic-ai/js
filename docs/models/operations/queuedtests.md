@@ -6,8 +6,8 @@
 import { QueuedTests } from "momentic/models/operations";
 
 let value: QueuedTests = {
-    name: "<value>",
-    id: "<id>",
+  name: "<value>",
+  id: "<id>",
 };
 ```
 

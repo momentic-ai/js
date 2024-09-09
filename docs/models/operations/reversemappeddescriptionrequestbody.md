@@ -6,8 +6,8 @@
 import { ReverseMappedDescriptionRequestBody } from "momentic/models/operations";
 
 let value: ReverseMappedDescriptionRequestBody = {
-    goal: "<value>",
-    browserState: "<value>",
+  goal: "<value>",
+  browserState: "<value>",
 };
 ```
 

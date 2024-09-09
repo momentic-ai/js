@@ -6,8 +6,10 @@
 import { GetCachedResultRequestBody } from "momentic/models/operations";
 
 let value: GetCachedResultRequestBody = {
-    orgId: "<value>",
-    cacheKeys: ["<value>"],
+  orgId: "<value>",
+  cacheKeys: [
+    "<value>",
+  ],
 };
 ```
 

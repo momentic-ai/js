@@ -8,10 +8,10 @@ Environment retrieved successfully
 import { GetEnvironmentByNameResponseBody } from "momentic/models/operations";
 
 let value: GetEnvironmentByNameResponseBody = {
-    name: "<value>",
-    variables: {
-        key: "<value>",
-    },
+  name: "<value>",
+  variables: {
+    "key": "<value>",
+  },
 };
 ```
 

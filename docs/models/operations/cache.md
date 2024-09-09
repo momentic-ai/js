@@ -6,9 +6,9 @@
 import { Cache } from "momentic/models/operations";
 
 let value: Cache = {
-    target: {
-        id: 947371,
-    },
+  target: {
+    id: 947371,
+  },
 };
 ```
 

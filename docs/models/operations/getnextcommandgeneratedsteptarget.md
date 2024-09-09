@@ -6,7 +6,7 @@
 import { GetNextCommandGeneratedStepTarget } from "momentic/models/operations";
 
 let value: GetNextCommandGeneratedStepTarget = {
-    elementDescriptor: "<value>",
+  elementDescriptor: "<value>",
 };
 ```
 

@@ -6,8 +6,8 @@
 import { TextExtractionRequestBody } from "momentic/models/operations";
 
 let value: TextExtractionRequestBody = {
-    goal: "<value>",
-    browserState: "<value>",
+  goal: "<value>",
+  browserState: "<value>",
 };
 ```
 

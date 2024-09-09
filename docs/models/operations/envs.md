@@ -6,7 +6,7 @@
 import { Envs } from "momentic/models/operations";
 
 let value: Envs = {
-    name: "<value>",
+  name: "<value>",
 };
 ```
 

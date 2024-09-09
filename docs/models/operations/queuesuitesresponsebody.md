@@ -8,7 +8,9 @@ Successfully queued suites
 import { QueueSuitesResponseBody } from "momentic/models/operations";
 
 let value: QueueSuitesResponseBody = {
-    suiteRunIds: ["<value>"],
+  suiteRunIds: [
+    "<value>",
+  ],
 };
 ```
 

@@ -8,9 +8,9 @@ Lock acquisition attempt result
 import { TryAcquireLockResponseBody } from "momentic/models/operations";
 
 let value: TryAcquireLockResponseBody = {
-    acquired: false,
-    acquiredByMetadata: "<value>",
-    keyPrefix: "<value>",
+  acquired: false,
+  acquiredByMetadata: "<value>",
+  keyPrefix: "<value>",
 };
 ```
 

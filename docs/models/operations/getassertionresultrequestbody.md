@@ -6,10 +6,10 @@
 import { GetAssertionResultRequestBody } from "momentic/models/operations";
 
 let value: GetAssertionResultRequestBody = {
-    goal: "<value>",
-    browserState: "<value>",
-    screenshot: "<value>",
-    url: "http://joint-wash.info",
+  goal: "<value>",
+  browserState: "<value>",
+  screenshot: "<value>",
+  url: "http://joint-wash.info",
 };
 ```
 

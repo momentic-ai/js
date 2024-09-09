@@ -8,7 +8,7 @@ Reverse mapped description retrieved successfully
 import { ReverseMappedDescriptionResponseBody } from "momentic/models/operations";
 
 let value: ReverseMappedDescriptionResponseBody = {
-    phrase: "<value>",
+  phrase: "<value>",
 };
 ```
 

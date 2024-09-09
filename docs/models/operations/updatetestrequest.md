@@ -6,7 +6,7 @@
 import { UpdateTestRequest } from "momentic/models/operations";
 
 let value: UpdateTestRequest = {
-    testId: "<value>",
+  testId: "<value>",
 };
 ```
 

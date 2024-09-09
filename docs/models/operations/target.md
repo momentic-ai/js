@@ -6,7 +6,7 @@
 import { Target } from "momentic/models/operations";
 
 let value: Target = {
-    elementDescriptor: "<value>",
+  elementDescriptor: "<value>",
 };
 ```
 

@@ -6,8 +6,8 @@
 import { Condition } from "momentic/models/operations";
 
 let value: Condition = {
-    id: "07aff1a3-a2fa-4946-b739-251aa52c3f5a",
-    assertion: "<value>",
+  id: "07aff1a3-a2fa-4946-b739-251aa52c3f5a",
+  assertion: "<value>",
 };
 ```
 

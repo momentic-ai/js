@@ -6,9 +6,9 @@
 import { SetCachedResultRequestBody } from "momentic/models/operations";
 
 let value: SetCachedResultRequestBody = {
-    keyPrefix: "<value>",
-    result: "<value>",
-    ttlMs: 5928.45,
+  keyPrefix: "<value>",
+  result: "<value>",
+  ttlMs: 5928.45,
 };
 ```
 

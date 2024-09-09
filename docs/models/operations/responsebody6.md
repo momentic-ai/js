@@ -6,7 +6,7 @@
 import { ResponseBody6 } from "momentic/models/operations";
 
 let value: ResponseBody6 = {
-    id: "2e9817ee-17cb-4e61-a6b7-b95bc0ab3c20",
+  id: "2e9817ee-17cb-4e61-a6b7-b95bc0ab3c20",
 };
 ```
 

@@ -6,7 +6,7 @@
 import { GetEnvironmentByNameRequest } from "momentic/models/operations";
 
 let value: GetEnvironmentByNameRequest = {
-    name: "<value>",
+  name: "<value>",
 };
 ```
 

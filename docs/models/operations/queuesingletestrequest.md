@@ -6,7 +6,7 @@
 import { QueueSingleTestRequest } from "momentic/models/operations";
 
 let value: QueueSingleTestRequest = {
-    testId: "<value>",
+  testId: "<value>",
 };
 ```
 

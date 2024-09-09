@@ -7,9 +7,10 @@ DEPRECATED: new a11y cache is stored in DB and resolved into the 'cache' field
 ```typescript
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBody7A11yData } from "momentic/models/operations";
 
-let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody7A11yData = {
+let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody7A11yData =
+  {
     id: 777408,
-};
+  };
 ```
 
 ## Fields

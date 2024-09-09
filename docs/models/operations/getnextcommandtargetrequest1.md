@@ -6,7 +6,7 @@
 import { GetNextCommandTargetRequest1 } from "momentic/models/operations";
 
 let value: GetNextCommandTargetRequest1 = {
-    elementDescriptor: "<value>",
+  elementDescriptor: "<value>",
 };
 ```
 

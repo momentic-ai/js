@@ -8,12 +8,12 @@ Tests exported successfully
 import { ExportTestsResponseBody } from "momentic/models/operations";
 
 let value: ExportTestsResponseBody = {
-    tests: {
-        key: "<value>",
-    },
-    modules: {
-        key: "<value>",
-    },
+  tests: {
+    "key": "<value>",
+  },
+  modules: {
+    "key": "<value>",
+  },
 };
 ```
 

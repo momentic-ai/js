@@ -6,8 +6,8 @@
 import { ResponseBodyCondition } from "momentic/models/operations";
 
 let value: ResponseBodyCondition = {
-    id: "c0f5d2cf-f7c7-40a4-9626-d436813f16d9",
-    assertion: "<value>",
+  id: "c0f5d2cf-f7c7-40a4-9626-d436813f16d9",
+  assertion: "<value>",
 };
 ```
 

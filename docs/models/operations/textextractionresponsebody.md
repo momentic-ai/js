@@ -8,7 +8,7 @@ Text extracted successfully
 import { TextExtractionResponseBody } from "momentic/models/operations";
 
 let value: TextExtractionResponseBody = {
-    result: "<value>",
+  result: "<value>",
 };
 ```
 

@@ -8,7 +8,7 @@ Screenshot uploaded successfully
 import { UploadScreenshotResponseBody } from "momentic/models/operations";
 
 let value: UploadScreenshotResponseBody = {
-    key: "<key>",
+  key: "<key>",
 };
 ```
 

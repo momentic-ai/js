@@ -6,7 +6,7 @@
 import { UpdateRunRequest } from "momentic/models/operations";
 
 let value: UpdateRunRequest = {
-    runId: "<value>",
+  runId: "<value>",
 };
 ```
 

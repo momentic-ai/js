@@ -8,7 +8,7 @@ User is authenticated
 import { AuthCheckResponseBody } from "momentic/models/operations";
 
 let value: AuthCheckResponseBody = {
-    orgId: "<value>",
+  orgId: "<value>",
 };
 ```
 

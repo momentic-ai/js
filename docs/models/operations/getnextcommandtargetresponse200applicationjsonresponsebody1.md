@@ -6,7 +6,7 @@
 import { GetNextCommandTargetResponse200ApplicationJSONResponseBody1 } from "momentic/models/operations";
 
 let value: GetNextCommandTargetResponse200ApplicationJSONResponseBody1 = {
-    elementDescriptor: "<value>",
+  elementDescriptor: "<value>",
 };
 ```
 

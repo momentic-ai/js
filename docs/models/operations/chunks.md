@@ -6,9 +6,11 @@
 import { Chunks } from "momentic/models/operations";
 
 let value: Chunks = {
-    content: "<value>",
-    ids: ["<value>"],
-    tokenLength: 2777.73,
+  content: "<value>",
+  ids: [
+    "<value>",
+  ],
+  tokenLength: 2777.73,
 };
 ```
 

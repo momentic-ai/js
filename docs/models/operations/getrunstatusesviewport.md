@@ -6,8 +6,8 @@
 import { GetRunStatusesViewport } from "momentic/models/operations";
 
 let value: GetRunStatusesViewport = {
-    width: 4776.65,
-    height: 7917.25,
+  width: 4776.65,
+  height: 7917.25,
 };
 ```
 

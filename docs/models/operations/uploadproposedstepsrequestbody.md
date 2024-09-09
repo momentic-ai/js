@@ -6,14 +6,14 @@
 import { UploadProposedStepsRequestBody } from "momentic/models/operations";
 
 let value: UploadProposedStepsRequestBody = {
-    testId: "<value>",
-    orgId: "<value>",
-    runId: "<value>",
-    steps: [
-        {
-            key: "<value>",
-        },
-    ],
+  testId: "<value>",
+  orgId: "<value>",
+  runId: "<value>",
+  steps: [
+    {
+      "key": "<value>",
+    },
+  ],
 };
 ```
 

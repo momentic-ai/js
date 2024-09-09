@@ -6,8 +6,8 @@
 import { GetRunStatusesClassification } from "momentic/models/operations";
 
 let value: GetRunStatusesClassification = {
-    reason: "UserConfigurationError",
-    summary: "<value>",
+  reason: "UserConfigurationError",
+  summary: "<value>",
 };
 ```
 

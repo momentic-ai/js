@@ -8,8 +8,8 @@ Next command retrieved successfully
 import { GetNextCommandResponseBody } from "momentic/models/operations";
 
 let value: GetNextCommandResponseBody = {
-    id: "194a276b-2691-46fe-9f08-f4294e3698f4",
-    assertion: "<value>",
+  id: "194a276b-2691-46fe-9f08-f4294e3698f4",
+  assertion: "<value>",
 };
 ```
 

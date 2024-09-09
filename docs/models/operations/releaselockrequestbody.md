@@ -6,7 +6,7 @@
 import { ReleaseLockRequestBody } from "momentic/models/operations";
 
 let value: ReleaseLockRequestBody = {
-    key: "<key>",
+  key: "<key>",
 };
 ```
 

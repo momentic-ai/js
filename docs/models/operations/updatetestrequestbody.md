@@ -6,13 +6,13 @@
 import { UpdateTestRequestBody } from "momentic/models/operations";
 
 let value: UpdateTestRequestBody = {
-    testId: "<value>",
-    schemaVersion: "<value>",
-    steps: [
-        {
-            key: "<value>",
-        },
-    ],
+  testId: "<value>",
+  schemaVersion: "<value>",
+  steps: [
+    {
+      "key": "<value>",
+    },
+  ],
 };
 ```
 

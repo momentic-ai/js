@@ -8,12 +8,12 @@ Autohealing proposal retrieved successfully
 import { AutohealSectionResponseBody } from "momentic/models/operations";
 
 let value: AutohealSectionResponseBody = {
-    patches: [
-        {
-            key: "<value>",
-        },
-    ],
-    thoughts: "<value>",
+  patches: [
+    {
+      "key": "<value>",
+    },
+  ],
+  thoughts: "<value>",
 };
 ```
 

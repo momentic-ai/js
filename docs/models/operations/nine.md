@@ -6,7 +6,7 @@
 import { Nine } from "momentic/models/operations";
 
 let value: Nine = {
-    id: "d019da1f-fe78-4f09-bb00-74f15471b5e6",
+  id: "d019da1f-fe78-4f09-bb00-74f15471b5e6",
 };
 ```
 

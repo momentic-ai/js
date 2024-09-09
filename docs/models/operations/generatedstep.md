@@ -6,8 +6,8 @@
 import { GeneratedStep } from "momentic/models/operations";
 
 let value: GeneratedStep = {
-    id: "9d232271-5bf0-4cbb-9e31-b8b90f3443a1",
-    url: "http://afraid-merit.org",
+  id: "9d232271-5bf0-4cbb-9e31-b8b90f3443a1",
+  url: "http://afraid-merit.org",
 };
 ```
 

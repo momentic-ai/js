@@ -6,9 +6,9 @@
 import { SmsSendRequestBody } from "momentic/models/operations";
 
 let value: SmsSendRequestBody = {
-    body: "<value>",
-    to: "<value>",
-    from: "<value>",
+  body: "<value>",
+  to: "<value>",
+  from: "<value>",
 };
 ```
 

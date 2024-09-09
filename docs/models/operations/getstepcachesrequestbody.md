@@ -6,14 +6,14 @@
 import { GetStepCachesRequestBody } from "momentic/models/operations";
 
 let value: GetStepCachesRequestBody = {
-    steps: [
-        {
-            key: "<value>",
-        },
-    ],
-    testId: "<value>",
-    schemaVersion: "<value>",
-    organizationId: "<value>",
+  steps: [
+    {
+      "key": "<value>",
+    },
+  ],
+  testId: "<value>",
+  schemaVersion: "<value>",
+  organizationId: "<value>",
 };
 ```
 
