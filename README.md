@@ -75,14 +75,14 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
@@ -207,25 +207,25 @@ To change the default retry strategy for a single API call, simply provide a ret
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck({
-        retries: {
-            strategy: "backoff",
-            backoff: {
-                initialInterval: 1,
-                maxInterval: 50,
-                exponent: 1.1,
-                maxElapsedTime: 100,
-            },
-            retryConnectionErrors: false,
-        },
-    });
+  const result = await momentic.authCheck({
+    retries: {
+      strategy: "backoff",
+      backoff: {
+        initialInterval: 1,
+        maxInterval: 50,
+        exponent: 1.1,
+        maxElapsedTime: 100,
+      },
+      retryConnectionErrors: false,
+    },
+  });
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
@@ -237,24 +237,24 @@ If you'd like to override the default retry strategy for all operations that sup
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    retryConfig: {
-        strategy: "backoff",
-        backoff: {
-            initialInterval: 1,
-            maxInterval: 50,
-            exponent: 1.1,
-            maxElapsedTime: 100,
-        },
-        retryConnectionErrors: false,
+  retryConfig: {
+    strategy: "backoff",
+    backoff: {
+      initialInterval: 1,
+      maxInterval: 50,
+      exponent: 1.1,
+      maxElapsedTime: 100,
     },
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+    retryConnectionErrors: false,
+  },
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
@@ -279,30 +279,30 @@ import { Momentic } from "momentic";
 import { SDKValidationError } from "momentic/models/errors";
 
 const momentic = new Momentic({
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    let result;
-    try {
-        result = await momentic.authCheck();
+  let result;
+  try {
+    result = await momentic.authCheck();
 
-        // Handle the result
-        console.log(result);
-    } catch (err) {
-        switch (true) {
-            case err instanceof SDKValidationError: {
-                // Validation errors can be pretty-printed
-                console.error(err.pretty());
-                // Raw value may also be inspected
-                console.error(err.rawValue);
-                return;
-            }
-            default: {
-                throw err;
-            }
-        }
+    // Handle the result
+    console.log(result);
+  } catch (err) {
+    switch (true) {
+      case (err instanceof SDKValidationError): {
+        // Validation errors can be pretty-printed
+        console.error(err.pretty());
+        // Raw value may also be inspected
+        console.error(err.rawValue);
+        return;
+      }
+      default: {
+        throw err;
+      }
     }
+  }
 }
 
 run();
@@ -326,15 +326,15 @@ You can override the default server globally by passing a server index to the `s
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    serverIdx: 1,
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  serverIdx: 1,
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
@@ -350,15 +350,15 @@ The default server can also be overridden globally by passing a URL to the `serv
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    serverURL: "https://api.momentic.ai",
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  serverURL: "https://api.momentic.ai",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
@@ -431,14 +431,14 @@ To authenticate with the API the `apiKey` parameter must be set when initializin
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
