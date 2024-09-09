@@ -3,14 +3,14 @@
 import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-    apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-    const result = await momentic.authCheck();
+  const result = await momentic.authCheck();
 
-    // Handle the result
-    console.log(result);
+  // Handle the result
+  console.log(result);
 }
 
 run();
