@@ -96,7 +96,8 @@ run();
 ### [Momentic SDK](docs/sdks/momentic/README.md)
 
 * [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses) - Get run statuses
-* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue a steps run
+* [getRun](docs/sdks/momentic/README.md#getrun) - Get run statuses
+* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue steps run
 <!-- End Available Resources and Operations [operations] -->
 
 <!-- Start Standalone functions [standalone-funcs] -->
@@ -115,6 +116,7 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 <summary>Available standalone functions</summary>
 
 - [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses)
+- [getRun](docs/sdks/momentic/README.md#getrun)
 - [queueSteps](docs/sdks/momentic/README.md#queuesteps)
 
 
