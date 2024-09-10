@@ -7,8 +7,8 @@ import { CoordinatesTarget } from "momentic/models/components";
 
 let value: CoordinatesTarget = {
   percentXYLocation: {
-    percentX: 831.12,
-    percentY: 9292.97,
+    percentX: 9621.89,
+    percentY: 4332.88,
   },
 };
 ```

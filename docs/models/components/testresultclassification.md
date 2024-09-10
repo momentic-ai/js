@@ -1,12 +1,12 @@
-# Classification
+# TestResultClassification
 
 ## Example Usage
 
 ```typescript
-import { Classification } from "momentic/models/components";
+import { TestResultClassification } from "momentic/models/components";
 
-let value: Classification = {
-  reason: "InternalPlatformError",
+let value: TestResultClassification = {
+  reason: "UserConfigurationError",
   summary: "<value>",
 };
 ```

@@ -6,15 +6,15 @@
 import { FileSource } from "momentic/models/components";
 
 let value: FileSource = {
-  url: "https://turbulent-gravitas.com",
+  url: "https://tidy-method.info",
 };
 ```
 
 ## Supported Types
 
-### `components.FileSource1`
+### `components.UrlSource`
 
 ```typescript
-const value: components.FileSource1 = /* values here */
+const value: components.UrlSource = /* values here */
 ```
 

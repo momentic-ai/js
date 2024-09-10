@@ -5,7 +5,7 @@
 ```typescript
 import { Reason } from "momentic/models/components";
 
-let value: Reason = "JobTimeoutError";
+let value: Reason = "InternalPlatformError";
 ```
 
 ## Values

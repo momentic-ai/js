@@ -1,12 +1,14 @@
-# Assertion1
+# UrlSource
+
+Accessible link to the file, either public http or local file://
 
 ## Example Usage
 
 ```typescript
-import { Assertion1 } from "momentic/models/components";
+import { UrlSource } from "momentic/models/components";
 
-let value: Assertion1 = {
-  value: "<value>",
+let value: UrlSource = {
+  url: "http://terrific-grief.name",
 };
 ```
 
@@ -15,5 +17,4 @@ let value: Assertion1 = {
 | Field              | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
 | `type`             | *string*           | :heavy_check_mark: | N/A                |
-| `negated`          | *boolean*          | :heavy_minus_sign: | N/A                |
-| `value`            | *string*           | :heavy_check_mark: | N/A                |
+| `url`              | *string*           | :heavy_check_mark: | N/A                |

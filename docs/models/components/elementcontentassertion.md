@@ -1,12 +1,13 @@
-# Three
+# ElementContentAssertion
 
 ## Example Usage
 
 ```typescript
-import { Three } from "momentic/models/components";
+import { ElementContentAssertion } from "momentic/models/components";
 
-let value: Three = {
-  condition: "ENABLED",
+let value: ElementContentAssertion = {
+  operation: "EQUALS",
+  value: "<value>",
 };
 ```
 
@@ -16,4 +17,5 @@ let value: Three = {
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | `type`                                                       | *string*                                                     | :heavy_check_mark:                                           | N/A                                                          |
 | `negated`                                                    | *boolean*                                                    | :heavy_minus_sign:                                           | N/A                                                          |
-| `condition`                                                  | [components.Condition](../../models/components/condition.md) | :heavy_check_mark:                                           | N/A                                                          |
+| `operation`                                                  | [components.Operation](../../models/components/operation.md) | :heavy_check_mark:                                           | N/A                                                          |
+| `value`                                                      | *string*                                                     | :heavy_check_mark:                                           | N/A                                                          |

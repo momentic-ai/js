@@ -6,7 +6,7 @@
 import { CaptchaCommand } from "momentic/models/components";
 
 let value: CaptchaCommand = {
-  id: "d74dd39c-0f5d-42cf-b7c7-0a45626d4368",
+  id: "6813f16d-9f5f-4ce6-8556-146c3e250fb0",
 };
 ```
 

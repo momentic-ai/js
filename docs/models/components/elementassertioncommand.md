@@ -6,14 +6,15 @@
 import { ElementAssertionCommand } from "momentic/models/components";
 
 let value: ElementAssertionCommand = {
-  id: "4796f2a7-0c68-4828-aaa4-82562f222e98",
+  id: "562f222e-9817-4ee1-bcbe-61e6b7b95bc0",
   target: {
-    elementDescriptor: "<value>",
+    percentXYLocation: {
+      percentX: 7313.98,
+      percentY: 2400.2,
+    },
   },
   assertion: {
-    operation: "EQUALS",
-    attr: "<value>",
-    value: "<value>",
+    condition: "EXISTS",
   },
 };
 ```
@@ -31,6 +32,6 @@ let value: ElementAssertionCommand = {
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |
 | `type`                                                                       | *string*                                                                     | :heavy_check_mark:                                                           | N/A                                                                          |
 | `target`                                                                     | *components.ElementTarget*                                                   | :heavy_check_mark:                                                           | N/A                                                                          |
-| `assertion`                                                                  | *components.Assertion*                                                       | :heavy_check_mark:                                                           | N/A                                                                          |
+| `assertion`                                                                  | *components.ManualElementAssertion*                                          | :heavy_check_mark:                                                           | N/A                                                                          |
 | `cache`                                                                      | [components.SingleTargetCache](../../models/components/singletargetcache.md) | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `timeout`                                                                    | *number*                                                                     | :heavy_minus_sign:                                                           | max seconds to wait for the assertion to be true                             |

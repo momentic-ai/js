@@ -6,13 +6,7 @@
 import { Command } from "momentic/models/components";
 
 let value: Command = {
-  id: "07aff1a3-a2fa-4946-b739-251aa52c3f5a",
-  target: {
-    percentXYLocation: {
-      percentX: 135.71,
-      percentY: 971.01,
-    },
-  },
+  id: "ad019da1-ffe7-48f0-97b0-074f15471b5e",
 };
 ```
 

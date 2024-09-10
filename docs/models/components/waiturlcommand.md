@@ -6,8 +6,8 @@
 import { WaitUrlCommand } from "momentic/models/components";
 
 let value: WaitUrlCommand = {
-  id: "61d01747-6360-4a15-9b6a-660659a1adea",
-  url: "https://scratchy-existence.name",
+  id: "adeaab58-51d6-4c64-9b08-b61891baa0fe",
+  url: "http://rectangular-sucker.org",
 };
 ```
 
