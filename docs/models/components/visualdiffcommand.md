@@ -6,7 +6,7 @@
 import { VisualDiffCommand } from "momentic/models/components";
 
 let value: VisualDiffCommand = {
-  id: "64a3e865-e795-46f9-a51a-5a9da660ff57",
+  id: "5f0597a6-0ff2-4a54-a31e-94764a3e865e",
 };
 ```
 

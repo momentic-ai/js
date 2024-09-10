@@ -6,7 +6,7 @@
 import { JavaScriptCommand } from "momentic/models/components";
 
 let value: JavaScriptCommand = {
-  id: "b375ed4f-6fbe-4e41-b333-17fe35b60eb1",
+  id: "aae8d678-64db-4b67-9fd5-e60b375ed4f6",
   code: "<value>",
 };
 ```

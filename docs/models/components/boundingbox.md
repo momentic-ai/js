@@ -8,8 +8,8 @@ css pixel bounding box
 import { BoundingBox } from "momentic/models/components";
 
 let value: BoundingBox = {
-  width: 1831.91,
-  height: 3978.21,
+  width: 2653.89,
+  height: 5089.69,
 };
 ```
 

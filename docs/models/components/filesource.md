@@ -6,7 +6,7 @@
 import { FileSource } from "momentic/models/components";
 
 let value: FileSource = {
-  url: "https://french-violin.biz",
+  url: "https://turbulent-gravitas.com",
 };
 ```
 

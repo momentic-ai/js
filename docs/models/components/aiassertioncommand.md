@@ -6,7 +6,7 @@
 import { AIAssertionCommand } from "momentic/models/components";
 
 let value: AIAssertionCommand = {
-  id: "7f3a4100-674e-4bf6-9280-d1ba77a89ebf",
+  id: "8d9cbf48-6333-423f-9b77-f3a4100674eb",
   assertion: "<value>",
 };
 ```

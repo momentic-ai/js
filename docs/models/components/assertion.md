@@ -6,7 +6,8 @@
 import { Assertion } from "momentic/models/components";
 
 let value: Assertion = {
-  operation: "STARTS_WITH",
+  operation: "EQUALS",
+  attr: "<value>",
   value: "<value>",
 };
 ```

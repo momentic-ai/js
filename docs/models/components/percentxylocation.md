@@ -6,8 +6,8 @@
 import { PercentXYLocation } from "momentic/models/components";
 
 let value: PercentXYLocation = {
-  percentX: 1649.4,
-  percentY: 8289.4,
+  percentX: 9211.58,
+  percentY: 5759.47,
 };
 ```
 

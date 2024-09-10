@@ -5,7 +5,7 @@
 ```typescript
 import { Operation } from "momentic/models/components";
 
-let value: Operation = "EQUALS";
+let value: Operation = "CONTAINS";
 ```
 
 ## Values

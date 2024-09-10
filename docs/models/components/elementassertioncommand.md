@@ -6,7 +6,7 @@
 import { ElementAssertionCommand } from "momentic/models/components";
 
 let value: ElementAssertionCommand = {
-  id: "2562f222-e981-47ee-97cb-e61e6b7b95bc",
+  id: "4796f2a7-0c68-4828-aaa4-82562f222e98",
   target: {
     elementDescriptor: "<value>",
   },

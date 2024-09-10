@@ -6,17 +6,14 @@
 import { DragCommand } from "momentic/models/components";
 
 let value: DragCommand = {
-  id: "dca42519-04e5-423c-be0b-c7178e4796f2",
+  id: "8a7bd466-d28c-410a-b3cd-ca4251904e52",
   fromTarget: {
-    percentXYLocation: {
-      percentX: 4752.89,
-      percentY: 353.62,
-    },
+    elementDescriptor: "<value>",
   },
   toTarget: {
     percentXYLocation: {
-      percentX: 4304.02,
-      percentY: 5564.29,
+      percentX: 4598.56,
+      percentY: 9251.64,
     },
   },
 };

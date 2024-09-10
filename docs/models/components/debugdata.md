@@ -9,10 +9,10 @@ let value: DebugData = {
   logsPerPage: [
     [
       {
-        timestamp: 5288.95,
+        timestamp: 7917.25,
         text: "<value>",
         type: "<value>",
-        tabIndex: 4799.77,
+        tabIndex: 8121.69,
       },
     ],
   ],
@@ -21,6 +21,6 @@ let value: DebugData = {
 
 ## Fields
 
-| Field                                                                | Type                                                                 | Required                                                             | Description                                                          |
-| -------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `logsPerPage`                                                        | [components.LogsPerPage](../../models/components/logsperpage.md)[][] | :heavy_check_mark:                                                   | N/A                                                                  |
+| Field                                                              | Type                                                               | Required                                                           | Description                                                        |
+| ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `logsPerPage`                                                      | [components.ConsoleLog](../../models/components/consolelog.md)[][] | :heavy_check_mark:                                                 | N/A                                                                |

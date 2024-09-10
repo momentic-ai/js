@@ -14,15 +14,11 @@ let value: GetRunResponse = {
   scheduledAt: "<value>",
   startedAt: "<value>",
   finishedAt: "<value>",
-  status: "FAILED",
+  status: "RUNNING",
   trigger: "CRON",
-  attempts: 9255.97,
+  attempts: 4776.65,
   testId: "<value>",
-  results: [
-    {
-      "key": "<value>",
-    },
-  ],
+  results: [],
 };
 ```
 
@@ -50,6 +46,6 @@ let value: GetRunResponse = {
 | `testName`                                                                                         | *string*                                                                                           | :heavy_minus_sign:                                                                                 | N/A                                                                                                |
 | `test`                                                                                             | [components.GetRunResponseTest](../../models/components/getrunresponsetest.md)                     | :heavy_minus_sign:                                                                                 | N/A                                                                                                |
 | `suiteId`                                                                                          | *string*                                                                                           | :heavy_minus_sign:                                                                                 | N/A                                                                                                |
-| `results`                                                                                          | Record<string, *any*>[]                                                                            | :heavy_check_mark:                                                                                 | N/A                                                                                                |
+| `results`                                                                                          | [components.Results](../../models/components/results.md)[]                                         | :heavy_check_mark:                                                                                 | N/A                                                                                                |
 | `debugData`                                                                                        | [components.DebugData](../../models/components/debugdata.md)                                       | :heavy_minus_sign:                                                                                 | N/A                                                                                                |
 | `resolvedInputs`                                                                                   | Record<string, *string*>                                                                           | :heavy_minus_sign:                                                                                 | N/A                                                                                                |

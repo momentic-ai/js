@@ -6,7 +6,7 @@
 import { PageAssertionCommand } from "momentic/models/components";
 
 let value: PageAssertionCommand = {
-  id: "e457e185-8b6a-489f-be3a-5aa8e4824d0a",
+  id: "f603e8b4-45e8-40ca-95ef-d20e457e1858",
   assertion: {
     value: "<value>",
   },

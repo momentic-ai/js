@@ -1,14 +1,14 @@
-# Location
+# CodeLocation
 
 ## Example Usage
 
 ```typescript
-import { Location } from "momentic/models/components";
+import { CodeLocation } from "momentic/models/components";
 
-let value: Location = {
-  url: "https://awesome-voter.biz",
-  lineNumber: 3834.41,
-  columnNumber: 4776.65,
+let value: CodeLocation = {
+  url: "https://hospitable-travel.org",
+  lineNumber: 710.36,
+  columnNumber: 3373.96,
 };
 ```
 

@@ -6,7 +6,7 @@
 import { ScrollUpCommand } from "momentic/models/components";
 
 let value: ScrollUpCommand = {
-  id: "c28909b3-fe49-4a8d-9cbf-48633323f9b7",
+  id: "7053202c-73d5-4fe9-b90c-28909b3fe49a",
 };
 ```
 

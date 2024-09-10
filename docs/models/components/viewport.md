@@ -6,8 +6,8 @@
 import { Viewport } from "momentic/models/components";
 
 let value: Viewport = {
-  width: 4146.62,
-  height: 4736,
+  width: 1863.32,
+  height: 7742.34,
 };
 ```
 

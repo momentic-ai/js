@@ -6,9 +6,12 @@
 import { ClickCommand } from "momentic/models/components";
 
 let value: ClickCommand = {
-  id: "71b5e6e1-3b99-4d48-8e1e-91e450ad2abd",
+  id: "9da1ffe7-8f09-47b0-874f-15471b5e6e13",
   target: {
-    elementDescriptor: "<value>",
+    percentXYLocation: {
+      percentX: 5651.89,
+      percentY: 5666.02,
+    },
   },
 };
 ```

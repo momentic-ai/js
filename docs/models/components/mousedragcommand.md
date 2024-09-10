@@ -6,7 +6,7 @@
 import { MouseDragCommand } from "momentic/models/components";
 
 let value: MouseDragCommand = {
-  id: "5c0b2f2f-b7b1-494a-a76b-26916fe1f08f",
+  id: "a3c28744-ed53-4b88-b3a8-d8f5c0b2f2fb",
   deltaX: "<value>",
   deltaY: "<value>",
 };

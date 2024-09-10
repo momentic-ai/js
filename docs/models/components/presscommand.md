@@ -6,7 +6,7 @@
 import { PressCommand } from "momentic/models/components";
 
 let value: PressCommand = {
-  id: "6ae395ef-b9ba-488f-ba66-997074ba4469",
+  id: "969e9a3e-fa77-4dfb-94cd-66ae395efb9b",
   value: "<value>",
 };
 ```

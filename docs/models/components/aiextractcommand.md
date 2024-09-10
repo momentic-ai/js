@@ -6,7 +6,7 @@
 import { AIExtractCommand } from "momentic/models/components";
 
 let value: AIExtractCommand = {
-  id: "a8422bb6-79d2-4322-b15b-f0cbb1e31b8b",
+  id: "70b326b5-a734-429c-9b1a-8422bb679d23",
   goal: "<value>",
 };
 ```

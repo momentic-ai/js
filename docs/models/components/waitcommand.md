@@ -6,8 +6,8 @@
 import { WaitCommand } from "momentic/models/components";
 
 let value: WaitCommand = {
-  id: "bfaad4f9-efc1-4b45-92c1-032648dc2f61",
-  delay: 3251.18,
+  id: "7956f925-1a5a-49da-a60f-f57bfaad4f9e",
+  delay: 9569.33,
 };
 ```
 

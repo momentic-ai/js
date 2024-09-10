@@ -6,7 +6,7 @@
 import { Three } from "momentic/models/components";
 
 let value: Three = {
-  condition: "EXISTS",
+  condition: "ENABLED",
 };
 ```
 
