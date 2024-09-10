@@ -7,7 +7,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
