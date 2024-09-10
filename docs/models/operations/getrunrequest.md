@@ -1,12 +1,12 @@
-# QueueStepsResponse
+# GetRunRequest
 
 ## Example Usage
 
 ```typescript
-import { QueueStepsResponse } from "momentic/models/components";
+import { GetRunRequest } from "momentic/models/operations";
 
-let value: QueueStepsResponse = {
-  runId: "d151a05d-fc2d-4df7-8c78-ca1ba928fc81",
+let value: GetRunRequest = {
+  runId: "<value>",
 };
 ```
 

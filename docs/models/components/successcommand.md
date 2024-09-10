@@ -6,7 +6,7 @@
 import { SuccessCommand } from "momentic/models/components";
 
 let value: SuccessCommand = {
-  id: "f4863332-3f9b-477f-ba41-00674ebf6928",
+  id: "737ae420-3ce5-4e6a-95d8-a0d446ce2af7",
 };
 ```
 

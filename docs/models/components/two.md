@@ -6,7 +6,7 @@
 import { Two } from "momentic/models/components";
 
 let value: Two = {
-  operation: "STARTS_WITH",
+  operation: "CONTAINS",
   attr: "<value>",
   value: "<value>",
 };

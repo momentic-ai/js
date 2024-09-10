@@ -6,8 +6,8 @@
 import { NavigateCommand } from "momentic/models/components";
 
 let value: NavigateCommand = {
-  id: "997074ba-4469-4b6e-a141-959890afa563",
-  url: "https://conventional-frequency.com",
+  id: "1e5b7fd2-ed02-4892-9cdd-c692601fb576",
+  url: "https://attractive-subtitle.info",
 };
 ```
 

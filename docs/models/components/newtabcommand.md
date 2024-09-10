@@ -6,8 +6,8 @@
 import { NewTabCommand } from "momentic/models/components";
 
 let value: NewTabCommand = {
-  id: "28744ed5-3b88-4f3a-8d8f-5c0b2f2fb7b1",
-  url: "https://flippant-plugin.com",
+  id: "4294e369-8f44-47f6-83e8-b445e80ca55e",
+  url: "https://torn-cleft.com",
 };
 ```
 

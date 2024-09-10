@@ -6,7 +6,7 @@
 import { SelectOptionCommand } from "momentic/models/components";
 
 let value: SelectOptionCommand = {
-  id: "efa77dfb-14cd-466a-a395-efb9ba88f3a6",
+  id: "b6e21419-5989-40af-a563-e2516fe4c8b7",
   target: {
     elementDescriptor: "<value>",
   },

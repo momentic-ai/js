@@ -6,9 +6,12 @@
 import { HoverCommand } from "momentic/models/components";
 
 let value: HoverCommand = {
-  id: "9f1d1705-1339-4d08-886a-1840394c2607",
+  id: "515cc413-aa63-4aae-8d67-864dbb675fd5",
   target: {
-    elementDescriptor: "<value>",
+    percentXYLocation: {
+      percentX: 3975.33,
+      percentY: 460.07,
+    },
   },
 };
 ```

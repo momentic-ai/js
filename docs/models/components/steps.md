@@ -6,7 +6,9 @@
 import { Steps } from "momentic/models/components";
 
 let value: Steps = {
-  text: "<value>",
+  command: {
+    id: "cb739205-9293-496f-aa75-96eb10faaa23",
+  },
 };
 ```
 

@@ -6,8 +6,8 @@
 import { WaitUrlCommand } from "momentic/models/components";
 
 let value: WaitUrlCommand = {
-  id: "2ca3aed0-1179-4963-92fd-e04771778ff6",
-  url: "http://thunderous-archeology.com",
+  id: "a660659a-1ade-4aab-9851-d6c645b08b61",
+  url: "https://overjoyed-bite.net",
 };
 ```
 

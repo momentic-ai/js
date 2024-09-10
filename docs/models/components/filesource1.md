@@ -8,7 +8,7 @@ Accessible link to the file, either public http or local file://
 import { FileSource1 } from "momentic/models/components";
 
 let value: FileSource1 = {
-  url: "https://lanky-apparel.net",
+  url: "http://smart-chuck.com",
 };
 ```
 

@@ -1,15 +1,13 @@
-# BoundingBox
-
-css pixel bounding box
+# GetRunResponseViewport
 
 ## Example Usage
 
 ```typescript
-import { BoundingBox } from "momentic/models/components";
+import { GetRunResponseViewport } from "momentic/models/components";
 
-let value: BoundingBox = {
-  width: 1831.91,
-  height: 3978.21,
+let value: GetRunResponseViewport = {
+  width: 4375.87,
+  height: 2975.34,
 };
 ```
 
@@ -17,7 +15,5 @@ let value: BoundingBox = {
 
 | Field              | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `x`                | *number*           | :heavy_minus_sign: | N/A                |
-| `y`                | *number*           | :heavy_minus_sign: | N/A                |
 | `width`            | *number*           | :heavy_check_mark: | N/A                |
 | `height`           | *number*           | :heavy_check_mark: | N/A                |

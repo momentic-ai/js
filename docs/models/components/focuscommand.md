@@ -6,7 +6,7 @@
 import { FocusCommand } from "momentic/models/components";
 
 let value: FocusCommand = {
-  id: "f9251a5a-9da6-460f-b57b-faad4f9efc1b",
+  id: "199ebfd0-e9fe-46c6-b2ca-3aed01179963",
   target: {
     elementDescriptor: "<value>",
   },

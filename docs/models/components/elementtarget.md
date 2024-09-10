@@ -6,10 +6,7 @@
 import { ElementTarget } from "momentic/models/components";
 
 let value: ElementTarget = {
-  percentXYLocation: {
-    percentX: 199.87,
-    percentY: 391.87,
-  },
+  elementDescriptor: "<value>",
 };
 ```
 

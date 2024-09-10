@@ -7,15 +7,7 @@ import { PresetAction } from "momentic/models/components";
 
 let value: PresetAction = {
   command: {
-    id: "cc78ca1b-a928-4fc8-9674-2cb739205929",
-    target: {
-      elementDescriptor: "<value>",
-    },
-    assertion: {
-      operation: "STARTS_WITH",
-      attr: "<value>",
-      value: "<value>",
-    },
+    id: "2c595590-7aff-41a3-a2fa-9467739251aa",
   },
 };
 ```

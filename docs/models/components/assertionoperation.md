@@ -5,7 +5,7 @@
 ```typescript
 import { AssertionOperation } from "momentic/models/components";
 
-let value: AssertionOperation = "CONTAINS";
+let value: AssertionOperation = "STARTS_WITH";
 ```
 
 ## Values

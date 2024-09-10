@@ -6,10 +6,8 @@
 import { Command } from "momentic/models/components";
 
 let value: Command = {
-  id: "ea7596eb-10fa-4aa2-b52c-5955907aff1a",
-  target: {
-    elementDescriptor: "<value>",
-  },
+  id: "2c3f5ad0-19da-41ff-a78f-097b0074f154",
+  storageState: "<value>",
 };
 ```
 

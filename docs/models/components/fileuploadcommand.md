@@ -6,9 +6,9 @@
 import { FileUploadCommand } from "momentic/models/components";
 
 let value: FileUploadCommand = {
-  id: "82aa4825-62f2-422e-9817-ee17cbe61e6b",
+  id: "789fd871-f99d-4d2e-bd12-1aa6f1e674bd",
   fileSource: {
-    url: "http://right-mouse.biz",
+    url: "https://ancient-encouragement.org",
   },
 };
 ```
