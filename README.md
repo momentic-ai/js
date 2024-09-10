@@ -79,7 +79,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -95,46 +95,8 @@ run();
 
 ### [Momentic SDK](docs/sdks/momentic/README.md)
 
-* [authCheck](docs/sdks/momentic/README.md#authcheck) - Check authentication status
-* [getFeatureFlags](docs/sdks/momentic/README.md#getfeatureflags) - Get feature flags
-* [updateStepCaches](docs/sdks/momentic/README.md#updatestepcaches) - Update step caches
-* [getStepCaches](docs/sdks/momentic/README.md#getstepcaches) - Get step caches
-* [updateLastUsedAt](docs/sdks/momentic/README.md#updatelastusedat) - Update last used at for cache entries
-* [getAllEnvironments](docs/sdks/momentic/README.md#getallenvironments) - Get all resolved environments
-* [updateEnvironments](docs/sdks/momentic/README.md#updateenvironments) - Update environments
-* [getEnvironmentByName](docs/sdks/momentic/README.md#getenvironmentbyname) - Get a specific environment by name
-* [getCachedResult](docs/sdks/momentic/README.md#getcachedresult) - Get cached result
-* [setCachedResult](docs/sdks/momentic/README.md#setcachedresult) - Set cached result
-* [tryAcquireLock](docs/sdks/momentic/README.md#tryacquirelock) - Try to acquire a lock
-* [releaseLock](docs/sdks/momentic/README.md#releaselock) - Release a lock
-* [createRun](docs/sdks/momentic/README.md#createrun) - Create a new run
-* [updateRun](docs/sdks/momentic/README.md#updaterun) - Update an existing run
 * [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses) - Get run statuses
-* [uploadProposedSteps](docs/sdks/momentic/README.md#uploadproposedsteps) - Upload set of proposed steps
-* [uploadScreenshot](docs/sdks/momentic/README.md#uploadscreenshot) - Upload a screenshot
-* [getSuiteRunStatuses](docs/sdks/momentic/README.md#getsuiterunstatuses) - Get suite run statuses
-* [queueSuites](docs/sdks/momentic/README.md#queuesuites) - Queue suites
-* [getAllTestIds](docs/sdks/momentic/README.md#getalltestids) - Get all test IDs
-* [exportTests](docs/sdks/momentic/README.md#exporttests) - Export tests as YAML
-* [updateTestsWithYAML](docs/sdks/momentic/README.md#updatetestswithyaml) - Update tests with YAML representation
-* [queueTests](docs/sdks/momentic/README.md#queuetests) - Queue multiple test runs
-* [queueSingleTest](docs/sdks/momentic/README.md#queuesingletest) - Queue a single test run
-* [getTest](docs/sdks/momentic/README.md#gettest) - Get a single test
-* [updateTest](docs/sdks/momentic/README.md#updatetest) - Update a single test
-* [getNextCommand](docs/sdks/momentic/README.md#getnextcommand) - Get the next command for the web agent
-* [getAssertionResult](docs/sdks/momentic/README.md#getassertionresult) - Get the assertion result for the web agent
-* [locateElement](docs/sdks/momentic/README.md#locateelement) - Locate an element for the web agent
-* [splitGoal](docs/sdks/momentic/README.md#splitgoal) - Split a goal into granular goals
-* [reverseMappedDescription](docs/sdks/momentic/README.md#reversemappeddescription) - Get reverse mapped description
-* [textExtraction](docs/sdks/momentic/README.md#textextraction) - Extract text from the web page
-* [recommendChunks](docs/sdks/momentic/README.md#recommendchunks) - Get recommended chunks
-* [templateMatching](docs/sdks/momentic/README.md#templatematching) - Perform template matching
-* [resultClassification](docs/sdks/momentic/README.md#resultclassification) - Classify test results
-* [autohealSection](docs/sdks/momentic/README.md#autohealsection) - Get autohealing proposal for a section
-* [keywordExtractor](docs/sdks/momentic/README.md#keywordextractor) - Extract keywords
-* [smsSend](docs/sdks/momentic/README.md#smssend) - Send an SMS message
-* [smsFetchLatest](docs/sdks/momentic/README.md#smsfetchlatest) - Fetch the latest SMS message
-* [emailFetchLatest](docs/sdks/momentic/README.md#emailfetchlatest) - Fetch the latest email
+* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue a steps run
 <!-- End Available Resources and Operations [operations] -->
 
 <!-- Start Standalone functions [standalone-funcs] -->
@@ -152,46 +114,8 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [authCheck](docs/sdks/momentic/README.md#authcheck)
-- [autohealSection](docs/sdks/momentic/README.md#autohealsection)
-- [createRun](docs/sdks/momentic/README.md#createrun)
-- [emailFetchLatest](docs/sdks/momentic/README.md#emailfetchlatest)
-- [exportTests](docs/sdks/momentic/README.md#exporttests)
-- [getAllEnvironments](docs/sdks/momentic/README.md#getallenvironments)
-- [getAllTestIds](docs/sdks/momentic/README.md#getalltestids)
-- [getAssertionResult](docs/sdks/momentic/README.md#getassertionresult)
-- [getCachedResult](docs/sdks/momentic/README.md#getcachedresult)
-- [getEnvironmentByName](docs/sdks/momentic/README.md#getenvironmentbyname)
-- [getFeatureFlags](docs/sdks/momentic/README.md#getfeatureflags)
-- [getNextCommand](docs/sdks/momentic/README.md#getnextcommand)
 - [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses)
-- [getStepCaches](docs/sdks/momentic/README.md#getstepcaches)
-- [getSuiteRunStatuses](docs/sdks/momentic/README.md#getsuiterunstatuses)
-- [getTest](docs/sdks/momentic/README.md#gettest)
-- [keywordExtractor](docs/sdks/momentic/README.md#keywordextractor)
-- [locateElement](docs/sdks/momentic/README.md#locateelement)
-- [queueSingleTest](docs/sdks/momentic/README.md#queuesingletest)
-- [queueSuites](docs/sdks/momentic/README.md#queuesuites)
-- [queueTests](docs/sdks/momentic/README.md#queuetests)
-- [recommendChunks](docs/sdks/momentic/README.md#recommendchunks)
-- [releaseLock](docs/sdks/momentic/README.md#releaselock)
-- [resultClassification](docs/sdks/momentic/README.md#resultclassification)
-- [reverseMappedDescription](docs/sdks/momentic/README.md#reversemappeddescription)
-- [setCachedResult](docs/sdks/momentic/README.md#setcachedresult)
-- [smsFetchLatest](docs/sdks/momentic/README.md#smsfetchlatest)
-- [smsSend](docs/sdks/momentic/README.md#smssend)
-- [splitGoal](docs/sdks/momentic/README.md#splitgoal)
-- [templateMatching](docs/sdks/momentic/README.md#templatematching)
-- [textExtraction](docs/sdks/momentic/README.md#textextraction)
-- [tryAcquireLock](docs/sdks/momentic/README.md#tryacquirelock)
-- [updateEnvironments](docs/sdks/momentic/README.md#updateenvironments)
-- [updateLastUsedAt](docs/sdks/momentic/README.md#updatelastusedat)
-- [updateRun](docs/sdks/momentic/README.md#updaterun)
-- [updateStepCaches](docs/sdks/momentic/README.md#updatestepcaches)
-- [updateTest](docs/sdks/momentic/README.md#updatetest)
-- [updateTestsWithYAML](docs/sdks/momentic/README.md#updatetestswithyaml)
-- [uploadProposedSteps](docs/sdks/momentic/README.md#uploadproposedsteps)
-- [uploadScreenshot](docs/sdks/momentic/README.md#uploadscreenshot)
+- [queueSteps](docs/sdks/momentic/README.md#queuesteps)
 
 
 </details>
@@ -211,7 +135,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck({
+  const result = await momentic.getRunStatuses({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -251,7 +175,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -285,7 +209,7 @@ const momentic = new Momentic({
 async function run() {
   let result;
   try {
-    result = await momentic.authCheck();
+    result = await momentic.getRunStatuses();
 
     // Handle the result
     console.log(result);
@@ -331,7 +255,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -355,7 +279,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -435,7 +359,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.authCheck();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
