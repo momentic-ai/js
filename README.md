@@ -79,7 +79,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -93,11 +93,14 @@ run();
 <!-- Start Available Resources and Operations [operations] -->
 ## Available Resources and Operations
 
-### [Momentic SDK](docs/sdks/momentic/README.md)
+### [runs](docs/sdks/runs/README.md)
 
-* [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses) - Get run statuses
-* [getRun](docs/sdks/momentic/README.md#getrun) - Get run statuses
-* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue steps run
+* [getStatuses](docs/sdks/runs/README.md#getstatuses) - Get run statuses
+* [get](docs/sdks/runs/README.md#get) - Get run statuses
+
+### [steps](docs/sdks/steps/README.md)
+
+* [queue](docs/sdks/steps/README.md#queue) - Queue steps run
 <!-- End Available Resources and Operations [operations] -->
 
 <!-- Start Standalone functions [standalone-funcs] -->
@@ -115,9 +118,9 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses)
-- [getRun](docs/sdks/momentic/README.md#getrun)
-- [queueSteps](docs/sdks/momentic/README.md#queuesteps)
+- [runsGetStatuses](docs/sdks/runs/README.md#getstatuses)
+- [runsGet](docs/sdks/runs/README.md#get)
+- [stepsQueue](docs/sdks/steps/README.md#queue)
 
 
 </details>
@@ -137,7 +140,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses({
+  const result = await momentic.runs.getStatuses({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -177,7 +180,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -211,7 +214,7 @@ const momentic = new Momentic({
 async function run() {
   let result;
   try {
-    result = await momentic.getRunStatuses();
+    result = await momentic.runs.getStatuses();
 
     // Handle the result
     console.log(result);
@@ -257,7 +260,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -281,7 +284,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -361,7 +364,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
