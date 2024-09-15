@@ -19,18 +19,18 @@ specific category of applications.
 ## Example
 
 ```typescript
-import { MomenticCore } from "momentic/core.js";
-import { runsGetStatuses } from "momentic/funcs/runsGetStatuses.js";
-import { SDKValidationError } from "momentic/models/errors/sdkvalidationerror.js";
+import { MomenticCore } from "@momentic/js/core.js";
+import { getRunStatuses } from "@momentic/js/funcs/getRunStatuses.js";
+import { SDKValidationError } from "@momentic/js/models/errors/sdkvalidationerror.js";
 
 // Use `MomenticCore` for best tree-shaking performance.
 // You can create one instance of it to use across an application.
 const momentic = new MomenticCore({
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const res = await runsGetStatuses(momentic);
+  const res = await getRunStatuses(momentic);
 
   switch (true) {
     case res.ok:
