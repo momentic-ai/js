@@ -1,6 +1,22 @@
-# momentic
+# @momentic/js
 
-Developer-friendly & type-safe Typescript SDK specifically catered to leverage *momentic* API.
+Developer-friendly & type-safe Typescript SDK specifically catered to leverage *@momentic/js* API.
+
+<div align="left">
+    <a href="https://www.speakeasy.com/?utm_source=@momentic/js&utm_campaign=typescript"><img src="https://custom-icon-badges.demolab.com/badge/-Built%20By%20Speakeasy-212015?style=for-the-badge&logoColor=FBE331&logo=speakeasy&labelColor=545454" /></a>
+    <a href="https://opensource.org/licenses/MIT">
+        <img src="https://img.shields.io/badge/License-MIT-blue.svg" style="width: 100px; height: 28px;" />
+    </a>
+</div>
+
+
+## 🏗 **Welcome to your new SDK!** 🏗
+
+It has been generated successfully based on your OpenAPI spec. However, it is not yet ready for production use. Here are some next steps:
+- [ ] 🛠 Make your SDK feel handcrafted by [customizing it](https://www.speakeasy.com/docs/customize-sdks)
+- [ ] ♻️ Refine your SDK quickly by iterating locally with the [Speakeasy CLI](https://github.com/speakeasy-api/speakeasy)
+- [ ] 🎁 Publish your SDK to package managers by [configuring automatic publishing](https://www.speakeasy.com/docs/advanced-setup/publish-sdks)
+- [ ] ✨ When ready to productionize, delete this section from the README
 
 <!-- Start Summary [summary] -->
 ## Summary
@@ -32,32 +48,29 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add momentic
+npm add <UNSET>
 ```
 
 ### PNPM
 
 ```bash
-pnpm add momentic
+pnpm add <UNSET>
 ```
 
 ### Bun
 
 ```bash
-bun add momentic
+bun add <UNSET>
 ```
 
 ### Yarn
 
 ```bash
-yarn add momentic zod
+yarn add <UNSET> zod
 
 # Note that Yarn does not install peer dependencies automatically. You will need
 # to install zod as shown above.
 ```
-
-> [!NOTE]
-> This package is published with CommonJS and ES Modules (ESM) support.
 <!-- End SDK Installation [installation] -->
 
 <!-- Start Requirements [requirements] -->
@@ -72,14 +85,14 @@ For supported JavaScript runtimes, please consult [RUNTIMES.md](RUNTIMES.md).
 ### Example
 
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -93,14 +106,16 @@ run();
 <!-- Start Available Resources and Operations [operations] -->
 ## Available Resources and Operations
 
-### [runs](docs/sdks/runs/README.md)
+<details open>
+<summary>Available methods</summary>
 
-* [getStatuses](docs/sdks/runs/README.md#getstatuses) - Get run statuses
-* [get](docs/sdks/runs/README.md#get) - Get run statuses
+### [Momentic SDK](docs/sdks/momentic/README.md)
 
-### [steps](docs/sdks/steps/README.md)
+* [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses) - Get run statuses
+* [getRun](docs/sdks/momentic/README.md#getrun) - Get run statuses
+* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue steps run
 
-* [queue](docs/sdks/steps/README.md#queue) - Queue steps run
+</details>
 <!-- End Available Resources and Operations [operations] -->
 
 <!-- Start Standalone functions [standalone-funcs] -->
@@ -118,9 +133,9 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [runsGetStatuses](docs/sdks/runs/README.md#getstatuses)
-- [runsGet](docs/sdks/runs/README.md#get)
-- [stepsQueue](docs/sdks/steps/README.md#queue)
+- [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses)
+- [getRun](docs/sdks/momentic/README.md#getrun)
+- [queueSteps](docs/sdks/momentic/README.md#queuesteps)
 
 
 </details>
@@ -133,14 +148,14 @@ Some of the endpoints in this SDK support retries.  If you use the SDK without a
 
 To change the default retry strategy for a single API call, simply provide a retryConfig object to the call:
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses({
+  const result = await momentic.getRunStatuses({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -163,7 +178,7 @@ run();
 
 If you'd like to override the default retry strategy for all operations that support retries, you can provide a retryConfig at SDK initialization:
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
   retryConfig: {
@@ -176,11 +191,11 @@ const momentic = new Momentic({
     },
     retryConnectionErrors: false,
   },
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -204,17 +219,17 @@ Validation errors can also occur when either method arguments or data returned f
 
 
 ```typescript
-import { Momentic } from "momentic";
-import { SDKValidationError } from "momentic/models/errors";
+import { Momentic } from "@momentic/js";
+import { SDKValidationError } from "@momentic/js/models/errors";
 
 const momentic = new Momentic({
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
   let result;
   try {
-    result = await momentic.runs.getStatuses();
+    result = await momentic.getRunStatuses();
 
     // Handle the result
     console.log(result);
@@ -252,15 +267,15 @@ You can override the default server globally by passing a server index to the `s
 | 1 | `https://api.staging.momentic.ai` | None |
 
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
   serverIdx: 1,
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -276,15 +291,15 @@ run();
 The default server can also be overridden globally by passing a URL to the `serverURL` optional parameter when initializing the SDK client instance. For example:
 
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
   serverURL: "https://api.momentic.ai",
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -313,8 +328,8 @@ custom header and a timeout to requests and how to use the `"requestError"` hook
 to log errors:
 
 ```typescript
-import { Momentic } from "momentic";
-import { HTTPClient } from "momentic/lib/http";
+import { Momentic } from "@momentic/js";
+import { HTTPClient } from "@momentic/js/lib/http";
 
 const httpClient = new HTTPClient({
   // fetcher takes a function that has the same signature as native `fetch`.
@@ -351,20 +366,20 @@ const sdk = new Momentic({ httpClient });
 
 This SDK supports the following security scheme globally:
 
-| Name        | Type        | Scheme      |
-| ----------- | ----------- | ----------- |
-| `apiKey`    | http        | HTTP Bearer |
+| Name                 | Type                 | Scheme               | Environment Variable |
+| -------------------- | -------------------- | -------------------- | -------------------- |
+| `apiKey`             | http                 | HTTP Bearer          | `MOMENTIC_API_KEY`   |
 
 To authenticate with the API the `apiKey` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const momentic = new Momentic({
-  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
+  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
 });
 
 async function run() {
-  const result = await momentic.runs.getStatuses();
+  const result = await momentic.getRunStatuses();
 
   // Handle the result
   console.log(result);
@@ -386,10 +401,12 @@ You can pass a logger that matches `console`'s interface as an SDK option.
 > Beware that debug logging will reveal secrets, like API tokens in headers, in log messages printed to a console or files. It's recommended to use this feature only during local development and not in production.
 
 ```typescript
-import { Momentic } from "momentic";
+import { Momentic } from "@momentic/js";
 
 const sdk = new Momentic({ debugLogger: console });
 ```
+
+You can also enable a default debug logger by setting an environment variable `MOMENTIC_DEBUG` to true.
 <!-- End Debugging [debug] -->
 
 <!-- Placeholder for Future Speakeasy SDK Sections -->
@@ -406,3 +423,5 @@ looking for the latest version.
 
 While we value open-source contributions to this SDK, this library is generated programmatically. Any manual changes added to internal files will be overwritten on the next generation. 
 We look forward to hearing your feedback. Feel free to open a PR or an issue with a proof of concept and we'll do our best to include it in a future release. 
+
+### SDK Created by [Speakeasy](https://www.speakeasy.com/?utm_source=@momentic/js&utm_campaign=typescript)
