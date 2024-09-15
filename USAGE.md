@@ -1,13 +1,13 @@
 <!-- Start SDK Example Usage [usage] -->
 ```typescript
-import { Momentic } from "@momentic/js";
+import { Momentic } from "momentic";
 
 const momentic = new Momentic({
-  apiKey: process.env["MOMENTIC_API_KEY"] ?? "",
+  apiKey: "<YOUR_BEARER_TOKEN_HERE>",
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
