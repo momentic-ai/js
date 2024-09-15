@@ -9,15 +9,6 @@ Developer-friendly & type-safe Typescript SDK specifically catered to leverage *
     </a>
 </div>
 
-
-## 🏗 **Welcome to your new SDK!** 🏗
-
-It has been generated successfully based on your OpenAPI spec. However, it is not yet ready for production use. Here are some next steps:
-- [ ] 🛠 Make your SDK feel handcrafted by [customizing it](https://www.speakeasy.com/docs/customize-sdks)
-- [ ] ♻️ Refine your SDK quickly by iterating locally with the [Speakeasy CLI](https://github.com/speakeasy-api/speakeasy)
-- [ ] 🎁 Publish your SDK to package managers by [configuring automatic publishing](https://www.speakeasy.com/docs/advanced-setup/publish-sdks)
-- [ ] ✨ When ready to productionize, delete this section from the README
-
 <!-- Start Summary [summary] -->
 ## Summary
 
@@ -48,29 +39,32 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add <UNSET>
+npm add @momentic/js
 ```
 
 ### PNPM
 
 ```bash
-pnpm add <UNSET>
+pnpm add @momentic/js
 ```
 
 ### Bun
 
 ```bash
-bun add <UNSET>
+bun add @momentic/js
 ```
 
 ### Yarn
 
 ```bash
-yarn add <UNSET> zod
+yarn add @momentic/js zod
 
 # Note that Yarn does not install peer dependencies automatically. You will need
 # to install zod as shown above.
 ```
+
+> [!NOTE]
+> This package is published with CommonJS and ES Modules (ESM) support.
 <!-- End SDK Installation [installation] -->
 
 <!-- Start Requirements [requirements] -->
@@ -92,7 +86,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -109,11 +103,15 @@ run();
 <details open>
 <summary>Available methods</summary>
 
-### [Momentic SDK](docs/sdks/momentic/README.md)
 
-* [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses) - Get run statuses
-* [getRun](docs/sdks/momentic/README.md#getrun) - Get run statuses
-* [queueSteps](docs/sdks/momentic/README.md#queuesteps) - Queue steps run
+### [runs](docs/sdks/runs/README.md)
+
+* [getStatuses](docs/sdks/runs/README.md#getstatuses) - Get run statuses
+* [get](docs/sdks/runs/README.md#get) - Get run statuses
+
+### [steps](docs/sdks/steps/README.md)
+
+* [queue](docs/sdks/steps/README.md#queue) - Queue steps run
 
 </details>
 <!-- End Available Resources and Operations [operations] -->
@@ -133,9 +131,9 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [getRunStatuses](docs/sdks/momentic/README.md#getrunstatuses)
-- [getRun](docs/sdks/momentic/README.md#getrun)
-- [queueSteps](docs/sdks/momentic/README.md#queuesteps)
+- [runsGetStatuses](docs/sdks/runs/README.md#getstatuses)
+- [runsGet](docs/sdks/runs/README.md#get)
+- [stepsQueue](docs/sdks/steps/README.md#queue)
 
 
 </details>
@@ -155,7 +153,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses({
+  const result = await momentic.runs.getStatuses({
     retries: {
       strategy: "backoff",
       backoff: {
@@ -195,7 +193,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -229,7 +227,7 @@ const momentic = new Momentic({
 async function run() {
   let result;
   try {
-    result = await momentic.getRunStatuses();
+    result = await momentic.runs.getStatuses();
 
     // Handle the result
     console.log(result);
@@ -275,7 +273,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -299,7 +297,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
@@ -379,7 +377,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
