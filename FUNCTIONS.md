@@ -20,7 +20,7 @@ specific category of applications.
 
 ```typescript
 import { MomenticCore } from "@momentic/js/core.js";
-import { getRunStatuses } from "@momentic/js/funcs/getRunStatuses.js";
+import { runsGetStatuses } from "@momentic/js/funcs/runsGetStatuses.js";
 import { SDKValidationError } from "@momentic/js/models/errors/sdkvalidationerror.js";
 
 // Use `MomenticCore` for best tree-shaking performance.
@@ -30,7 +30,7 @@ const momentic = new MomenticCore({
 });
 
 async function run() {
-  const res = await getRunStatuses(momentic);
+  const res = await runsGetStatuses(momentic);
 
   switch (true) {
     case res.ok:
