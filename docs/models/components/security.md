@@ -3,13 +3,15 @@
 ## Example Usage
 
 ```typescript
-import { Security } from "@momentic/js/models/components";
+import { Security } from "momentic/models/components";
 
-let value: Security = {};
+let value: Security = {
+  apiKey: "<value>",
+};
 ```
 
 ## Fields
 
 | Field              | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
-| `apiKey`           | *string*           | :heavy_minus_sign: | N/A                |
+| `apiKey`           | *string*           | :heavy_check_mark: | N/A                |

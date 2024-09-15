@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { TargetSource } from "@momentic/js/models/components";
+import { TargetSource } from "momentic/models/components";
 
 let value: TargetSource = "AI";
 ```

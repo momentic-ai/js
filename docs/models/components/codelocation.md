@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { CodeLocation } from "@momentic/js/models/components";
+import { CodeLocation } from "momentic/models/components";
 
 let value: CodeLocation = {
   url: "https://lawful-missionary.info",

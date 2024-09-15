@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { LocalStorageCommand } from "@momentic/js/models/components";
+import { LocalStorageCommand } from "momentic/models/components";
 
 let value: LocalStorageCommand = {
   id: "a3c28744-ed53-4b88-b3a8-d8f5c0b2f2fb",

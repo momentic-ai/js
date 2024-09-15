@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ElementAttributeValueAssertionOperation } from "@momentic/js/models/components";
+import { ElementAttributeValueAssertionOperation } from "momentic/models/components";
 
 let value: ElementAttributeValueAssertionOperation = "CONTAINS";
 ```

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { FailureReason } from "@momentic/js/models/components";
+import { FailureReason } from "momentic/models/components";
 
 let value: FailureReason = "InternalWebAgentError";
 ```

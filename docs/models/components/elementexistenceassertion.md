@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ElementExistenceAssertion } from "@momentic/js/models/components";
+import { ElementExistenceAssertion } from "momentic/models/components";
 
 let value: ElementExistenceAssertion = {
   condition: "ENABLED",

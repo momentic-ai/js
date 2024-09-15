@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { CaptchaCommand } from "@momentic/js/models/components";
+import { CaptchaCommand } from "momentic/models/components";
 
 let value: CaptchaCommand = {
   id: "6813f16d-9f5f-4ce6-8556-146c3e250fb0",

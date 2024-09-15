@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ManualElementAssertion } from "@momentic/js/models/components";
+import { ManualElementAssertion } from "momentic/models/components";
 
 let value: ManualElementAssertion = {
   operation: "EQUALS",

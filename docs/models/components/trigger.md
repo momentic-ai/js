@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Trigger } from "@momentic/js/models/components";
+import { Trigger } from "momentic/models/components";
 
 let value: Trigger = "CRON";
 ```

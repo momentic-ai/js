@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ElementContentAssertion } from "@momentic/js/models/components";
+import { ElementContentAssertion } from "momentic/models/components";
 
 let value: ElementContentAssertion = {
   operation: "EQUALS",

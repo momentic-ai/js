@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Viewport } from "@momentic/js/models/components";
+import { Viewport } from "momentic/models/components";
 
 let value: Viewport = {
   width: 4736,

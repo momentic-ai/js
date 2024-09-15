@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Condition } from "@momentic/js/models/components";
+import { Condition } from "momentic/models/components";
 
 let value: Condition = "ENABLED";
 ```

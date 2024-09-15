@@ -5,7 +5,7 @@ css pixel bounding box
 ## Example Usage
 
 ```typescript
-import { BoundingBox } from "@momentic/js/models/components";
+import { BoundingBox } from "momentic/models/components";
 
 let value: BoundingBox = {
   width: 3698.08,

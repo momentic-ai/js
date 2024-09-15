@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Test } from "@momentic/js/models/components";
+import { Test } from "momentic/models/components";
 
 let value: Test = {
   name: "<value>",

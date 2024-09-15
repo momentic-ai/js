@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { GetRunRequest } from "@momentic/js/models/operations";
+import { GetRunRequest } from "momentic/models/operations";
 
 let value: GetRunRequest = {
   runId: "<value>",

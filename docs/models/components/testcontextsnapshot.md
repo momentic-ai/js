@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { TestContextSnapshot } from "@momentic/js/models/components";
+import { TestContextSnapshot } from "momentic/models/components";
 
 let value: TestContextSnapshot = {
   env: {

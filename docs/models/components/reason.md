@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Reason } from "@momentic/js/models/components";
+import { Reason } from "momentic/models/components";
 
 let value: Reason = "InternalPlatformError";
 ```

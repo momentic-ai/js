@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { AIExtractCommand } from "@momentic/js/models/components";
+import { AIExtractCommand } from "momentic/models/components";
 
 let value: AIExtractCommand = {
   id: "2322715b-f0cb-4b1e-b1b8-b90f3443a110",

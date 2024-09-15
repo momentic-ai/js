@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { TestResultClassification } from "@momentic/js/models/components";
+import { TestResultClassification } from "momentic/models/components";
 
 let value: TestResultClassification = {
   reason: "UserConfigurationError",

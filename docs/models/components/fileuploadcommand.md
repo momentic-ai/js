@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { FileUploadCommand } from "@momentic/js/models/components";
+import { FileUploadCommand } from "momentic/models/components";
 
 let value: FileUploadCommand = {
   id: "1f99dd2e-fd12-41aa-af1e-674bdb04f157",

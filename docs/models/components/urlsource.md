@@ -5,7 +5,7 @@ Accessible link to the file, either public http or local file://
 ## Example Usage
 
 ```typescript
-import { UrlSource } from "@momentic/js/models/components";
+import { UrlSource } from "momentic/models/components";
 
 let value: UrlSource = {
   url: "http://terrific-grief.name",

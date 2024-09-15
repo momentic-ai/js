@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { PercentXYLocation } from "@momentic/js/models/components";
+import { PercentXYLocation } from "momentic/models/components";
 
 let value: PercentXYLocation = {
   percentX: 7351.94,
