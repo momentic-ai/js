@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { WaitUrlCommand } from "momentic/models/components";
+import { WaitUrlCommand } from "@momentic/js/models/components";
 
 let value: WaitUrlCommand = {
   id: "adeaab58-51d6-4c64-9b08-b61891baa0fe",

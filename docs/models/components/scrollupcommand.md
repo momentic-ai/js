@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ScrollUpCommand } from "momentic/models/components";
+import { ScrollUpCommand } from "@momentic/js/models/components";
 
 let value: ScrollUpCommand = {
   id: "9a8d9cbf-4863-4332-bf9b-77f3a4100674",

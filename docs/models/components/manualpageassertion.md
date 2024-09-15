@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ManualPageAssertion } from "momentic/models/components";
+import { ManualPageAssertion } from "@momentic/js/models/components";
 
 let value: ManualPageAssertion = {
   value: "<value>",

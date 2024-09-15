@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ElementTarget } from "momentic/models/components";
+import { ElementTarget } from "@momentic/js/models/components";
 
 let value: ElementTarget = {
   percentXYLocation: {

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Cache } from "momentic/models/components";
+import { Cache } from "@momentic/js/models/components";
 
 let value: Cache = {};
 ```

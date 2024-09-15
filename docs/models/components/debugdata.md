@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { DebugData } from "momentic/models/components";
+import { DebugData } from "@momentic/js/models/components";
 
 let value: DebugData = {
   logsPerPage: [

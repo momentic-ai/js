@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { DescriptionTarget } from "momentic/models/components";
+import { DescriptionTarget } from "@momentic/js/models/components";
 
 let value: DescriptionTarget = {
   elementDescriptor: "<value>",

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { VisualDiffCommand } from "momentic/models/components";
+import { VisualDiffCommand } from "@momentic/js/models/components";
 
 let value: VisualDiffCommand = {
   id: "7956f925-1a5a-49da-a60f-f57bfaad4f9e",

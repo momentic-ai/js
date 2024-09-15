@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ElementAssertionCommand } from "momentic/models/components";
+import { ElementAssertionCommand } from "@momentic/js/models/components";
 
 let value: ElementAssertionCommand = {
   id: "562f222e-9817-4ee1-bcbe-61e6b7b95bc0",

@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { ConsoleLog } from "momentic/models/components";
+import { ConsoleLog } from "@momentic/js/models/components";
 
 let value: ConsoleLog = {
   timestamp: 7917.25,

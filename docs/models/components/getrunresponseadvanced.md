@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { GetRunResponseAdvanced } from "momentic/models/components";
+import { GetRunResponseAdvanced } from "@momentic/js/models/components";
 
 let value: GetRunResponseAdvanced = {};
 ```

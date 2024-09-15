@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { GoBackCommand } from "momentic/models/components";
+import { GoBackCommand } from "@momentic/js/models/components";
 
 let value: GoBackCommand = {
   id: "ea19f1d1-7051-4339-9080-86a1840394c2",
