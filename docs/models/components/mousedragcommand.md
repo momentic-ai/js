@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { MouseDragCommand } from "momentic/models/components";
+import { MouseDragCommand } from "@momentic/js/models/components";
 
 let value: MouseDragCommand = {
   id: "7b194a27-6b26-4916-be1f-08f4294e3698",

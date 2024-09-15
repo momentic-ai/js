@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { GetRunResponseResultsStatus } from "momentic/models/components";
+import { GetRunResponseResultsStatus } from "@momentic/js/models/components";
 
 let value: GetRunResponseResultsStatus = "RUNNING";
 ```

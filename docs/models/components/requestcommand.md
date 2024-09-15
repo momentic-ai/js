@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { RequestCommand } from "momentic/models/components";
+import { RequestCommand } from "@momentic/js/models/components";
 
 let value: RequestCommand = {
   id: "9dfe0ab7-da8a-450c-a187-f86bc173d689",

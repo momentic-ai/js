@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { CookieCommand } from "momentic/models/components";
+import { CookieCommand } from "@momentic/js/models/components";
 
 let value: CookieCommand = {
   id: "08c42e14-1aac-4366-88dd-6b1442907474",

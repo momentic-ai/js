@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { BlurCommand } from "momentic/models/components";
+import { BlurCommand } from "@momentic/js/models/components";
 
 let value: BlurCommand = {
   id: "778ff61d-0174-4763-a0a1-5db6a660659a",

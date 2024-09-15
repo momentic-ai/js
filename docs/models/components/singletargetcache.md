@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { SingleTargetCache } from "momentic/models/components";
+import { SingleTargetCache } from "@momentic/js/models/components";
 
 let value: SingleTargetCache = {
   target: {

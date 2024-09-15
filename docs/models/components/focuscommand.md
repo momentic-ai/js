@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { FocusCommand } from "momentic/models/components";
+import { FocusCommand } from "@momentic/js/models/components";
 
 let value: FocusCommand = {
   id: "9fe6c632-ca3a-4ed0-9179-96312fde0477",

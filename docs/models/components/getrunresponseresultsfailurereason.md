@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { GetRunResponseResultsFailureReason } from "momentic/models/components";
+import { GetRunResponseResultsFailureReason } from "@momentic/js/models/components";
 
 let value: GetRunResponseResultsFailureReason = "AssertionFailureError";
 ```

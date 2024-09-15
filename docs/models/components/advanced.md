@@ -3,7 +3,7 @@
 ## Example Usage
 
 ```typescript
-import { Advanced } from "momentic/models/components";
+import { Advanced } from "@momentic/js/models/components";
 
 let value: Advanced = {};
 ```
