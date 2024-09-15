@@ -7,7 +7,7 @@ const momentic = new Momentic({
 });
 
 async function run() {
-  const result = await momentic.getRunStatuses();
+  const result = await momentic.runs.getStatuses();
 
   // Handle the result
   console.log(result);
