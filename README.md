@@ -39,25 +39,25 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add @momentic/js
+npm add <UNSET>
 ```
 
 ### PNPM
 
 ```bash
-pnpm add @momentic/js
+pnpm add <UNSET>
 ```
 
 ### Bun
 
 ```bash
-bun add @momentic/js
+bun add <UNSET>
 ```
 
 ### Yarn
 
 ```bash
-yarn add @momentic/js zod
+yarn add <UNSET> zod
 
 # Note that Yarn does not install peer dependencies automatically. You will need
 # to install zod as shown above.
