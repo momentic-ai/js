@@ -6,7 +6,7 @@
 import { AuthLoadCommand } from "@momentic/js/models/components";
 
 let value: AuthLoadCommand = {
-  id: "8e0adcf4-b921-4879-bce9-53f73ef7fbc7",
+  id: "22715bf0-cbb1-4e31-b8b9-0f3443a1108e",
   storageState: "<value>",
 };
 ```

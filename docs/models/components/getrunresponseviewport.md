@@ -6,8 +6,8 @@
 import { GetRunResponseViewport } from "@momentic/js/models/components";
 
 let value: GetRunResponseViewport = {
-  width: 6458.94,
-  height: 3843.82,
+  width: 4375.87,
+  height: 2975.34,
 };
 ```
 

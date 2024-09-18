@@ -6,8 +6,8 @@
 import { NavigateCommand } from "@momentic/js/models/components";
 
 let value: NavigateCommand = {
-  id: "28921cdd-c692-4601-bb57-6b0d5f0d30c5",
-  url: "https://secret-rhinoceros.biz",
+  id: "fa563e25-16fe-44c8-b711-e5b7fd2ed028",
+  url: "https://daring-camel.net",
 };
 ```
 

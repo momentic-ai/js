@@ -14,9 +14,9 @@ let value: GetRunResponse = {
   scheduledAt: "<value>",
   startedAt: "<value>",
   finishedAt: "<value>",
-  status: "PENDING",
-  trigger: "CLI",
-  attempts: 2726.56,
+  status: "RUNNING",
+  trigger: "CRON",
+  attempts: 4776.65,
   testId: "<value>",
   results: [],
 };
@@ -40,6 +40,7 @@ let value: GetRunResponse = {
 | `status`                                                                                         | [components.GetRunResponseStatus](../../models/components/getrunresponsestatus.md)               | :heavy_check_mark:                                                                               | N/A                                                                                              |
 | `trigger`                                                                                        | [components.Trigger](../../models/components/trigger.md)                                         | :heavy_check_mark:                                                                               | N/A                                                                                              |
 | `attempts`                                                                                       | *number*                                                                                         | :heavy_check_mark:                                                                               | N/A                                                                                              |
+| `runAttempts`                                                                                    | [components.RunAttempts](../../models/components/runattempts.md)[]                               | :heavy_minus_sign:                                                                               | N/A                                                                                              |
 | `failureReason`                                                                                  | [components.GetRunResponseFailureReason](../../models/components/getrunresponsefailurereason.md) | :heavy_minus_sign:                                                                               | N/A                                                                                              |
 | `failureDetails`                                                                                 | [components.TestFailureDetails](../../models/components/testfailuredetails.md)                   | :heavy_minus_sign:                                                                               | N/A                                                                                              |
 | `testId`                                                                                         | *string*                                                                                         | :heavy_check_mark:                                                                               | N/A                                                                                              |

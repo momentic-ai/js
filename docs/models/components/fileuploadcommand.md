@@ -6,9 +6,9 @@
 import { FileUploadCommand } from "@momentic/js/models/components";
 
 let value: FileUploadCommand = {
-  id: "1f99dd2e-fd12-41aa-af1e-674bdb04f157",
+  id: "be61e6b7-b95b-4c0a-b3c2-0c4f3789fd87",
   fileSource: {
-    url: "http://horrible-aide.name",
+    url: "http://weekly-overexertion.name",
   },
 };
 ```

@@ -6,12 +6,9 @@
 import { ElementAssertionCommand } from "@momentic/js/models/components";
 
 let value: ElementAssertionCommand = {
-  id: "562f222e-9817-4ee1-bcbe-61e6b7b95bc0",
+  id: "0bc7178e-4796-4f2a-b0c6-88282aa48256",
   target: {
-    percentXYLocation: {
-      percentX: 7313.98,
-      percentY: 2400.2,
-    },
+    elementDescriptor: "<value>",
   },
   assertion: {
     condition: "EXISTS",

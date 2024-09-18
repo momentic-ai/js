@@ -7,7 +7,16 @@ import { PresetAction } from "@momentic/js/models/components";
 
 let value: PresetAction = {
   command: {
-    id: "5907aff1-a3a2-4fa9-8677-39251aa52c3f",
+    id: "39205929-396f-4ea7-996e-b10faaa2352c",
+    fromTarget: {
+      elementDescriptor: "<value>",
+    },
+    toTarget: {
+      percentXYLocation: {
+        percentX: 3637.11,
+        percentY: 3250.47,
+      },
+    },
   },
 };
 ```

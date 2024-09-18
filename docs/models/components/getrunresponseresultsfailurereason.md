@@ -5,7 +5,7 @@
 ```typescript
 import { GetRunResponseResultsFailureReason } from "@momentic/js/models/components";
 
-let value: GetRunResponseResultsFailureReason = "AssertionFailureError";
+let value: GetRunResponseResultsFailureReason = "AIProviderError";
 ```
 
 ## Values

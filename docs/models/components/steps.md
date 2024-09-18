@@ -6,10 +6,7 @@
 import { Steps } from "@momentic/js/models/components";
 
 let value: Steps = {
-  command: {
-    id: "b7392059-2939-46fe-a759-6eb10faaa235",
-    url: "http://sick-escort.name",
-  },
+  text: "<value>",
 };
 ```
 

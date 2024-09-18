@@ -6,7 +6,7 @@
 import { ElementContentAssertion } from "@momentic/js/models/components";
 
 let value: ElementContentAssertion = {
-  operation: "EQUALS",
+  operation: "STARTS_WITH",
   value: "<value>",
 };
 ```

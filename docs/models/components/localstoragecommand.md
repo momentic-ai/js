@@ -6,7 +6,7 @@
 import { LocalStorageCommand } from "@momentic/js/models/components";
 
 let value: LocalStorageCommand = {
-  id: "a3c28744-ed53-4b88-b3a8-d8f5c0b2f2fb",
+  id: "fbee41f3-3317-4fe3-9b60-eb1ea426555b",
   key: "<key>",
   value: "<value>",
 };

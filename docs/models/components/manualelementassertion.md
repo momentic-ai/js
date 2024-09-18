@@ -6,7 +6,7 @@
 import { ManualElementAssertion } from "@momentic/js/models/components";
 
 let value: ManualElementAssertion = {
-  operation: "EQUALS",
+  operation: "CONTAINS",
   value: "<value>",
 };
 ```

@@ -6,7 +6,7 @@
 import { TypeCommand } from "@momentic/js/models/components";
 
 let value: TypeCommand = {
-  id: "3c969e9a-3efa-477d-bb14-cd66ae395efb",
+  id: "450ad2ab-d442-4698-82d5-02a94bb4f63c",
   value: "<value>",
 };
 ```

@@ -6,11 +6,11 @@
 import { SelectOptionCommand } from "@momentic/js/models/components";
 
 let value: SelectOptionCommand = {
-  id: "9890afa5-63e2-4516-be4c-8b711e5b7fd2",
+  id: "a88f3a66-9970-474b-a446-9b6e21419598",
   target: {
     percentXYLocation: {
-      percentX: 8681.26,
-      percentY: 375.59,
+      percentX: 336.25,
+      percentY: 6532.01,
     },
   },
   option: "<value>",

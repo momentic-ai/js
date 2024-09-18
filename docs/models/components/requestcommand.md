@@ -6,8 +6,8 @@
 import { RequestCommand } from "@momentic/js/models/components";
 
 let value: RequestCommand = {
-  id: "9dfe0ab7-da8a-450c-a187-f86bc173d689",
-  url: "https://unfit-symbol.name",
+  id: "51862065-e904-4f3b-9194-b8abf603a79f",
+  url: "https://talkative-volcano.org",
 };
 ```
 

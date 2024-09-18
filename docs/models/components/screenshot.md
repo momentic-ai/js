@@ -7,8 +7,8 @@ import { Screenshot } from "@momentic/js/models/components";
 
 let value: Screenshot = {
   data: "<value>",
-  width: 3679.27,
-  height: 9282.19,
+  width: 5230.06,
+  height: 3044.46,
 };
 ```
 

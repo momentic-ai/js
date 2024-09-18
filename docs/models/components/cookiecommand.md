@@ -6,7 +6,7 @@
 import { CookieCommand } from "@momentic/js/models/components";
 
 let value: CookieCommand = {
-  id: "08c42e14-1aac-4366-88dd-6b1442907474",
+  id: "13f16d9f-5fce-46c5-9614-6c3e250fb008",
   value: "<value>",
 };
 ```
