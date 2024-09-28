@@ -6,7 +6,7 @@
 import { AuthSaveCommand } from "@momentic/js/models/components";
 
 let value: AuthSaveCommand = {
-  id: "0adcf4b9-2187-49fc-a953-f73ef7fbc7ab",
+  id: "34e3cce1-3b34-4227-b156-0617dd19d3ce",
 };
 ```
 

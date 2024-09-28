@@ -6,8 +6,8 @@
 import { WaitUrlCommand } from "@momentic/js/models/components";
 
 let value: WaitUrlCommand = {
-  id: "61d01747-6360-4a15-9b6a-660659a1adea",
-  url: "https://scratchy-existence.name",
+  id: "44cba3df-8a84-4453-9ed7-5f38039a9dfc",
+  url: "https://cloudy-plugin.name",
 };
 ```
 

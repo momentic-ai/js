@@ -6,7 +6,7 @@
 import { ScrollRightCommand } from "@momentic/js/models/components";
 
 let value: ScrollRightCommand = {
-  id: "526f8d98-6e88-41ea-94f0-e1012563f94e",
+  id: "91f3b873-b1fd-4864-a8e4-8353f9b15e12",
 };
 ```
 

@@ -9,10 +9,10 @@ let value: DebugData = {
   logsPerPage: [
     [
       {
-        timestamp: 7917.25,
+        timestamp: 7991.59,
         text: "<value>",
         type: "<value>",
-        tabIndex: 8121.69,
+        tabIndex: 4614.79,
       },
     ],
   ],

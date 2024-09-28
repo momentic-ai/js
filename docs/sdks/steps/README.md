@@ -22,9 +22,9 @@ const momentic = new Momentic({
 
 async function run() {
   const result = await momentic.steps.queue();
-  
+
   // Handle the result
-  console.log(result)
+  console.log(result);
 }
 
 run();
@@ -54,7 +54,7 @@ async function run() {
   const { value: result } = res;
 
   // Handle the result
-  console.log(result)
+  console.log(result);
 }
 
 run();

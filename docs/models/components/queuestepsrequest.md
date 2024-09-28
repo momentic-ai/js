@@ -7,9 +7,13 @@ import { QueueStepsRequest } from "@momentic/js/models/components";
 
 let value: QueueStepsRequest = {
   testName: "<value>",
-  baseUrl: "<value>",
+  baseUrl: "https://hoarse-slide.com/",
   advanced: {},
-  steps: [],
+  steps: [
+    {
+      text: "<value>",
+    },
+  ],
 };
 ```
 

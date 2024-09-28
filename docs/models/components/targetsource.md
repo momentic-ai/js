@@ -5,7 +5,7 @@
 ```typescript
 import { TargetSource } from "@momentic/js/models/components";
 
-let value: TargetSource = "XY_PERCENT";
+let value: TargetSource = "RECORDING";
 ```
 
 ## Values

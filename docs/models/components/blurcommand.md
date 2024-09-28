@@ -6,12 +6,9 @@
 import { BlurCommand } from "@momentic/js/models/components";
 
 let value: BlurCommand = {
-  id: "6c632ca3-aed0-4117-9963-12fde0477177",
+  id: "94168088-c68b-4e69-9b0c-6a7bb3ad3caf",
   target: {
-    percentXYLocation: {
-      percentX: 9799.63,
-      percentY: 9672.6,
-    },
+    elementDescriptor: "<value>",
   },
 };
 ```

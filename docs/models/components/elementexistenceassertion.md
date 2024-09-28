@@ -6,7 +6,7 @@
 import { ElementExistenceAssertion } from "@momentic/js/models/components";
 
 let value: ElementExistenceAssertion = {
-  condition: "EDITABLE",
+  condition: "VISIBLE",
 };
 ```
 

@@ -6,7 +6,7 @@
 import { GoForwardCommand } from "@momentic/js/models/components";
 
 let value: GoForwardCommand = {
-  id: "ea19f1d1-7051-4339-9080-86a1840394c2",
+  id: "a6cb7a8c-7849-4492-a266-420047b7e025",
 };
 ```
 

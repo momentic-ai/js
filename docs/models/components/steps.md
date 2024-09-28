@@ -1,26 +1,27 @@
 # Steps
 
-## Example Usage
-
-```typescript
-import { Steps } from "@momentic/js/models/components";
-
-let value: Steps = {
-  text: "<value>",
-};
-```
 
 ## Supported Types
 
 ### `components.PresetAction`
 
 ```typescript
-const value: components.PresetAction = /* values here */
+const value: components.PresetAction = {
+  command: {
+    id: "f7f9b041-4156-41b9-a481-9e5a2b4290d0",
+    target: {
+      elementDescriptor: "<value>",
+    },
+    option: "<value>",
+  },
+};
 ```
 
 ### `components.AIAction`
 
 ```typescript
-const value: components.AIAction = /* values here */
+const value: components.AIAction = {
+  text: "<value>",
+};
 ```
 

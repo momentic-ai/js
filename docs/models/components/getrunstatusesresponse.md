@@ -7,8 +7,8 @@ import { GetRunStatusesResponse } from "@momentic/js/models/components";
 
 let value: GetRunStatusesResponse = {
   id: "<id>",
-  status: "CANCELLED",
-  testId: "<value>",
+  status: "PASSED",
+  testId: "<id>",
 };
 ```
 

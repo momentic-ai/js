@@ -5,7 +5,7 @@
 ```typescript
 import { GetRunResponseRunAttemptsStatus } from "@momentic/js/models/components";
 
-let value: GetRunResponseRunAttemptsStatus = "CANCELLED";
+let value: GetRunResponseRunAttemptsStatus = "PASSED";
 ```
 
 ## Values

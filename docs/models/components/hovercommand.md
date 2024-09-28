@@ -6,7 +6,7 @@
 import { HoverCommand } from "@momentic/js/models/components";
 
 let value: HoverCommand = {
-  id: "6071f93f-5f06-442d-ac7a-f515cc413aa6",
+  id: "d540d69f-02cc-4c8f-b691-6b3fa4c1f0e4",
   target: {
     elementDescriptor: "<value>",
   },

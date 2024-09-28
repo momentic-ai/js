@@ -6,8 +6,8 @@
 import { RequestCommand } from "@momentic/js/models/components";
 
 let value: RequestCommand = {
-  id: "51862065-e904-4f3b-9194-b8abf603a79f",
-  url: "https://talkative-volcano.org",
+  id: "cf6afba1-5e3d-4b58-98b8-2c6f4459e249",
+  url: "https://sugary-traditionalism.info/",
 };
 ```
 

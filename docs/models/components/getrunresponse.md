@@ -8,17 +8,28 @@ import { GetRunResponse } from "@momentic/js/models/components";
 let value: GetRunResponse = {
   id: "<id>",
   runKey: "<value>",
-  organizationId: "<value>",
+  organizationId: "<id>",
   createdAt: "<value>",
   createdBy: "<value>",
   scheduledAt: "<value>",
   startedAt: "<value>",
   finishedAt: "<value>",
-  status: "RUNNING",
-  trigger: "CRON",
-  attempts: 4776.65,
-  testId: "<value>",
-  results: [],
+  status: "RETRYING",
+  trigger: "CLI",
+  attempts: 8700.12,
+  testId: "<id>",
+  results: [
+    {
+      startedAt: "<value>",
+      finishedAt: "<value>",
+      status: "CANCELLED",
+      results: [
+        {
+          "key": "<value>",
+        },
+      ],
+    },
+  ],
 };
 ```
 

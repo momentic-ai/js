@@ -1,33 +1,32 @@
 # ManualElementAssertion
 
-## Example Usage
-
-```typescript
-import { ManualElementAssertion } from "@momentic/js/models/components";
-
-let value: ManualElementAssertion = {
-  operation: "CONTAINS",
-  value: "<value>",
-};
-```
 
 ## Supported Types
 
 ### `components.ElementContentAssertion`
 
 ```typescript
-const value: components.ElementContentAssertion = /* values here */
+const value: components.ElementContentAssertion = {
+  operation: "CONTAINS",
+  value: "<value>",
+};
 ```
 
 ### `components.ElementAttributeValueAssertion`
 
 ```typescript
-const value: components.ElementAttributeValueAssertion = /* values here */
+const value: components.ElementAttributeValueAssertion = {
+  operation: "STARTS_WITH",
+  attr: "<value>",
+  value: "<value>",
+};
 ```
 
 ### `components.ElementExistenceAssertion`
 
 ```typescript
-const value: components.ElementExistenceAssertion = /* values here */
+const value: components.ElementExistenceAssertion = {
+  condition: "VISIBLE",
+};
 ```
 

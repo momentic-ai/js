@@ -5,7 +5,7 @@
 ```typescript
 import { Trigger } from "@momentic/js/models/components";
 
-let value: Trigger = "CRON";
+let value: Trigger = "CLI";
 ```
 
 ## Values
