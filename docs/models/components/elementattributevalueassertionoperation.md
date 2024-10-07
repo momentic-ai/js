@@ -5,7 +5,7 @@
 ```typescript
 import { ElementAttributeValueAssertionOperation } from "@momentic/js/models/components";
 
-let value: ElementAttributeValueAssertionOperation = "CONTAINS";
+let value: ElementAttributeValueAssertionOperation = "EQUALS";
 ```
 
 ## Values

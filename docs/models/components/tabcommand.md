@@ -6,8 +6,8 @@
 import { TabCommand } from "@momentic/js/models/components";
 
 let value: TabCommand = {
-  id: "9de24601-374e-45ef-b734-c4679f354515",
-  url: "https://honorable-unblinking.net/",
+  id: "e45fb8c1-7132-456f-a47c-dc47236b8ed0",
+  url: "https://whispered-airline.name",
 };
 ```
 

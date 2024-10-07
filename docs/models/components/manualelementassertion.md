@@ -7,7 +7,7 @@
 
 ```typescript
 const value: components.ElementContentAssertion = {
-  operation: "CONTAINS",
+  operation: "STARTS_WITH",
   value: "<value>",
 };
 ```
@@ -16,7 +16,7 @@ const value: components.ElementContentAssertion = {
 
 ```typescript
 const value: components.ElementAttributeValueAssertion = {
-  operation: "STARTS_WITH",
+  operation: "CONTAINS",
   attr: "<value>",
   value: "<value>",
 };
@@ -26,7 +26,7 @@ const value: components.ElementAttributeValueAssertion = {
 
 ```typescript
 const value: components.ElementExistenceAssertion = {
-  condition: "VISIBLE",
+  condition: "EXISTS",
 };
 ```
 

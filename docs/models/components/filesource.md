@@ -7,7 +7,7 @@
 
 ```typescript
 const value: components.UrlSource = {
-  url: "https://baggy-minister.biz/",
+  url: "https://friendly-produce.net",
 };
 ```
 

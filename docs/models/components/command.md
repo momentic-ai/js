@@ -43,7 +43,6 @@ const value: components.SelectOptionCommand = {
   target: {
     elementDescriptor: "<value>",
   },
-  option: "<value>",
 };
 ```
 
@@ -81,11 +80,34 @@ const value: components.AIAssertionCommand = {
 };
 ```
 
+### `components.HoverCommand`
+
+```typescript
+const value: components.HoverCommand = {
+  id: "164d0f55-026e-41fd-b753-900614342019",
+  target: {
+    percentXYLocation: {
+      percentX: 4090.54,
+      percentY: 1629.54,
+    },
+  },
+};
+```
+
+### `components.WaitCommand`
+
+```typescript
+const value: components.WaitCommand = {
+  id: "a7f1c43a-3a86-484b-b65d-e035dffe4f31",
+  delay: 2334.20,
+};
+```
+
 ### `components.SuccessCommand`
 
 ```typescript
 const value: components.SuccessCommand = {
-  id: "164d0f55-026e-41fd-b753-900614342019",
+  id: "b0be465b-3274-4d38-9fad-fcbff7142629",
 };
 ```
 
@@ -93,7 +115,7 @@ const value: components.SuccessCommand = {
 
 ```typescript
 const value: components.AIWaitCommand = {
-  id: "f62a7f1c-43a3-4a86-b84b-65de035dffe4",
+  id: "ef849e68-4763-4845-98c5-ed04715ba9b3",
   assertion: "<value>",
 };
 ```
@@ -102,7 +124,7 @@ const value: components.AIWaitCommand = {
 
 ```typescript
 const value: components.AIExtractCommand = {
-  id: "31f3b0be-465b-4327-84d3-8fadfcbff714",
+  id: "ae840b05-8e16-4059-a431-9baf0a99f0bd",
   goal: "<value>",
 };
 ```
@@ -111,7 +133,7 @@ const value: components.AIExtractCommand = {
 
 ```typescript
 const value: components.AuthLoadCommand = {
-  id: "6296ef84-9e68-4476-a384-58c5ed04715b",
+  id: "5c178b13-69e9-42fd-b8e8-edfe026f42e7",
   storageState: "<value>",
 };
 ```
@@ -120,7 +142,7 @@ const value: components.AuthLoadCommand = {
 
 ```typescript
 const value: components.AuthSaveCommand = {
-  id: "9b35ae84-0b05-48e1-b605-94319baf0a99",
+  id: "2a71b300-0ebe-4a84-9f57-6f25a1974385",
 };
 ```
 
@@ -128,7 +150,7 @@ const value: components.AuthSaveCommand = {
 
 ```typescript
 const value: components.CaptchaCommand = {
-  id: "0bd85c17-8b13-469e-992f-d8e8edfe026f",
+  id: "5f2159a6-f5ba-4dfe-bcb5-21368cf119bd",
 };
 ```
 
@@ -136,7 +158,7 @@ const value: components.CaptchaCommand = {
 
 ```typescript
 const value: components.CookieCommand = {
-  id: "2e7e2a71-b300-40eb-9ea8-4f576f25a197",
+  id: "f662aad1-7932-4d07-a17f-6d1466a5ba66",
   value: "<value>",
 };
 ```
@@ -145,7 +167,7 @@ const value: components.CookieCommand = {
 
 ```typescript
 const value: components.DialogCommand = {
-  id: "38575f21-59a6-4f5b-8adf-ecb521368cf1",
+  id: "1dab8166-50b1-49ba-8f1d-08685308d531",
 };
 ```
 
@@ -153,18 +175,15 @@ const value: components.DialogCommand = {
 
 ```typescript
 const value: components.DragCommand = {
-  id: "9bdef662-aad1-4793-a2d0-717f6d1466a5",
+  id: "31411d28-c723-4685-9cce-0e6ebfc58654",
   fromTarget: {
     percentXYLocation: {
-      percentX: 3991.61,
-      percentY: 4317.60,
+      percentX: 2773.40,
+      percentY: 5243.80,
     },
   },
   toTarget: {
-    percentXYLocation: {
-      percentX: 700.42,
-      percentY: 8224.07,
-    },
+    elementDescriptor: "<value>",
   },
 };
 ```
@@ -173,12 +192,15 @@ const value: components.DragCommand = {
 
 ```typescript
 const value: components.ElementAssertionCommand = {
-  id: "ab816650-b19b-4af1-8d08-685308d53113",
+  id: "20f0291e-bf84-48e8-b4e5-035d775eff6f",
   target: {
-    elementDescriptor: "<value>",
+    percentXYLocation: {
+      percentX: 2448.89,
+      percentY: 2164.57,
+    },
   },
   assertion: {
-    operation: "CONTAINS",
+    operation: "EQUALS",
     value: "<value>",
   },
 };
@@ -188,9 +210,9 @@ const value: components.ElementAssertionCommand = {
 
 ```typescript
 const value: components.FileUploadCommand = {
-  id: "d28c7236-85cc-4e0e-86eb-fc586547a481",
+  id: "477cd26d-d124-4161-a939-1fe63470a66c",
   fileSource: {
-    url: "https://wilted-academics.biz/",
+    url: "https://hairy-technologist.net",
   },
 };
 ```
@@ -199,7 +221,7 @@ const value: components.FileUploadCommand = {
 
 ```typescript
 const value: components.GoBackCommand = {
-  id: "91ebf848-e84e-4503-b5d7-75eff6fca332",
+  id: "594d1326-b870-4613-9e3d-c291bac7e04b",
 };
 ```
 
@@ -207,18 +229,7 @@ const value: components.GoBackCommand = {
 
 ```typescript
 const value: components.GoForwardCommand = {
-  id: "477cd26d-d124-4161-a939-1fe63470a66c",
-};
-```
-
-### `components.HoverCommand`
-
-```typescript
-const value: components.HoverCommand = {
-  id: "f5ec594d-1326-4b87-b061-3e3dc291bac7",
-  target: {
-    elementDescriptor: "<value>",
-  },
+  id: "21d7eb65-8eb0-4beb-8272-5ee459f24d7e",
 };
 ```
 
@@ -226,7 +237,7 @@ const value: components.HoverCommand = {
 
 ```typescript
 const value: components.JavaScriptCommand = {
-  id: "4b621d7e-b658-4eb0-bbeb-2725ee459f24",
+  id: "855765eb-b49c-4c5c-8b2d-777997da66c5",
   code: "<value>",
 };
 ```
@@ -235,7 +246,7 @@ const value: components.JavaScriptCommand = {
 
 ```typescript
 const value: components.LocalStorageCommand = {
-  id: "7e285576-5ebb-449c-9c5c-b2d777997da6",
+  id: "0ee1521e-0f1d-4955-8c5a-87e8db0c3e05",
   key: "<key>",
   value: "<value>",
 };
@@ -245,7 +256,7 @@ const value: components.LocalStorageCommand = {
 
 ```typescript
 const value: components.MouseDragCommand = {
-  id: "c530ee15-21e0-4f1d-b955-c5a87e8db0c3",
+  id: "7d425d23-1b64-4b5b-9d3f-242578de3917",
   deltaX: "<value>",
   deltaY: "<value>",
 };
@@ -255,8 +266,8 @@ const value: components.MouseDragCommand = {
 
 ```typescript
 const value: components.NewTabCommand = {
-  id: "0517d425-d231-4b64-ab5b-d3f242578de3",
-  url: "https://lavish-fedora.biz/",
+  id: "57b1eb2f-8f38-4449-8ecb-8e7dd3c0538b",
+  url: "https://warmhearted-deed.net",
 };
 ```
 
@@ -264,7 +275,7 @@ const value: components.NewTabCommand = {
 
 ```typescript
 const value: components.PageAssertionCommand = {
-  id: "7b1eb2f8-f384-449e-acb8-e7dd3c0538b1",
+  id: "907b0e80-3f91-4470-9673-9c39afcd72f2",
   assertion: {
     value: "<value>",
   },
@@ -275,7 +286,7 @@ const value: components.PageAssertionCommand = {
 
 ```typescript
 const value: components.RefreshCommand = {
-  id: "f3a907b0-e803-4f91-8470-6739c39afcd7",
+  id: "1ffb5442-825a-4b06-9ad7-f4074d34cb8b",
 };
 ```
 
@@ -283,8 +294,8 @@ const value: components.RefreshCommand = {
 
 ```typescript
 const value: components.RequestCommand = {
-  id: "f271ffb5-4428-425a-ab06-ad7f4074d34c",
-  url: "https://same-hello.com",
+  id: "00810fd2-0f42-4b14-bfa8-6c2fd90be851",
+  url: "https://calculating-reward.com",
 };
 ```
 
@@ -292,7 +303,7 @@ const value: components.RequestCommand = {
 
 ```typescript
 const value: components.ScrollLeftCommand = {
-  id: "0810fd20-f42b-414f-ba86-c2fd90be851c",
+  id: "f984e4df-c817-4736-a527-480ed8df1aff",
 };
 ```
 
@@ -300,7 +311,7 @@ const value: components.ScrollLeftCommand = {
 
 ```typescript
 const value: components.ScrollRightCommand = {
-  id: "1c0f984e-4dfc-4817-a736-527480ed8df1",
+  id: "2903f5a4-fb5c-4163-8a16-485b0a34cf5d",
 };
 ```
 
@@ -308,8 +319,8 @@ const value: components.ScrollRightCommand = {
 
 ```typescript
 const value: components.TabCommand = {
-  id: "ff92903f-5a4f-4b5c-b163-a16485b0a34c",
-  url: "https://supportive-brook.name/",
+  id: "ac26e109-6ce4-4679-bfb6-4f2bea635bae",
+  url: "https://unwelcome-dulcimer.info",
 };
 ```
 
@@ -317,16 +328,7 @@ const value: components.TabCommand = {
 
 ```typescript
 const value: components.VisualDiffCommand = {
-  id: "c26e1096-ce46-479f-bb64-f2bea635baed",
-};
-```
-
-### `components.WaitCommand`
-
-```typescript
-const value: components.WaitCommand = {
-  id: "e4568a40-64fe-4da5-b8d1-c0dc0a822c9f",
-  delay: 9926.67,
+  id: "68a4064f-eda5-48d1-bc0d-c0a822c9fff1",
 };
 ```
 
@@ -334,12 +336,9 @@ const value: components.WaitCommand = {
 
 ```typescript
 const value: components.FocusCommand = {
-  id: "1f37c392-1150-46a6-b114-2f2c998f5c86",
+  id: "37c39211-506a-4611-842f-2c998f5c86f9",
   target: {
-    percentXYLocation: {
-      percentX: 1189.17,
-      percentY: 4175.39,
-    },
+    elementDescriptor: "<value>",
   },
 };
 ```

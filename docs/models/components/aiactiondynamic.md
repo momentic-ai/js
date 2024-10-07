@@ -1,18 +1,13 @@
-# PresetAction
+# AIActionDynamic
 
 ## Example Usage
 
 ```typescript
-import { PresetAction } from "@momentic/js/models/components";
+import { AIActionDynamic } from "@momentic/js/models/components";
 
-let value: PresetAction = {
+let value: AIActionDynamic = {
   id: "<id>",
-  command: {
-    id: "f39993f7-db4d-46e9-9ebb-8fa6904a4962",
-    assertion: {
-      value: "<value>",
-    },
-  },
+  text: "<value>",
 };
 ```
 
@@ -25,4 +20,4 @@ let value: PresetAction = {
 | `skipped`                                                 | *boolean*                                                 | :heavy_minus_sign:                                        | N/A                                                       |
 | `envKey`                                                  | *string*                                                  | :heavy_minus_sign:                                        | key in the environment to save the result of this step to |
 | `type`                                                    | *string*                                                  | :heavy_check_mark:                                        | N/A                                                       |
-| `command`                                                 | *components.Command*                                      | :heavy_check_mark:                                        | N/A                                                       |
+| `text`                                                    | *string*                                                  | :heavy_check_mark:                                        | N/A                                                       |

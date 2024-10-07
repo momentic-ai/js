@@ -1,14 +1,12 @@
-# UrlSource
-
-Accessible link to the file, either public http or local file://
+# One
 
 ## Example Usage
 
 ```typescript
-import { UrlSource } from "@momentic/js/models/components";
+import { One } from "@momentic/js/models/components";
 
-let value: UrlSource = {
-  url: "https://delicious-flame.name/",
+let value: One = {
+  value: "<value>",
 };
 ```
 
@@ -17,4 +15,4 @@ let value: UrlSource = {
 | Field              | Type               | Required           | Description        |
 | ------------------ | ------------------ | ------------------ | ------------------ |
 | `type`             | *string*           | :heavy_check_mark: | N/A                |
-| `url`              | *string*           | :heavy_check_mark: | N/A                |
+| `value`            | *string*           | :heavy_check_mark: | N/A                |

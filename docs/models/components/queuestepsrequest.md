@@ -11,6 +11,7 @@ let value: QueueStepsRequest = {
   advanced: {},
   steps: [
     {
+      id: "<id>",
       text: "<value>",
     },
   ],
@@ -26,3 +27,4 @@ let value: QueueStepsRequest = {
 | `advanced`                                                 | [components.Advanced](../../models/components/advanced.md) | :heavy_check_mark:                                         | N/A                                                        |
 | `environment`                                              | Record<string, *any*>                                      | :heavy_minus_sign:                                         | N/A                                                        |
 | `steps`                                                    | *components.Steps*[]                                       | :heavy_check_mark:                                         | N/A                                                        |
+| `schemaVersion`                                            | *string*                                                   | :heavy_minus_sign:                                         | N/A                                                        |

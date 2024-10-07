@@ -5,11 +5,11 @@
 ```typescript
 import { Reason } from "@momentic/js/models/components";
 
-let value: Reason = "JobTimeoutError";
+let value: Reason = "InternalWebAgentError";
 ```
 
 ## Values
 
 ```typescript
-"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "UnknownError"
+"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "InternalPlatformError" | "UnknownError"
 ```

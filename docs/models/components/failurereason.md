@@ -5,11 +5,11 @@
 ```typescript
 import { FailureReason } from "@momentic/js/models/components";
 
-let value: FailureReason = "UserConfigurationError";
+let value: FailureReason = "JobTimeoutError";
 ```
 
 ## Values
 
 ```typescript
-"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "UnknownError"
+"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "InternalPlatformError" | "UnknownError"
 ```

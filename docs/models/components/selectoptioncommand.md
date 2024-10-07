@@ -6,14 +6,10 @@
 import { SelectOptionCommand } from "@momentic/js/models/components";
 
 let value: SelectOptionCommand = {
-  id: "f61647a7-eeb7-426b-941e-b9cd7ee4988f",
+  id: "1647a7ee-b726-4b41-beb9-cd7ee4988f4f",
   target: {
-    percentXYLocation: {
-      percentX: 9021.31,
-      percentY: 4587.23,
-    },
+    elementDescriptor: "<value>",
   },
-  option: "<value>",
 };
 ```
 
@@ -30,5 +26,6 @@ let value: SelectOptionCommand = {
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |
 | `type`                                                                       | *string*                                                                     | :heavy_check_mark:                                                           | N/A                                                                          |
 | `target`                                                                     | *components.ElementTarget*                                                   | :heavy_check_mark:                                                           | N/A                                                                          |
-| `option`                                                                     | *string*                                                                     | :heavy_check_mark:                                                           | N/A                                                                          |
 | `cache`                                                                      | [components.SingleTargetCache](../../models/components/singletargetcache.md) | :heavy_minus_sign:                                                           | N/A                                                                          |
+| `option`                                                                     | *string*                                                                     | :heavy_minus_sign:                                                           | option value, deprecated old field                                           |
+| `choice`                                                                     | *components.Choice*                                                          | :heavy_minus_sign:                                                           | new field for selecting options, optional for backcompat                     |

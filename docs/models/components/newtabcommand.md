@@ -6,8 +6,8 @@
 import { NewTabCommand } from "@momentic/js/models/components";
 
 let value: NewTabCommand = {
-  id: "8bf6e009-4345-4b9c-bdd6-6ea185f09b4f",
-  url: "https://agreeable-metal.biz",
+  id: "de094da8-18af-49ff-aa87-e011c5a968af",
+  url: "https://bitter-valentine.name",
 };
 ```
 

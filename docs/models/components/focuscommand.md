@@ -6,9 +6,12 @@
 import { FocusCommand } from "@momentic/js/models/components";
 
 let value: FocusCommand = {
-  id: "d2cb8919-6d59-46e4-a1b6-90fe906fa27f",
+  id: "7ad2cb89-196d-4596-9e41-b690fe906fa2",
   target: {
-    elementDescriptor: "<value>",
+    percentXYLocation: {
+      percentX: 5347.08,
+      percentY: 246.15,
+    },
   },
 };
 ```

@@ -6,7 +6,7 @@
 import { AIWaitCommand } from "@momentic/js/models/components";
 
 let value: AIWaitCommand = {
-  id: "8abefadc-4e00-447a-81ac-2687cfc1c132",
+  id: "c8f2e12b-196b-4ecd-8048-634f450d234e",
   assertion: "<value>",
 };
 ```
