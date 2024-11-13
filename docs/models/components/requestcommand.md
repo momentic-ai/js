@@ -6,8 +6,8 @@
 import { RequestCommand } from "@momentic/js/models/components";
 
 let value: RequestCommand = {
-  id: "77de7ac8-4a9e-40e8-b05b-7f65d8aca619",
-  url: "https://unusual-knuckle.name/",
+  id: "4f5e2c07-0cf0-4ec5-ae46-1a07ad2cb891",
+  url: "https://trim-extent.name/",
 };
 ```
 

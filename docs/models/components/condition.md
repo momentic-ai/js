@@ -5,7 +5,7 @@
 ```typescript
 import { Condition } from "@momentic/js/models/components";
 
-let value: Condition = "EXISTS";
+let value: Condition = "VISIBLE";
 ```
 
 ## Values

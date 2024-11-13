@@ -14,15 +14,15 @@ let value: GetRunResponse = {
   scheduledAt: "<value>",
   startedAt: "<value>",
   finishedAt: "<value>",
-  status: "RETRYING",
-  trigger: "CLI",
-  attempts: 8700.12,
+  status: "PENDING",
+  trigger: "CRON",
+  attempts: 1187.28,
   testId: "<id>",
   results: [
     {
       startedAt: "<value>",
       finishedAt: "<value>",
-      status: "CANCELLED",
+      status: "FAILED",
       results: [
         {
           "key": "<value>",

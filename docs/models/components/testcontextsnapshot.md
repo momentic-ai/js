@@ -17,5 +17,3 @@ let value: TestContextSnapshot = {
 | Field                 | Type                  | Required              | Description           |
 | --------------------- | --------------------- | --------------------- | --------------------- |
 | `env`                 | Record<string, *any*> | :heavy_check_mark:    | N/A                   |
-| `results`             | *any*[]               | :heavy_minus_sign:    | N/A                   |
-| `inputs`              | Record<string, *any*> | :heavy_minus_sign:    | N/A                   |

@@ -6,7 +6,7 @@
 import { MouseDragCommand } from "@momentic/js/models/components";
 
 let value: MouseDragCommand = {
-  id: "d8bf6e00-9434-45b9-bcdd-66ea185f09b4",
+  id: "5b7f65d8-aca6-419e-b6e8-9d91f3b873b1",
   deltaX: "<value>",
   deltaY: "<value>",
 };
@@ -19,7 +19,6 @@ let value: MouseDragCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

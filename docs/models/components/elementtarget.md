@@ -15,9 +15,9 @@ const value: components.DescriptionTarget = {
 
 ```typescript
 const value: components.CoordinatesTarget = {
-  percentXYLocation: {
-    percentX: 7672.10,
-    percentY: 2871.53,
+  pixels: {
+    x: 4939.45,
+    y: 9296.19,
   },
 };
 ```

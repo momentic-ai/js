@@ -6,7 +6,7 @@
 import { CaptchaCommand } from "@momentic/js/models/components";
 
 let value: CaptchaCommand = {
-  id: "ffd9709f-d52c-4bfd-8817-584dd596e2bf",
+  id: "cf432fc2-8622-4f4f-9172-081bb2fb4bb5",
 };
 ```
 
@@ -17,7 +17,6 @@ let value: CaptchaCommand = {
 | `thoughts`                                          | *string*                                            | :heavy_minus_sign:                                  | N/A                                                 |
 | `id`                                                | *string*                                            | :heavy_check_mark:                                  | unique identifier to this step, used for step cache |
 | `useSelector`                                       | *boolean*                                           | :heavy_minus_sign:                                  | N/A                                                 |
-| `useXY`                                             | *boolean*                                           | :heavy_minus_sign:                                  | N/A                                                 |
 | `force`                                             | *boolean*                                           | :heavy_minus_sign:                                  | N/A                                                 |
 | `disableCache`                                      | *boolean*                                           | :heavy_minus_sign:                                  | disable element caching for this step               |
 | `iframeUrl`                                         | *string*                                            | :heavy_minus_sign:                                  | url or url regex for the iframe                     |

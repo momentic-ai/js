@@ -6,11 +6,11 @@
 import { HoverCommand } from "@momentic/js/models/components";
 
 let value: HoverCommand = {
-  id: "d531b7be-2e64-4ff3-9a1a-da6669ee0213",
+  id: "17dd19d3-cec1-4034-b96b-525ef3c4e2a1",
   target: {
-    percentXYLocation: {
-      percentX: 6294.61,
-      percentY: 7321.42,
+    pixels: {
+      x: 8418.16,
+      y: 5666.69,
     },
   },
 };
@@ -23,7 +23,6 @@ let value: HoverCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

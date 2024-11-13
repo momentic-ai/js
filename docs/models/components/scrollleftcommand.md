@@ -6,7 +6,7 @@
 import { ScrollLeftCommand } from "@momentic/js/models/components";
 
 let value: ScrollLeftCommand = {
-  id: "d91f3b87-3b1f-4d86-848e-48353f9b15e1",
+  id: "b0c6a7bb-3ad3-4caf-9424-4cba3df8a844",
 };
 ```
 
@@ -17,7 +17,6 @@ let value: ScrollLeftCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

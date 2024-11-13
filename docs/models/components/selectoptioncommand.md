@@ -6,9 +6,12 @@
 import { SelectOptionCommand } from "@momentic/js/models/components";
 
 let value: SelectOptionCommand = {
-  id: "1647a7ee-b726-4b41-beb9-cd7ee4988f4f",
+  id: "5004bacc-dbfe-4990-bf2b-d531b7be2e64",
   target: {
-    elementDescriptor: "<value>",
+    pixels: {
+      x: 1988.92,
+      y: 6568.38,
+    },
   },
 };
 ```
@@ -20,7 +23,6 @@ let value: SelectOptionCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

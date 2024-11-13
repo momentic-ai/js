@@ -9,7 +9,7 @@
 const value: components.PresetAction = {
   id: "<id>",
   command: {
-    id: "f7f9b041-4156-41b9-a481-9e5a2b4290d0",
+    id: "5eb02993-e989-4b46-a32f-b734064b6201",
     target: {
       elementDescriptor: "<value>",
     },

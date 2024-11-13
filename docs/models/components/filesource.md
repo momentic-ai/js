@@ -7,7 +7,7 @@
 
 ```typescript
 const value: components.UrlSource = {
-  url: "https://friendly-produce.net",
+  url: "https://granular-wombat.name/",
 };
 ```
 

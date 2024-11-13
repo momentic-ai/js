@@ -6,7 +6,7 @@
 import { DialogCommand } from "@momentic/js/models/components";
 
 let value: DialogCommand = {
-  id: "680293d5-11e1-42d4-aad9-fb18bc0bdb87",
+  id: "7e0259d5-40d6-49f0-b2cc-c8f6916b3fa4",
 };
 ```
 

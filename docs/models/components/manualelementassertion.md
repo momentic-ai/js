@@ -7,7 +7,7 @@
 
 ```typescript
 const value: components.ElementContentAssertion = {
-  operation: "STARTS_WITH",
+  operation: "EQUALS",
   value: "<value>",
 };
 ```
@@ -16,7 +16,7 @@ const value: components.ElementContentAssertion = {
 
 ```typescript
 const value: components.ElementAttributeValueAssertion = {
-  operation: "CONTAINS",
+  operation: "EQUALS",
   attr: "<value>",
   value: "<value>",
 };

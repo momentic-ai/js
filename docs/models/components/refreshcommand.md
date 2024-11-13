@@ -6,7 +6,7 @@
 import { RefreshCommand } from "@momentic/js/models/components";
 
 let value: RefreshCommand = {
-  id: "5cf6afba-15e3-4db5-a88b-82c6f4459e24",
+  id: "7cdc4723-6b8e-4d09-99f0-8309cc060333",
 };
 ```
 

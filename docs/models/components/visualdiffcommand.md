@@ -6,7 +6,7 @@
 import { VisualDiffCommand } from "@momentic/js/models/components";
 
 let value: VisualDiffCommand = {
-  id: "9cc06033-354f-45e2-8c07-0cf0ec5e461a",
+  id: "566181e0-742c-4b2a-9cc1-abd87fc85d71",
 };
 ```
 
@@ -17,7 +17,6 @@ let value: VisualDiffCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

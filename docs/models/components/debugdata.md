@@ -9,10 +9,10 @@ let value: DebugData = {
   logsPerPage: [
     [
       {
-        timestamp: 7991.59,
+        timestamp: 8289.40,
         text: "<value>",
         type: "<value>",
-        tabIndex: 4614.79,
+        tabIndex: 46.95,
       },
     ],
   ],
@@ -21,6 +21,7 @@ let value: DebugData = {
 
 ## Fields
 
-| Field                                                              | Type                                                               | Required                                                           | Description                                                        |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------ |
-| `logsPerPage`                                                      | [components.ConsoleLog](../../models/components/consolelog.md)[][] | :heavy_check_mark:                                                 | N/A                                                                |
+| Field                                                                                                  | Type                                                                                                   | Required                                                                                               | Description                                                                                            |
+| ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| `logsPerPage`                                                                                          | [components.ConsoleLog](../../models/components/consolelog.md)[][]                                     | :heavy_check_mark:                                                                                     | N/A                                                                                                    |
+| `networkEntriesPerPage`                                                                                | Record<string, [components.NetworkEntriesPerPage](../../models/components/networkentriesperpage.md)>[] | :heavy_minus_sign:                                                                                     | N/A                                                                                                    |

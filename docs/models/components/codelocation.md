@@ -6,9 +6,9 @@
 import { CodeLocation } from "@momentic/js/models/components";
 
 let value: CodeLocation = {
-  url: "https://corrupt-unblinking.name",
-  lineNumber: 4146.62,
-  columnNumber: 2645.56,
+  url: "https://white-digestive.name",
+  lineNumber: 5920.42,
+  columnNumber: 5722.52,
 };
 ```
 

@@ -6,10 +6,10 @@
 import { ConsoleLog } from "@momentic/js/models/components";
 
 let value: ConsoleLog = {
-  timestamp: 7805.29,
+  timestamp: 6778.17,
   text: "<value>",
   type: "<value>",
-  tabIndex: 1182.74,
+  tabIndex: 2700.08,
 };
 ```
 

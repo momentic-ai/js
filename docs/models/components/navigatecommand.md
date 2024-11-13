@@ -6,8 +6,8 @@
 import { NavigateCommand } from "@momentic/js/models/components";
 
 let value: NavigateCommand = {
-  id: "dca53ad0-a7e5-4782-bbd0-40faf8c556a5",
-  url: "https://amused-corporation.com",
+  id: "1ada6669-ee02-4135-88ab-efadc4e0047a",
+  url: "https://stiff-convection.info",
 };
 ```
 

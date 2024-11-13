@@ -6,12 +6,12 @@
 import { ElementAssertionCommand } from "@momentic/js/models/components";
 
 let value: ElementAssertionCommand = {
-  id: "a09f2b92-008f-4ab7-b92e-cf432fc28622",
+  id: "d9bbf4b5-635f-4439-847d-3698fabf6502",
   target: {
     elementDescriptor: "<value>",
   },
   assertion: {
-    condition: "EXISTS",
+    condition: "ENABLED",
   },
 };
 ```
@@ -23,7 +23,6 @@ let value: ElementAssertionCommand = {
 | `thoughts`                                                                   | *string*                                                                     | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `id`                                                                         | *string*                                                                     | :heavy_check_mark:                                                           | unique identifier to this step, used for step cache                          |
 | `useSelector`                                                                | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
-| `useXY`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `force`                                                                      | *boolean*                                                                    | :heavy_minus_sign:                                                           | N/A                                                                          |
 | `disableCache`                                                               | *boolean*                                                                    | :heavy_minus_sign:                                                           | disable element caching for this step                                        |
 | `iframeUrl`                                                                  | *string*                                                                     | :heavy_minus_sign:                                                           | url or url regex for the iframe                                              |

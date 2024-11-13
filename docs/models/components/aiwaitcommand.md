@@ -6,7 +6,7 @@
 import { AIWaitCommand } from "@momentic/js/models/components";
 
 let value: AIWaitCommand = {
-  id: "c8f2e12b-196b-4ecd-8048-634f450d234e",
+  id: "4dd596e2-bf23-4bc7-9937-1547e269f2e1",
   assertion: "<value>",
 };
 ```
@@ -21,4 +21,5 @@ let value: AIWaitCommand = {
 | `assertion`                                         | *string*                                            | :heavy_check_mark:                                  | N/A                                                 |
 | `disableCache`                                      | *boolean*                                           | :heavy_minus_sign:                                  | N/A                                                 |
 | `iframeUrl`                                         | *string*                                            | :heavy_minus_sign:                                  | N/A                                                 |
+| `contextChoice`                                     | *string*                                            | :heavy_minus_sign:                                  | N/A                                                 |
 | `timeout`                                           | *number*                                            | :heavy_minus_sign:                                  | Max seconds to wait for assertion to be true        |

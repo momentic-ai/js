@@ -6,7 +6,7 @@
 import { GoBackCommand } from "@momentic/js/models/components";
 
 let value: GoBackCommand = {
-  id: "d540d69f-02cc-4c8f-b691-6b3fa4c1f0e4",
+  id: "ea185f09-b4fd-4e09-84da-818af9ffa87e",
 };
 ```
 

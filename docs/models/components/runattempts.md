@@ -7,7 +7,7 @@ import { RunAttempts } from "@momentic/js/models/components";
 
 let value: RunAttempts = {
   id: "<id>",
-  status: "RETRYING",
+  status: "PASSED",
   startedAt: "<value>",
   finishedAt: "<value>",
 };

@@ -25,7 +25,7 @@ const value: components.Two = {
 
 ```typescript
 const value: components.Three = {
-  index: 396610,
+  index: 317632,
 };
 ```
 

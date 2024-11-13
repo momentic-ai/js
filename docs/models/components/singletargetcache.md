@@ -7,7 +7,7 @@ import { SingleTargetCache } from "@momentic/js/models/components";
 
 let value: SingleTargetCache = {
   target: {
-    id: 78246,
+    id: 42364,
   },
 };
 ```

@@ -6,7 +6,7 @@
 import { TestResultClassification } from "@momentic/js/models/components";
 
 let value: TestResultClassification = {
-  reason: "UserConfigurationError",
+  reason: "JobTimeoutError",
   summary: "<value>",
 };
 ```

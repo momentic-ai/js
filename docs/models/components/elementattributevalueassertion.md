@@ -6,7 +6,7 @@
 import { ElementAttributeValueAssertion } from "@momentic/js/models/components";
 
 let value: ElementAttributeValueAssertion = {
-  operation: "EQUALS",
+  operation: "CONTAINS",
   attr: "<value>",
   value: "<value>",
 };

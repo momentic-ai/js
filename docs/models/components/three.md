@@ -6,7 +6,7 @@
 import { Three } from "@momentic/js/models/components";
 
 let value: Three = {
-  index: 944203,
+  index: 722392,
 };
 ```
 

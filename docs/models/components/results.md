@@ -8,7 +8,7 @@ import { Results } from "@momentic/js/models/components";
 let value: Results = {
   startedAt: "<value>",
   finishedAt: "<value>",
-  status: "SUCCESS",
+  status: "FAILED",
   results: [
     {
       "key": "<value>",

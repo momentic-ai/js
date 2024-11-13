@@ -8,9 +8,9 @@ import { PresetAction } from "@momentic/js/models/components";
 let value: PresetAction = {
   id: "<id>",
   command: {
-    id: "f39993f7-db4d-46e9-9ebb-8fa6904a4962",
-    assertion: {
-      value: "<value>",
+    id: "ef3a40c5-69da-4d4c-a2fa-3fb438036574",
+    fileSource: {
+      url: "https://clear-cut-league.com",
     },
   },
 };

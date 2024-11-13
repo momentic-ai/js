@@ -5,7 +5,7 @@
 ```typescript
 import { GetRunResponseStatus } from "@momentic/js/models/components";
 
-let value: GetRunResponseStatus = "WAITING_FOR_USER";
+let value: GetRunResponseStatus = "CANCELLED";
 ```
 
 ## Values
