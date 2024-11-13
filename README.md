@@ -39,25 +39,25 @@ The SDK can be installed with either [npm](https://www.npmjs.com/), [pnpm](https
 ### NPM
 
 ```bash
-npm add @momentic/js
+npm add <UNSET>
 ```
 
 ### PNPM
 
 ```bash
-pnpm add @momentic/js
+pnpm add <UNSET>
 ```
 
 ### Bun
 
 ```bash
-bun add @momentic/js
+bun add <UNSET>
 ```
 
 ### Yarn
 
 ```bash
-yarn add @momentic/js zod
+yarn add <UNSET> zod
 
 # Note that Yarn does not install peer dependencies automatically. You will need
 # to install zod as shown above.
@@ -131,10 +131,9 @@ To read more about standalone functions, check [FUNCTIONS.md](./FUNCTIONS.md).
 
 <summary>Available standalone functions</summary>
 
-- [runsGetStatuses](docs/sdks/runs/README.md#getstatuses)
-- [runsGet](docs/sdks/runs/README.md#get)
-- [stepsQueue](docs/sdks/steps/README.md#queue)
-
+- [`runsGet`](docs/sdks/runs/README.md#get) - Get run statuses
+- [`runsGetStatuses`](docs/sdks/runs/README.md#getstatuses) - Get run statuses
+- [`stepsQueue`](docs/sdks/steps/README.md#queue) - Queue steps run
 
 </details>
 <!-- End Standalone functions [standalone-funcs] -->
@@ -221,9 +220,9 @@ If a HTTP request fails, an operation my also throw an error from the `models/er
 
 In addition, when custom error responses are specified for an operation, the SDK may throw their associated Error type. You can refer to respective *Errors* tables in SDK docs for more details on possible error types for each operation. For example, the `getStatuses` method may throw the following errors:
 
-| Error Type      | Status Code     | Content Type    |
-| --------------- | --------------- | --------------- |
-| errors.SDKError | 4XX, 5XX        | \*/\*           |
+| Error Type      | Status Code | Content Type |
+| --------------- | ----------- | ------------ |
+| errors.SDKError | 4XX, 5XX    | \*/\*        |
 
 ```typescript
 import { Momentic } from "@momentic/js";
@@ -268,12 +267,14 @@ Validation errors can also occur when either method arguments or data returned f
 
 ### Select Server by Index
 
-You can override the default server globally by passing a server index to the `serverIdx` optional parameter when initializing the SDK client instance. The selected server will then be used as the default on the operations that use it. This table lists the indexes associated with the available servers:
+You can override the default server globally by passing a server index to the `serverIdx: number` optional parameter when initializing the SDK client instance. The selected server will then be used as the default on the operations that use it. This table lists the indexes associated with the available servers:
 
-| # | Server | Variables |
-| - | ------ | --------- |
-| 0 | `https://api.momentic.ai` | None |
-| 1 | `https://api.staging.momentic.ai` | None |
+| #   | Server                            |
+| --- | --------------------------------- |
+| 0   | `https://api.momentic.ai`         |
+| 1   | `https://api.staging.momentic.ai` |
+
+#### Example
 
 ```typescript
 import { Momentic } from "@momentic/js";
@@ -294,11 +295,9 @@ run();
 
 ```
 
-
 ### Override Server URL Per-Client
 
-The default server can also be overridden globally by passing a URL to the `serverURL` optional parameter when initializing the SDK client instance. For example:
-
+The default server can also be overridden globally by passing a URL to the `serverURL: string` optional parameter when initializing the SDK client instance. For example:
 ```typescript
 import { Momentic } from "@momentic/js";
 
@@ -375,9 +374,9 @@ const sdk = new Momentic({ httpClient });
 
 This SDK supports the following security scheme globally:
 
-| Name                 | Type                 | Scheme               | Environment Variable |
-| -------------------- | -------------------- | -------------------- | -------------------- |
-| `apiKey`             | http                 | HTTP Bearer          | `MOMENTIC_API_KEY`   |
+| Name     | Type | Scheme      | Environment Variable |
+| -------- | ---- | ----------- | -------------------- |
+| `apiKey` | http | HTTP Bearer | `MOMENTIC_API_KEY`   |
 
 To authenticate with the API the `apiKey` parameter must be set when initializing the SDK client instance. For example:
 ```typescript
