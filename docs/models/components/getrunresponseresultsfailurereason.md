@@ -11,5 +11,5 @@ let value: GetRunResponseResultsFailureReason = "AIProviderError";
 ## Values
 
 ```typescript
-"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "InternalPlatformError" | "UnknownError"
+"AIProviderError" | "UserInfrastructureError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "InternalWebAgentError" | "InternalPlatformError" | "JobTimeoutError" | "UnknownError"
 ```

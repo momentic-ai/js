@@ -5,11 +5,11 @@
 ```typescript
 import { GetRunResponseFailureReason } from "@momentic/js/models/components";
 
-let value: GetRunResponseFailureReason = "UserConfigurationError";
+let value: GetRunResponseFailureReason = "AssertionFailureError";
 ```
 
 ## Values
 
 ```typescript
-"AIProviderError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "JobTimeoutError" | "InternalWebAgentError" | "InternalPlatformError" | "UnknownError"
+"AIProviderError" | "UserInfrastructureError" | "ActionFailureError" | "AssertionFailureError" | "UserConfigurationError" | "InternalWebAgentError" | "InternalPlatformError" | "JobTimeoutError" | "UnknownError"
 ```
